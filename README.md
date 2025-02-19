@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EduSync
 
-## Getting Started
+> EduSync es una aplicación para mantener sincronizados todos los aspectos de una escuela.
+> EduSync es una plataforma integral para la administración escolar que incluya funcionalidades para alumnos, maestros, directivos y padres, optimizando la gestión académica, financiera y organizativa de una escuela.
 
-First, run the development server:
+## Components Basic Structure
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+> Editing for the future.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Contribution [Commit Messages Prefix and Rules]
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> We have an standar to make a simple commit, and it depends on the taks that you're solving.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+![Git three](https://user-images.githubusercontent.com/31743982/167278056-1911dedc-d4b6-4110-b6c2-01dcb2c53133.png)
 
-## Learn More
+- **_[config]:_** When you have an addition of new dependencies (like react-native-pdf) in the package.json or you have been added a configuration to the project, we need to specify the **_config prefix._**
+- **_[fix]:_** When you have an error or bug in the app and the commit solves the error, we need to specify the **_fix prefix._**
+- **_[feat]:_** When you have a new module, or new characteristic to the project, we need to specify the **_feat prefix._**
+- **_[refactor]:_** When you have a new change in the way that the code is running or changes in components (example. You moved parts of component to a new one)
 
-To learn more about Next.js, take a look at the following resources:
+> This helps with the organization of all the changes inside the application and saves a lot of time when we need to rollback the app in some point of the time.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+![Git Messages](https://user-images.githubusercontent.com/31743982/167278327-effad862-257a-4bc5-92fe-7e15e4848b5f.png)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Source: ![Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.2/)
