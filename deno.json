@@ -1,15 +1,6 @@
 {
     "lint": {
-        "rules": {
-            "exclude": ["src/services/config/supabaseClient.ts"],
-            "include": [],
-            "tags": ["recommended"],
-            "rules": {
-                "ban-ts-comment": false,
-                "no-explicit-any": false,
-                "no-window": false,
-                "no-node-globals": false
-            }
-        }
+        "exclude": ["src/services/config/"],
+        "tags": ["recommended"]
     }
 }
