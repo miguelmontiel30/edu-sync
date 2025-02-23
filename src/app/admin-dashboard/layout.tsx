@@ -1,17 +1,34 @@
-import AdminSidebar from "@/components/navigation/AdminSidebar";
-import AdminNavbar from "@/components/navigation/AdminNavbar";
+'use client';
+// Context
+import {useSidebar} from '@/context/SidebarContext';
 
-export default function AdminLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+// Components
+import AdminSidebar from '@/components/navigation/AdminSidebar';
+import AdminNavbar from '@/components/navigation/AdminNavbar';
+
+export default function AdminLayout({children}: {children: React.ReactNode}) {
+    // Sidebar state
+    const {isExpanded, isHovered, isMobileOpen} = useSidebar();
+
+    // Dynamic class for main content margin based on sidebar state
+    const mainContentMargin = isMobileOpen
+        ? 'ml-0'
+        : isExpanded || isHovered
+          ? 'lg:ml-[290px]'
+          : 'lg:ml-[90px]';
+
     return (
-        <div className="flex h-screen">
+        <div className="min-h-screen xl:flex">
+            {/* Sidebar content */}
             <AdminSidebar />
-            <div className="flex-1 flex flex-col">
+
+            {/* Contenido principal */}
+            <div className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}>
+                {/* Navbar */}
                 <AdminNavbar />
-                <main className="p-6">{children}</main>
+
+                {/* Main content */}
+                <div className="mx-auto max-w-screen-2xl p-4 md:p-6">{children}</div>
             </div>
         </div>
     );
