@@ -1,0 +1,15 @@
+{
+    "lint": {
+        "rules": {
+            "exclude": [],
+            "include": [],
+            "tags": ["recommended"],
+            "rules": {
+                "ban-ts-comment": false,
+                "no-explicit-any": false,
+                "no-window": false,
+                "no-node-globals": false
+            }
+        }
+    }
+}
