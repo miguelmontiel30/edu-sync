@@ -1,6 +1,8 @@
 {
     "lint": {
         "exclude": ["src/services/config/"],
-        "tags": ["recommended"]
+        "rules": {
+            "include": ["recommended"]
+        }
     }
 }
