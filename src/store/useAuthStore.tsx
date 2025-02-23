@@ -5,6 +5,7 @@ import {create} from 'zustand';
 import {login, logout, getUser} from '@/services/auth/auth.service';
 
 interface AuthState {
+    // deno-lint-ignore no-explicit-any
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     user: any;
     isAuthenticated: boolean;
