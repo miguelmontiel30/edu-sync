@@ -1,8 +1,9 @@
 {
     "lint": {
-        "exclude": ["src/services/config/"],
+        "exclude": [],
         "rules": {
-            "include": ["recommended"]
+            "include": ["recommended"],
+            "exclude": ["no-explicit-any", "no-window-prefix"]
         }
     }
 }
