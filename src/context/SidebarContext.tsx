@@ -34,7 +34,7 @@ export const SidebarProvider: React.FC<{children: React.ReactNode}> = ({children
 
     useEffect(() => {
         const handleResize = () => {
-            // deno-lint-ignore no-window-prefix
+            // deno-lint-ignore no-window
             const mobile = window.innerWidth < 768;
             setIsMobile(mobile);
             if (!mobile) {
@@ -43,11 +43,11 @@ export const SidebarProvider: React.FC<{children: React.ReactNode}> = ({children
         };
 
         handleResize();
-        // deno-lint-ignore no-window-prefix
+        // deno-lint-ignore no-window
         window.addEventListener('resize', handleResize);
 
         return () => {
-            // deno-lint-ignore no-window-prefix
+            // deno-lint-ignore no-window
             window.removeEventListener('resize', handleResize);
         };
     }, []);
