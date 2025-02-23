@@ -30,7 +30,7 @@ const AdminNavbar: React.FC = () => {
     }, []);
 
     const handleToggle = () => {
-        // deno-lint-ignore no-window
+        // deno-lint-ignore no-window-prefix
         if (window.innerWidth >= 991) {
             toggleSidebar();
         } else {
