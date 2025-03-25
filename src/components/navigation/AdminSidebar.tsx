@@ -6,16 +6,7 @@ import {usePathname} from 'next/navigation';
 import {useSidebar} from '@/context/SidebarContext';
 
 // Icons
-import {
-    Grid as GridIcon,
-    Calendar as CalenderIcon,
-    ChevronDown as ChevronDownIcon,
-    MoreHorizontal as HorizontaLDots,
-    PieChart as PieChartIcon,
-    User as UserCircleIcon,
-    Users,
-    User,
-} from 'lucide-react';
+import {ChevronDownIcon, HorizontaLDots} from '@/icons';
 
 type NavItem = {
     name: string;
@@ -26,42 +17,60 @@ type NavItem = {
 
 const navItems: NavItem[] = [
     {
-        icon: <GridIcon size={20} />,
+        icon: <i className="fa-duotone fa-solid fa-school-flag fa-xl"></i>,
         name: 'Inicio',
-        path: '/',
+        path: '/admin-dashboard/dashboard',
     },
     {
-        name: 'Alumnos y grupos',
-        icon: <User size={20} />,
+        name: 'Alumnos',
+        icon: <i className="fa-duotone fa-solid fa-user-graduate fa-xl"></i>,
+        subItems: [{name: 'Ver alumnos', path: '/admin-dashboard/students', pro: false}],
+    },
+    {
+        name: 'Grupos',
+        icon: <i className="fa-duotone fa-solid fa-people-group fa-xl"></i>,
         subItems: [
-            {name: 'Registro y gestión de alumnos', path: '/admin-dashboard/students', pro: false},
-            {name: 'Administración de grupos y materias', path: '/form-elements', pro: false},
-            {name: 'Reportes de asistencia y calificaciones', path: '/form-elements', pro: false},
+            {name: 'Mis grupos', path: '/admin-dashboard/groups', pro: false},
+            {name: 'Administración de grupos y materias', path: '/', pro: false},
+            {name: 'Gestión de grupos', path: '/', pro: false},
         ],
     },
     {
         name: 'Maestros',
-        icon: <Users size={20} />,
+        icon: <i className="fa-duotone fa-solid fa-person-chalkboard fa-xl"></i>,
         path: '/profile',
     },
     {
-        icon: <CalenderIcon size={20} />,
-        name: 'Calendario',
-        path: '/calendar',
+        name: 'Materias',
+        icon: <i className="fa-duotone fa-solid fa-books fa-xl"></i>,
+        subItems: [
+            {name: 'Mis materias', path: '/admin-dashboard/subjects', pro: false},
+            {name: 'Gestión de materias', path: '/admin-dashboard/admin-subjects', pro: false},
+        ],
+    },
+    {
+        icon: <i className="fa-duotone fa-solid fa-calendar-clock fa-xl"></i>,
+        name: 'Ciclo escolar',
+        path: '/admin-dashboard/school-year',
     },
 ];
 
 const othersItems: NavItem[] = [
     {
         name: 'Finanzas y pagos',
-        icon: <PieChartIcon size={20} />,
+        icon: <i className="fa-duotone fa-solid fa-chart-mixed-up-circle-dollar fa-xl"></i>,
         subItems: [
             {name: 'Blank Page', path: '/blank', pro: false},
             {name: '404 Error', path: '/error-404', pro: false},
         ],
     },
     {
-        icon: <UserCircleIcon size={20} />,
+        icon: <i className="fa-duotone fa-solid fa-calendar fa-xl"></i>,
+        name: 'Calendario',
+        path: '/calendar',
+    },
+    {
+        icon: <i className="fa-duotone fa-solid fa-id-card fa-xl"></i>,
         name: 'Mi Perfil',
         path: '/profile',
     },
