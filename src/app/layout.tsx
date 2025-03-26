@@ -1,14 +1,14 @@
 'use client';
 
 // React
-import {useEffect} from 'react';
+import { useEffect } from 'react';
 
 // Next
-import {useRouter} from 'next/navigation';
-import {Outfit} from 'next/font/google';
+import { useRouter } from 'next/navigation';
+import { Outfit } from 'next/font/google';
 
 // Store
-import {useAuthStore} from '@/store/useAuthStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // Global styles
 import './UI/globals.css';
@@ -20,8 +20,9 @@ import '../../public/icons/duotone.css';
 import '../../public/icons/brands.css';
 
 // Contexts
-import {SidebarProvider} from '@/context/SidebarContext';
-import {ThemeProvider} from '@/context/ThemeContext';
+import { SidebarProvider } from '@/context/SidebarContext';
+import { ThemeProvider } from '@/context/ThemeContext';
+import { AuthProvider } from '@/context/AuthContext';
 
 const outfit = Outfit({
     variable: '--font-outfit-sans',
@@ -33,7 +34,7 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const {isAuthenticated, fetchUser} = useAuthStore();
+    const { isAuthenticated, fetchUser } = useAuthStore();
     const router = useRouter();
 
     useEffect(() => {
@@ -50,9 +51,11 @@ export default function RootLayout({
     return (
         <html lang="es">
             <body className={`${outfit.variable} dark:bg-gray-900`}>
-                <ThemeProvider>
-                    <SidebarProvider>{children}</SidebarProvider>
-                </ThemeProvider>
+                <AuthProvider>
+                    <ThemeProvider>
+                        <SidebarProvider>{children}</SidebarProvider>
+                    </ThemeProvider>
+                </AuthProvider>
             </body>
         </html>
     );
