@@ -72,7 +72,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
                             roles:role_id(name, description)
                         `)
                         .eq('user_id', userData.user_id)
-                        .eq('is_active', true);
+                        .eq('delete_flag', false);
 
                     if (rolesError) throw rolesError;
 
@@ -81,8 +81,8 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
                     const { data: permissionsData, error: permissionsError } = await supabaseClient
                         .from('role_permissions')
                         .select(`
-              permissions:permission_id(name)
-            `)
+                            permissions:permission_id(name)
+                        `)
                         .in('role_id', roleIds);
 
                     if (permissionsError) throw permissionsError;

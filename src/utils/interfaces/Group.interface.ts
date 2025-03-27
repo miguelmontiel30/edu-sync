@@ -6,14 +6,25 @@ export interface Group {
     id: number;
     grade: number;
     group: string;
-    teachers: Teacher[];
-    schoolYear: SchoolYear;
+    teachers: Array<{
+        id: number;
+        name: string;
+        role: string;
+        image?: string;
+    }>;
+    schoolYear: {
+        id: number;
+        name: string;
+        startDate: string;
+        endDate: string;
+        status: string;
+    };
     studentsNumber: number;
     subjectsNumber: number;
-    status: GroupStatus;
+    status: string;
     generalAverage: number;
-    description?: string | null; // Opcional
-    createdAt: string; // Fecha de creación
-    updatedAt: string; // Fecha de última actualización
-    groupImage?: string;
+    attendancePercentage: number;
+    recentStudents: number;
+    createdAt: string;
+    updatedAt: string;
 }

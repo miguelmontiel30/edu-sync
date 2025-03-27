@@ -1,18 +1,18 @@
 'use client';
-import React, {useEffect, useRef, useState, useCallback} from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import {usePathname} from 'next/navigation';
-import {useSidebar} from '@/context/SidebarContext';
+import { usePathname } from 'next/navigation';
+import { useSidebar } from '@/context/SidebarContext';
 
 // Icons
-import {ChevronDownIcon, HorizontaLDots} from '@/icons';
+import { ChevronDownIcon, HorizontaLDots } from '@/icons';
 
 type NavItem = {
     name: string;
     icon: React.ReactNode;
     path?: string;
-    subItems?: {name: string; path: string; pro?: boolean; new?: boolean}[];
+    subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
 };
 
 const navItems: NavItem[] = [
@@ -22,36 +22,39 @@ const navItems: NavItem[] = [
         path: '/admin-dashboard/dashboard',
     },
     {
-        name: 'Alumnos',
-        icon: <i className="fa-duotone fa-solid fa-user-graduate fa-xl"></i>,
-        subItems: [{name: 'Ver alumnos', path: '/admin-dashboard/students', pro: false}],
+        icon: <i className="fa-duotone fa-solid fa-calendar-clock fa-xl"></i>,
+        name: 'Ciclos escolares',
+        path: '/admin-dashboard/admin-school-year',
     },
     {
         name: 'Grupos',
         icon: <i className="fa-duotone fa-solid fa-people-group fa-xl"></i>,
         subItems: [
-            {name: 'Mis grupos', path: '/admin-dashboard/groups', pro: false},
-            {name: 'Administración de grupos y materias', path: '/', pro: false},
-            {name: 'Gestión de grupos', path: '/', pro: false},
+            { name: 'Mis grupos', path: '/admin-dashboard/admin-groups', pro: false },
+            { name: 'Administración de grupos y materias', path: '/admin-dashboard/admin-groups/admin-group-subjects', pro: false },
+            { name: 'Gestión de grupos y alumnos', path: '/admin-dashboard/admin-groups/admin-group-students', pro: false },
         ],
+    },
+    {
+        name: 'Alumnos',
+        icon: <i className="fa-duotone fa-solid fa-user-graduate fa-xl"></i>,
+        subItems: [{ name: 'Ver alumnos', path: '/admin-dashboard/admin-students', pro: false }],
     },
     {
         name: 'Maestros',
         icon: <i className="fa-duotone fa-solid fa-person-chalkboard fa-xl"></i>,
-        path: '/profile',
+        subItems: [
+            { name: 'Mis profesores', path: '/admin-dashboard/admin-teachers', pro: false },
+            { name: 'Gestión de profesores', path: '/admin-dashboard/admin-teachers', pro: false },
+        ],
     },
     {
         name: 'Materias',
         icon: <i className="fa-duotone fa-solid fa-books fa-xl"></i>,
         subItems: [
-            {name: 'Mis materias', path: '/admin-dashboard/subjects', pro: false},
-            {name: 'Gestión de materias', path: '/admin-dashboard/admin-subjects', pro: false},
+            { name: 'Mis materias', path: '/admin-dashboard/admin-subjects', pro: false },
+            { name: 'Gestión de materias', path: '/admin-dashboard/admin-subjects', pro: false },
         ],
-    },
-    {
-        icon: <i className="fa-duotone fa-solid fa-calendar-clock fa-xl"></i>,
-        name: 'Ciclo escolar',
-        path: '/admin-dashboard/school-year',
     },
 ];
 
@@ -60,8 +63,8 @@ const othersItems: NavItem[] = [
         name: 'Finanzas y pagos',
         icon: <i className="fa-duotone fa-solid fa-chart-mixed-up-circle-dollar fa-xl"></i>,
         subItems: [
-            {name: 'Blank Page', path: '/blank', pro: false},
-            {name: '404 Error', path: '/error-404', pro: false},
+            { name: 'Blank Page', path: '/blank', pro: false },
+            { name: '404 Error', path: '/error-404', pro: false },
         ],
     },
     {
@@ -78,7 +81,7 @@ const othersItems: NavItem[] = [
 
 const AdminSidebar: React.FC = () => {
     // Hooks
-    const {isExpanded, isMobileOpen, isHovered, setIsHovered} = useSidebar();
+    const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
     const pathname = usePathname();
 
     // States
@@ -154,7 +157,7 @@ const AdminSidebar: React.FC = () => {
             ) {
                 return null;
             }
-            return {type: menuType, index};
+            return { type: menuType, index };
         });
     };
 
@@ -171,20 +174,17 @@ const AdminSidebar: React.FC = () => {
                     {nav.subItems ? (
                         <button
                             onClick={() => handleSubmenuToggle(index, menuType)}
-                            className={`menu-item group ${
-                                openSubmenu?.type === menuType && openSubmenu?.index === index
-                                    ? 'menu-item-active'
-                                    : 'menu-item-inactive'
-                            } cursor-pointer ${
-                                !isExpanded && !isHovered ? 'lg:justify-center' : 'lg:justify-start'
-                            }`}
+                            className={`menu-item group ${openSubmenu?.type === menuType && openSubmenu?.index === index
+                                ? 'menu-item-active'
+                                : 'menu-item-inactive'
+                                } cursor-pointer ${!isExpanded && !isHovered ? 'lg:justify-center' : 'lg:justify-start'
+                                }`}
                         >
                             <span
-                                className={` ${
-                                    openSubmenu?.type === menuType && openSubmenu?.index === index
-                                        ? 'menu-item-icon-active'
-                                        : 'menu-item-icon-inactive'
-                                }`}
+                                className={` ${openSubmenu?.type === menuType && openSubmenu?.index === index
+                                    ? 'menu-item-icon-active'
+                                    : 'menu-item-icon-inactive'
+                                    }`}
                             >
                                 {nav.icon}
                             </span>
@@ -193,12 +193,11 @@ const AdminSidebar: React.FC = () => {
                             )}
                             {(isExpanded || isHovered || isMobileOpen) && (
                                 <ChevronDownIcon
-                                    className={`ml-auto h-5 w-5 transition-transform duration-200 ${
-                                        openSubmenu?.type === menuType &&
+                                    className={`ml-auto h-5 w-5 transition-transform duration-200 ${openSubmenu?.type === menuType &&
                                         openSubmenu?.index === index
-                                            ? 'rotate-180 text-brand-500'
-                                            : ''
-                                    }`}
+                                        ? 'rotate-180 text-brand-500'
+                                        : ''
+                                        }`}
                                 />
                             )}
                         </button>
@@ -206,16 +205,14 @@ const AdminSidebar: React.FC = () => {
                         nav.path && (
                             <Link
                                 href={nav.path}
-                                className={`menu-item group ${
-                                    isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
-                                }`}
+                                className={`menu-item group ${isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
+                                    }`}
                             >
                                 <span
-                                    className={`${
-                                        isActive(nav.path)
-                                            ? 'menu-item-icon-active'
-                                            : 'menu-item-icon-inactive'
-                                    }`}
+                                    className={`${isActive(nav.path)
+                                        ? 'menu-item-icon-active'
+                                        : 'menu-item-icon-inactive'
+                                        }`}
                                 >
                                     {nav.icon}
                                 </span>
@@ -244,32 +241,29 @@ const AdminSidebar: React.FC = () => {
                                     <li key={subItem.name}>
                                         <Link
                                             href={subItem.path}
-                                            className={`menu-dropdown-item ${
-                                                isActive(subItem.path)
-                                                    ? 'menu-dropdown-item-active'
-                                                    : 'menu-dropdown-item-inactive'
-                                            }`}
+                                            className={`menu-dropdown-item ${isActive(subItem.path)
+                                                ? 'menu-dropdown-item-active'
+                                                : 'menu-dropdown-item-inactive'
+                                                }`}
                                         >
                                             {subItem.name}
                                             <span className="ml-auto flex items-center gap-1">
                                                 {subItem.new && (
                                                     <span
-                                                        className={`ml-auto ${
-                                                            isActive(subItem.path)
-                                                                ? 'menu-dropdown-badge-active'
-                                                                : 'menu-dropdown-badge-inactive'
-                                                        } menu-dropdown-badge`}
+                                                        className={`ml-auto ${isActive(subItem.path)
+                                                            ? 'menu-dropdown-badge-active'
+                                                            : 'menu-dropdown-badge-inactive'
+                                                            } menu-dropdown-badge`}
                                                     >
                                                         new
                                                     </span>
                                                 )}
                                                 {subItem.pro && (
                                                     <span
-                                                        className={`ml-auto ${
-                                                            isActive(subItem.path)
-                                                                ? 'menu-dropdown-badge-active'
-                                                                : 'menu-dropdown-badge-inactive'
-                                                        } menu-dropdown-badge`}
+                                                        className={`ml-auto ${isActive(subItem.path)
+                                                            ? 'menu-dropdown-badge-active'
+                                                            : 'menu-dropdown-badge-inactive'
+                                                            } menu-dropdown-badge`}
                                                     >
                                                         pro
                                                     </span>
@@ -297,9 +291,8 @@ const AdminSidebar: React.FC = () => {
             onMouseLeave={() => setIsHovered(false)}
         >
             <div
-                className={`flex py-8 ${
-                    !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
-                }`}
+                className={`flex py-8 ${!isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
+                    }`}
             >
                 <Link href="/">
                     {isExpanded || isHovered || isMobileOpen ? (
@@ -329,11 +322,10 @@ const AdminSidebar: React.FC = () => {
                     <div className="flex flex-col gap-4">
                         <div>
                             <h2
-                                className={`mb-4 flex text-xs uppercase leading-[20px] text-gray-400 ${
-                                    !isExpanded && !isHovered
-                                        ? 'lg:justify-center'
-                                        : 'justify-start'
-                                }`}
+                                className={`mb-4 flex text-xs uppercase leading-[20px] text-gray-400 ${!isExpanded && !isHovered
+                                    ? 'lg:justify-center'
+                                    : 'justify-start'
+                                    }`}
                             >
                                 {isExpanded || isHovered || isMobileOpen ? (
                                     'Menu'
@@ -346,11 +338,10 @@ const AdminSidebar: React.FC = () => {
 
                         <div className="">
                             <h2
-                                className={`mb-4 flex text-xs uppercase leading-[20px] text-gray-400 ${
-                                    !isExpanded && !isHovered
-                                        ? 'lg:justify-center'
-                                        : 'justify-start'
-                                }`}
+                                className={`mb-4 flex text-xs uppercase leading-[20px] text-gray-400 ${!isExpanded && !isHovered
+                                    ? 'lg:justify-center'
+                                    : 'justify-start'
+                                    }`}
                             >
                                 {isExpanded || isHovered || isMobileOpen ? (
                                     'Otros'
