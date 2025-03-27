@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/context/SidebarContext';
+import { cn } from '@/lib/utils';
 
 // Icons
 import { ChevronDownIcon, HorizontaLDots } from '@/icons';
@@ -12,7 +13,7 @@ type NavItem = {
     name: string;
     icon: React.ReactNode;
     path?: string;
-    subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+    subItems?: { name: string; path: string; pro?: boolean; new?: boolean; icon: string }[];
 };
 
 const navItems: NavItem[] = [
@@ -30,30 +31,72 @@ const navItems: NavItem[] = [
         name: 'Grupos',
         icon: <i className="fa-duotone fa-solid fa-people-group fa-xl"></i>,
         subItems: [
-            { name: 'Mis grupos', path: '/admin-dashboard/admin-groups', pro: false },
-            { name: 'Administración de grupos y materias', path: '/admin-dashboard/admin-groups/admin-group-subjects', pro: false },
-            { name: 'Gestión de grupos y alumnos', path: '/admin-dashboard/admin-groups/admin-group-students', pro: false },
+            {
+                name: 'Mis grupos',
+                path: '/admin-dashboard/admin-groups',
+                pro: false,
+                icon: 'fa-solid fa-users'
+            },
+            {
+                name: 'Administración de grupos y materias',
+                path: '/admin-dashboard/admin-groups/admin-group-subjects',
+                pro: false,
+                icon: 'fa-solid fa-book'
+            },
+            {
+                name: 'Gestión de grupos y alumnos',
+                path: '/admin-dashboard/admin-groups/admin-group-students',
+                pro: false,
+                icon: 'fa-solid fa-user-graduate'
+            },
         ],
     },
     {
         name: 'Alumnos',
         icon: <i className="fa-duotone fa-solid fa-user-graduate fa-xl"></i>,
-        subItems: [{ name: 'Ver alumnos', path: '/admin-dashboard/admin-students', pro: false }],
+        subItems: [
+            {
+                name: 'Ver alumnos',
+                path: '/admin-dashboard/admin-students',
+                pro: false,
+                icon: 'fa-solid fa-list'
+            }
+        ],
     },
     {
         name: 'Maestros',
         icon: <i className="fa-duotone fa-solid fa-person-chalkboard fa-xl"></i>,
         subItems: [
-            { name: 'Mis profesores', path: '/admin-dashboard/admin-teachers', pro: false },
-            { name: 'Gestión de profesores', path: '/admin-dashboard/admin-teachers', pro: false },
+            {
+                name: 'Mis profesores',
+                path: '/admin-dashboard/admin-teachers/list',
+                pro: false,
+                icon: 'fa-solid fa-chalkboard-teacher'
+            },
+            {
+                name: 'Gestión de profesores',
+                path: '/admin-dashboard/admin-teachers/manage',
+                pro: false,
+                icon: 'fa-solid fa-user-gear'
+            },
         ],
     },
     {
         name: 'Materias',
         icon: <i className="fa-duotone fa-solid fa-books fa-xl"></i>,
         subItems: [
-            { name: 'Mis materias', path: '/admin-dashboard/admin-subjects', pro: false },
-            { name: 'Gestión de materias', path: '/admin-dashboard/admin-subjects', pro: false },
+            {
+                name: 'Mis materias',
+                path: '/admin-dashboard/admin-subjects',
+                pro: false,
+                icon: 'fa-solid fa-book'
+            },
+            {
+                name: 'Gestión de materias',
+                path: '/admin-dashboard/admin-subjects/manage',
+                pro: false,
+                icon: 'fa-solid fa-gear'
+            },
         ],
     },
 ];
@@ -63,8 +106,18 @@ const othersItems: NavItem[] = [
         name: 'Finanzas y pagos',
         icon: <i className="fa-duotone fa-solid fa-chart-mixed-up-circle-dollar fa-xl"></i>,
         subItems: [
-            { name: 'Blank Page', path: '/blank', pro: false },
-            { name: '404 Error', path: '/error-404', pro: false },
+            {
+                name: 'Blank Page',
+                path: '/blank',
+                pro: false,
+                icon: 'fa-solid fa-file'
+            },
+            {
+                name: '404 Error',
+                path: '/error-404',
+                pro: false,
+                icon: 'fa-solid fa-triangle-exclamation'
+            },
         ],
     },
     {
@@ -232,47 +285,32 @@ const AdminSidebar: React.FC = () => {
                             style={{
                                 height:
                                     openSubmenu?.type === menuType && openSubmenu?.index === index
-                                        ? `${subMenuHeight[`${menuType}-${index}`]}px`
-                                        : '0px',
+                                        ? subMenuHeight[`${menuType}-${index}`]
+                                        : 0,
                             }}
                         >
-                            <ul className="ml-9 mt-2 space-y-1">
-                                {nav.subItems.map(subItem => (
-                                    <li key={subItem.name}>
-                                        <Link
-                                            href={subItem.path}
-                                            className={`menu-dropdown-item ${isActive(subItem.path)
-                                                ? 'menu-dropdown-item-active'
-                                                : 'menu-dropdown-item-inactive'
-                                                }`}
-                                        >
-                                            {subItem.name}
-                                            <span className="ml-auto flex items-center gap-1">
-                                                {subItem.new && (
-                                                    <span
-                                                        className={`ml-auto ${isActive(subItem.path)
-                                                            ? 'menu-dropdown-badge-active'
-                                                            : 'menu-dropdown-badge-inactive'
-                                                            } menu-dropdown-badge`}
-                                                    >
-                                                        new
-                                                    </span>
-                                                )}
-                                                {subItem.pro && (
-                                                    <span
-                                                        className={`ml-auto ${isActive(subItem.path)
-                                                            ? 'menu-dropdown-badge-active'
-                                                            : 'menu-dropdown-badge-inactive'
-                                                            } menu-dropdown-badge`}
-                                                    >
-                                                        pro
-                                                    </span>
-                                                )}
+                            <div className="ml-4 space-y-1">
+                                {nav.subItems.map((subItem) => (
+                                    <Link
+                                        key={subItem.path}
+                                        href={subItem.path}
+                                        className={cn(
+                                            "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                                            pathname === subItem.path
+                                                ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50"
+                                                : "text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50"
+                                        )}
+                                    >
+                                        <i className={cn(subItem.icon, "w-4 h-4")}></i>
+                                        {subItem.name}
+                                        {subItem.pro && (
+                                            <span className="ml-auto rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-0.5 text-xs font-medium text-white">
+                                                PRO
                                             </span>
-                                        </Link>
-                                    </li>
+                                        )}
+                                    </Link>
                                 ))}
-                            </ul>
+                            </div>
                         </div>
                     )}
                 </li>
