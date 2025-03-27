@@ -25,10 +25,12 @@ interface TableRowProps {
 }
 
 // Props for TableCell
-interface TableCellProps {
-  children: ReactNode; // Cell content
-  isHeader?: boolean; // If true, renders as <th>, otherwise <td>
-  className?: string; // Optional className for styling
+export interface TableCellProps {
+  children?: React.ReactNode;
+  className?: string;
+  isHeader?: boolean;
+  onClick?: () => void;
+  colSpan?: number;
 }
 
 // Table Component
@@ -54,11 +56,26 @@ const TableRow: React.FC<TableRowProps> = ({ children, className }) => {
 // TableCell Component
 const TableCell: React.FC<TableCellProps> = ({
   children,
+  className = '',
   isHeader = false,
-  className,
+  onClick,
+  colSpan
 }) => {
-  const CellTag = isHeader ? "th" : "td";
-  return <CellTag className={` ${className}`}>{children}</CellTag>;
+  const baseClasses = 'px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit';
+  const headerClasses = isHeader ? 'bg-gray-50 dark:bg-gray-800' : '';
+  const combinedClasses = `${baseClasses} ${headerClasses} ${className}`;
+
+  const Component = isHeader ? 'th' : 'td';
+
+  return (
+    <Component
+      className={combinedClasses}
+      onClick={onClick}
+      colSpan={colSpan}
+    >
+      {children}
+    </Component>
+  );
 };
 
 export { Table, TableHeader, TableBody, TableRow, TableCell };
