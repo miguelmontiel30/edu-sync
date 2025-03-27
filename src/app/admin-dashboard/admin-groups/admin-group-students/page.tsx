@@ -153,17 +153,33 @@ export default function GroupStudentsDashboard() {
         if (!selectedGroup) return;
 
         try {
+            // Primero obtenemos los IDs de los estudiantes que ya están en el grupo
+            const { data: groupStudents, error: groupError } = await supabaseClient
+                .from('student_groups')
+                .select('student_id')
+                .eq('group_id', selectedGroup.group_id)
+                .eq('delete_flag', false);
+
+            if (groupError) throw groupError;
+
+            // Si no hay estudiantes en el grupo, obtenemos todos los estudiantes
+            if (!groupStudents || groupStudents.length === 0) {
+                const { data, error } = await supabaseClient
+                    .from('students')
+                    .select('*')
+                    .eq('delete_flag', false);
+
+                if (error) throw error;
+                setAvailableStudents(data || []);
+                return;
+            }
+
+            // Si hay estudiantes en el grupo, obtenemos los que no están en él
             const { data, error } = await supabaseClient
                 .from('students')
                 .select('*')
                 .eq('delete_flag', false)
-                .not('student_id', 'in', (
-                    supabaseClient
-                        .from('student_groups')
-                        .select('student_id')
-                        .eq('group_id', selectedGroup.group_id)
-                        .eq('delete_flag', false)
-                ));
+                .not('student_id', 'in', `(${groupStudents.map(gs => gs.student_id).join(',')})`);
 
             if (error) throw error;
             setAvailableStudents(data || []);
@@ -183,18 +199,49 @@ export default function GroupStudentsDashboard() {
         if (!selectedGroup || selectedStudents.length === 0) return;
 
         try {
-            const { error } = await supabaseClient
+            // Primero verificamos si los estudiantes ya existen en el grupo (incluso si están eliminados)
+            const { data: existingStudents, error: checkError } = await supabaseClient
                 .from('student_groups')
-                .insert(
-                    selectedStudents.map(studentId => ({
-                        student_id: studentId,
-                        group_id: selectedGroup.group_id,
-                        status: 'active',
-                        enrollment_date: new Date().toISOString()
-                    }))
-                );
+                .select('student_id')
+                .eq('group_id', selectedGroup.group_id)
+                .in('student_id', selectedStudents);
 
-            if (error) throw error;
+            if (checkError) throw checkError;
+
+            // Separamos los estudiantes en dos grupos: nuevos y existentes
+            const existingStudentIds = existingStudents?.map(es => es.student_id) || [];
+            const newStudents = selectedStudents.filter(id => !existingStudentIds.includes(id));
+
+            // Si hay estudiantes existentes, los reactivamos
+            if (existingStudentIds.length > 0) {
+                const { error: updateError } = await supabaseClient
+                    .from('student_groups')
+                    .update({
+                        delete_flag: false,
+                        deleted_at: null,
+                        status: 'active'
+                    })
+                    .eq('group_id', selectedGroup.group_id)
+                    .in('student_id', existingStudentIds);
+
+                if (updateError) throw updateError;
+            }
+
+            // Si hay nuevos estudiantes, los insertamos
+            if (newStudents.length > 0) {
+                const { error: insertError } = await supabaseClient
+                    .from('student_groups')
+                    .insert(
+                        newStudents.map(studentId => ({
+                            student_id: studentId,
+                            group_id: selectedGroup.group_id,
+                            status: 'active',
+                            enrollment_date: new Date().toISOString()
+                        }))
+                    );
+
+                if (insertError) throw insertError;
+            }
 
             // Actualizar la lista de estudiantes
             await loadGroupStudents();
