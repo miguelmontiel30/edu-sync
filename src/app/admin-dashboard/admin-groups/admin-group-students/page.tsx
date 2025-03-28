@@ -50,6 +50,10 @@ export default function GroupStudentsDashboard() {
     const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
     const [sortField, setSortField] = useState<'name' | 'curp' | 'status'>('name');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [isLoadingGroups, setIsLoadingGroups] = useState(true);
+    const [isLoadingStudents, setIsLoadingStudents] = useState(false);
+    const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         loadGroups();
@@ -63,6 +67,7 @@ export default function GroupStudentsDashboard() {
     }, [selectedGroup]);
 
     async function loadGroups() {
+        setIsLoadingGroups(true);
         try {
             const { data, error } = await supabaseClient
                 .from('groups')
@@ -95,12 +100,14 @@ export default function GroupStudentsDashboard() {
         } catch (error) {
             console.error('Error al cargar los grupos:', error);
             alert('Error al cargar los grupos. Por favor recarga la página.');
+        } finally {
+            setIsLoadingGroups(false);
         }
     }
 
     async function loadGroupStudents() {
         if (!selectedGroup) return;
-
+        setIsLoadingStudents(true);
         try {
             const { data, error } = await supabaseClient
                 .from('student_groups')
@@ -146,23 +153,28 @@ export default function GroupStudentsDashboard() {
         } catch (error) {
             console.error('Error al cargar los estudiantes del grupo:', error);
             alert('Error al cargar los estudiantes del grupo. Por favor recarga la página.');
+        } finally {
+            setIsLoadingStudents(false);
         }
     }
 
     async function loadAvailableStudents() {
         if (!selectedGroup) return;
-
+        setIsLoadingMetrics(true);
         try {
-            // Primero obtenemos los IDs de los estudiantes que ya están en el grupo
             const { data: groupStudents, error: groupError } = await supabaseClient
                 .from('student_groups')
-                .select('student_id')
-                .eq('group_id', selectedGroup.group_id)
+                .select(`
+                    student_id,
+                    groups!inner (
+                        school_year_id
+                    )
+                `)
+                .eq('groups.school_year_id', selectedGroup.school_year_id)
                 .eq('delete_flag', false);
 
             if (groupError) throw groupError;
 
-            // Si no hay estudiantes en el grupo, obtenemos todos los estudiantes
             if (!groupStudents || groupStudents.length === 0) {
                 const { data, error } = await supabaseClient
                     .from('students')
@@ -174,7 +186,6 @@ export default function GroupStudentsDashboard() {
                 return;
             }
 
-            // Si hay estudiantes en el grupo, obtenemos los que no están en él
             const { data, error } = await supabaseClient
                 .from('students')
                 .select('*')
@@ -186,6 +197,8 @@ export default function GroupStudentsDashboard() {
         } catch (error) {
             console.error('Error al cargar los estudiantes disponibles:', error);
             alert('Error al cargar los estudiantes disponibles. Por favor recarga la página.');
+        } finally {
+            setIsLoadingMetrics(false);
         }
     }
 
@@ -197,42 +210,65 @@ export default function GroupStudentsDashboard() {
 
     async function handleAddStudents() {
         if (!selectedGroup || selectedStudents.length === 0) return;
-
+        setIsSaving(true);
         try {
-            // Primero verificamos si los estudiantes ya existen en el grupo (incluso si están eliminados)
+            // Verificamos si los estudiantes ya existen en cualquier grupo del mismo ciclo escolar (incluyendo los eliminados)
             const { data: existingStudents, error: checkError } = await supabaseClient
                 .from('student_groups')
-                .select('student_id')
-                .eq('group_id', selectedGroup.group_id)
+                .select(`
+                    student_id,
+                    delete_flag,
+                    groups!inner (
+                        school_year_id
+                    )
+                `)
+                .eq('groups.school_year_id', selectedGroup.school_year_id)
                 .in('student_id', selectedStudents);
 
             if (checkError) throw checkError;
 
-            // Separamos los estudiantes en dos grupos: nuevos y existentes
-            const existingStudentIds = existingStudents?.map(es => es.student_id) || [];
-            const newStudents = selectedStudents.filter(id => !existingStudentIds.includes(id));
+            // Si hay estudiantes que ya existen en algún grupo del ciclo escolar
+            if (existingStudents && existingStudents.length > 0) {
+                const existingStudentIds = existingStudents.map(es => es.student_id);
+                const newStudents = selectedStudents.filter(id => !existingStudentIds.includes(id));
 
-            // Si hay estudiantes existentes, los reactivamos
-            if (existingStudentIds.length > 0) {
-                const { error: updateError } = await supabaseClient
-                    .from('student_groups')
-                    .update({
-                        delete_flag: false,
-                        deleted_at: null,
-                        status: 'active'
-                    })
-                    .eq('group_id', selectedGroup.group_id)
-                    .in('student_id', existingStudentIds);
+                // Reactivamos los estudiantes eliminados
+                const deletedStudents = existingStudents.filter(es => es.delete_flag);
+                if (deletedStudents.length > 0) {
+                    const { error: updateError } = await supabaseClient
+                        .from('student_groups')
+                        .update({
+                            delete_flag: false,
+                            deleted_at: null,
+                            status: 'active'
+                        })
+                        .eq('group_id', selectedGroup.group_id)
+                        .in('student_id', deletedStudents.map(es => es.student_id));
 
-                if (updateError) throw updateError;
-            }
+                    if (updateError) throw updateError;
+                }
 
-            // Si hay nuevos estudiantes, los insertamos
-            if (newStudents.length > 0) {
+                // Si hay nuevos estudiantes, los insertamos
+                if (newStudents.length > 0) {
+                    const { error: insertError } = await supabaseClient
+                        .from('student_groups')
+                        .insert(
+                            newStudents.map(studentId => ({
+                                student_id: studentId,
+                                group_id: selectedGroup.group_id,
+                                status: 'active',
+                                enrollment_date: new Date().toISOString()
+                            }))
+                        );
+
+                    if (insertError) throw insertError;
+                }
+            } else {
+                // Si no hay estudiantes existentes, insertamos todos
                 const { error: insertError } = await supabaseClient
                     .from('student_groups')
                     .insert(
-                        newStudents.map(studentId => ({
+                        selectedStudents.map(studentId => ({
                             student_id: studentId,
                             group_id: selectedGroup.group_id,
                             status: 'active',
@@ -251,12 +287,14 @@ export default function GroupStudentsDashboard() {
         } catch (error) {
             console.error('Error al añadir estudiantes al grupo:', error);
             alert('Error al añadir estudiantes al grupo. Por favor intenta de nuevo.');
+        } finally {
+            setIsSaving(false);
         }
     }
 
     async function handleRemoveStudent(studentGroupId: number) {
         if (!confirm('¿Estás seguro de que deseas quitar este estudiante del grupo?')) return;
-
+        setIsSaving(true);
         try {
             const { error } = await supabaseClient
                 .from('student_groups')
@@ -271,6 +309,8 @@ export default function GroupStudentsDashboard() {
         } catch (error) {
             console.error('Error al quitar el estudiante del grupo:', error);
             alert('Error al quitar el estudiante del grupo. Por favor intenta de nuevo.');
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -356,17 +396,24 @@ export default function GroupStudentsDashboard() {
                 <Label htmlFor="group-select" className="font-outfit">
                     Seleccionar Grupo
                 </Label>
-                <Select
-                    options={[
-                        { value: "", label: "Selecciona un grupo" },
-                        ...groups.map(group => ({
-                            value: `${group.grade}${group.group_name}`,
-                            label: `${group.grade}° ${group.group_name} - ${group.school_year_name}`
-                        }))
-                    ]}
-                    placeholder="Selecciona un grupo"
-                    onChange={handleGroupChange}
-                />
+                <div className="relative">
+                    <Select
+                        options={[
+                            { value: "", label: "Selecciona un grupo" },
+                            ...groups.map(group => ({
+                                value: `${group.grade}${group.group_name}`,
+                                label: `${group.grade}° ${group.group_name} - ${group.school_year_name}`
+                            }))
+                        ]}
+                        placeholder="Selecciona un grupo"
+                        onChange={handleGroupChange}
+                    />
+                    {isLoadingGroups && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {selectedGroup && (
@@ -375,24 +422,32 @@ export default function GroupStudentsDashboard() {
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6 mb-6">
                         {/* Total de Estudiantes */}
                         <div className="relative rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                                <i className="fa-duotone fa-solid fa-user-graduate fa-xl text-gray-800 dark:text-white/90"></i>
-                            </div>
-                            <div className="mt-5 flex items-end justify-between">
-                                <div>
-                                    <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                        Total de Estudiantes
-                                    </span>
-                                    <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
-                                        {totalStudents}
-                                    </h4>
+                            {isLoadingMetrics ? (
+                                <div className="flex items-center justify-center h-full">
+                                    <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
                                 </div>
-                                <Badge color="info">
-                                    <span className="font-outfit">
-                                        {activeStudents} activos
-                                    </span>
-                                </Badge>
-                            </div>
+                            ) : (
+                                <>
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+                                        <i className="fa-duotone fa-solid fa-user-graduate fa-xl text-gray-800 dark:text-white/90"></i>
+                                    </div>
+                                    <div className="mt-5 flex items-end justify-between">
+                                        <div>
+                                            <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                                Total de Estudiantes
+                                            </span>
+                                            <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
+                                                {totalStudents}
+                                            </h4>
+                                        </div>
+                                        <Badge color="info">
+                                            <span className="font-outfit">
+                                                {activeStudents} activos
+                                            </span>
+                                        </Badge>
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         {/* Distribución por Estado */}
@@ -448,12 +503,18 @@ export default function GroupStudentsDashboard() {
                                     Distribución de Estudiantes por Estado
                                 </h3>
                             </div>
-                            <ReactApexChart
-                                options={genderOptions}
-                                series={genderSeries}
-                                type="donut"
-                                height={180}
-                            />
+                            {isLoadingMetrics ? (
+                                <div className="flex items-center justify-center h-[180px]">
+                                    <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                                </div>
+                            ) : (
+                                <ReactApexChart
+                                    options={genderOptions}
+                                    series={genderSeries}
+                                    type="donut"
+                                    height={180}
+                                />
+                            )}
                         </div>
                     </div>
 
@@ -477,105 +538,112 @@ export default function GroupStudentsDashboard() {
                                 variant="primary"
                                 startIcon={<i className="fa-duotone fa-solid fa-user-plus"></i>}
                                 onClick={() => setIsModalOpen(true)}
+                                disabled={isSaving}
                             >
                                 <span className="font-outfit">Añadir Estudiantes</span>
                             </Button>
                         </div>
 
                         <div className="overflow-x-auto">
-                            <Table className="min-w-full">
-                                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                                    <TableRow>
-                                        <TableCell
-                                            isHeader
-                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                            onClick={() => handleSort('name')}
-                                        >
-                                            <div className="flex items-center justify-center gap-1">
-                                                Nombre
-                                                {sortField === 'name' && (
-                                                    <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell
-                                            isHeader
-                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                            onClick={() => handleSort('curp')}
-                                        >
-                                            <div className="flex items-center justify-center gap-1">
-                                                CURP
-                                                {sortField === 'curp' && (
-                                                    <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell
-                                            isHeader
-                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                            onClick={() => handleSort('status')}
-                                        >
-                                            <div className="flex items-center justify-center gap-1">
-                                                Estado
-                                                {sortField === 'status' && (
-                                                    <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell
-                                            isHeader
-                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit"
-                                        >
-                                            Acciones
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                                    {sortStudents(filterStudents(groupStudents, searchTerm)).map((student) => (
-                                        <TableRow key={student.student_group_id}>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
-                                                    {student.student.first_name} {student.student.father_last_name} {student.student.mother_last_name}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                    {student.student.curp}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <Badge
-                                                    color={student.status === 'active' ? 'success' : 'error'}
-                                                    variant="light"
-                                                >
-                                                    <span className="font-outfit">
-                                                        {student.status === 'active' ? 'Activo' : 'Inactivo'}
-                                                    </span>
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    startIcon={<i className="fa-duotone fa-solid fa-user-minus"></i>}
-                                                    onClick={() => handleRemoveStudent(student.student_group_id)}
-                                                >
-                                                    <span className="font-outfit">Quitar</span>
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    {groupStudents.length === 0 && (
+                            {isLoadingStudents ? (
+                                <div className="flex items-center justify-center h-[200px]">
+                                    <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                                </div>
+                            ) : (
+                                <Table className="min-w-full">
+                                    <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                                         <TableRow>
-                                            <TableCell colSpan={4} className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                                    {searchTerm ? 'No se encontraron estudiantes que coincidan con la búsqueda.' : 'No hay estudiantes en este grupo.'}
-                                                </span>
+                                            <TableCell
+                                                isHeader
+                                                className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                                onClick={() => handleSort('name')}
+                                            >
+                                                <div className="flex items-center justify-center gap-1">
+                                                    Nombre
+                                                    {sortField === 'name' && (
+                                                        <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                                className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                                onClick={() => handleSort('curp')}
+                                            >
+                                                <div className="flex items-center justify-center gap-1">
+                                                    CURP
+                                                    {sortField === 'curp' && (
+                                                        <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                                className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                                onClick={() => handleSort('status')}
+                                            >
+                                                <div className="flex items-center justify-center gap-1">
+                                                    Estado
+                                                    {sortField === 'status' && (
+                                                        <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell
+                                                isHeader
+                                                className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit"
+                                            >
+                                                Acciones
                                             </TableCell>
                                         </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                                        {sortStudents(filterStudents(groupStudents, searchTerm)).map((student) => (
+                                            <TableRow key={student.student_group_id}>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                                                        {student.student.first_name} {student.student.father_last_name} {student.student.mother_last_name}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                        {student.student.curp}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <Badge
+                                                        color={student.status === 'active' ? 'success' : 'error'}
+                                                        variant="light"
+                                                    >
+                                                        <span className="font-outfit">
+                                                            {student.status === 'active' ? 'Activo' : 'Inactivo'}
+                                                        </span>
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        startIcon={<i className="fa-duotone fa-solid fa-user-minus"></i>}
+                                                        onClick={() => handleRemoveStudent(student.student_group_id)}
+                                                    >
+                                                        <span className="font-outfit">Quitar</span>
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {groupStudents.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={4} className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                                        {searchTerm ? 'No se encontraron estudiantes que coincidan con la búsqueda.' : 'No hay estudiantes en este grupo.'}
+                                                    </span>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            )}
                         </div>
                     </ComponentCard>
                 </>
@@ -593,10 +661,10 @@ export default function GroupStudentsDashboard() {
                 <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
                     <div>
                         <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
-                            Añadir Estudiantes al Grupo
+                            Añadir estudiantes al grupo
                         </h5>
                         <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                            Selecciona los estudiantes que deseas añadir al grupo {selectedGroup?.grade}° {selectedGroup?.group_name}.
+                            Selecciona los estudiantes que deseas añadir al grupo <strong>{selectedGroup?.grade}° {selectedGroup?.group_name}</strong>.
                         </p>
                     </div>
                     <div className="mt-8">
@@ -610,74 +678,91 @@ export default function GroupStudentsDashboard() {
                             />
                         </div>
                         <div className="max-h-[400px] overflow-y-auto">
-                            <Table className="min-w-full">
-                                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                                    <TableRow>
-                                        <TableCell isHeader>
-                                            <input
-                                                type="checkbox"
-                                                className="rounded border-gray-300 text-primary focus:ring-primary"
-                                                onChange={(e) => {
-                                                    if (e.target.checked) {
-                                                        setSelectedStudents(availableStudents.map(s => s.student_id));
-                                                    } else {
-                                                        setSelectedStudents([]);
-                                                    }
-                                                }}
-                                                checked={selectedStudents.length === availableStudents.length}
-                                            />
-                                        </TableCell>
-                                        <TableCell isHeader>Nombre</TableCell>
-                                        <TableCell isHeader>CURP</TableCell>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                                    {availableStudents
-                                        .filter(student =>
-                                            student.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            student.father_last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            student.mother_last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                            student.curp.toLowerCase().includes(searchTerm.toLowerCase())
-                                        )
-                                        .map((student) => (
-                                            <TableRow key={student.student_id}>
-                                                <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="rounded border-gray-300 text-primary focus:ring-primary"
-                                                        checked={selectedStudents.includes(student.student_id)}
-                                                        onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                setSelectedStudents([...selectedStudents, student.student_id]);
-                                                            } else {
-                                                                setSelectedStudents(selectedStudents.filter(id => id !== student.student_id));
-                                                            }
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
-                                                        {student.first_name} {student.father_last_name} {student.mother_last_name}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                        {student.curp}
+                            {isLoadingMetrics ? (
+                                <div className="flex items-center justify-center h-[200px]">
+                                    <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                                </div>
+                            ) : (
+                                <Table className="min-w-full">
+                                    <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                                        <TableRow>
+                                            <TableCell isHeader>
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                                                    onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            setSelectedStudents(availableStudents.map(s => s.student_id));
+                                                        } else {
+                                                            setSelectedStudents([]);
+                                                        }
+                                                    }}
+                                                    checked={selectedStudents.length === availableStudents.length}
+                                                />
+                                            </TableCell>
+                                            <TableCell isHeader>Nombre</TableCell>
+                                            <TableCell isHeader>CURP</TableCell>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                                        {availableStudents
+                                            .filter(student =>
+                                                student.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                student.father_last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                student.mother_last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                                student.curp.toLowerCase().includes(searchTerm.toLowerCase())
+                                            )
+                                            .map((student) => (
+                                                <TableRow
+                                                    key={student.student_id}
+                                                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                                                    onClick={() => {
+                                                        if (selectedStudents.includes(student.student_id)) {
+                                                            setSelectedStudents(selectedStudents.filter(id => id !== student.student_id));
+                                                        } else {
+                                                            setSelectedStudents([...selectedStudents, student.student_id]);
+                                                        }
+                                                    }}
+                                                >
+                                                    <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="rounded border-gray-300 text-primary focus:ring-primary"
+                                                            checked={selectedStudents.includes(student.student_id)}
+                                                            onChange={(e) => {
+                                                                e.stopPropagation();
+                                                                if (e.target.checked) {
+                                                                    setSelectedStudents([...selectedStudents, student.student_id]);
+                                                                } else {
+                                                                    setSelectedStudents(selectedStudents.filter(id => id !== student.student_id));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                        <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                                                            {student.first_name} {student.father_last_name} {student.mother_last_name}
+                                                        </span>
+                                                    </TableCell>
+                                                    <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                        <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                            {student.curp}
+                                                        </span>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        {availableStudents.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={3} className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                                        No hay estudiantes disponibles para añadir.
                                                     </span>
                                                 </TableCell>
                                             </TableRow>
-                                        ))}
-                                    {availableStudents.length === 0 && (
-                                        <TableRow>
-                                            <TableCell colSpan={3} className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                                    No hay estudiantes disponibles para añadir.
-                                                </span>
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            )}
                         </div>
                     </div>
                     <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
@@ -688,6 +773,7 @@ export default function GroupStudentsDashboard() {
                             }}
                             variant="outline"
                             className="sm:w-auto"
+                            disabled={isSaving}
                         >
                             <span className="font-outfit">Cancelar</span>
                         </Button>
@@ -695,9 +781,16 @@ export default function GroupStudentsDashboard() {
                             onClick={handleAddStudents}
                             variant="primary"
                             className="sm:w-auto"
-                            disabled={selectedStudents.length === 0}
+                            disabled={selectedStudents.length === 0 || isSaving}
                         >
-                            <span className="font-outfit">Añadir {selectedStudents.length} Estudiantes</span>
+                            {isSaving ? (
+                                <>
+                                    <i className="fa-duotone fa-solid fa-spinner fa-spin mr-2"></i>
+                                    <span className="font-outfit">Guardando...</span>
+                                </>
+                            ) : (
+                                <span className="font-outfit">Añadir {selectedStudents.length} Estudiantes</span>
+                            )}
                         </Button>
                     </div>
                 </div>
