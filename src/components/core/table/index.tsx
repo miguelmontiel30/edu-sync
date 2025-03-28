@@ -4,6 +4,12 @@ import React, { ReactNode } from "react";
 interface TableProps {
   children: ReactNode; // Table content (thead, tbody, etc.)
   className?: string; // Optional className for styling
+  maxHeight?: string;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    onPageChange: (page: number) => void;
+  };
 }
 
 // Props for TableHeader
@@ -35,27 +41,61 @@ export interface TableCellProps {
 }
 
 // Table Component
-const Table: React.FC<TableProps> = ({ children, className }) => {
-  return <table className={`min-w-full  ${className}`}>{children}</table>;
+export const Table: React.FC<TableProps> = ({ children, className = '', maxHeight = '400px', pagination }) => {
+  return (
+    <div className="relative">
+      <div className={`overflow-auto ${className}`} style={{ maxHeight }}>
+        <table className="w-full">
+          {children}
+        </table>
+      </div>
+      {pagination && (
+        <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 dark:border-gray-800 dark:bg-white/[0.03]">
+          <div className="flex items-center">
+            <p className="text-sm text-gray-700 dark:text-gray-300 font-outfit">
+              Página <span className="font-medium">{pagination.currentPage}</span> de{' '}
+              <span className="font-medium">{pagination.totalPages}</span>
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
+              disabled={pagination.currentPage === 1}
+              className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white/[0.03] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              Anterior
+            </button>
+            <button
+              onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
+              disabled={pagination.currentPage === pagination.totalPages}
+              className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white/[0.03] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 // TableHeader Component
-const TableHeader: React.FC<TableHeaderProps> = ({ children, className }) => {
+export const TableHeader: React.FC<TableHeaderProps> = ({ children, className }) => {
   return <thead className={className}>{children}</thead>;
 };
 
 // TableBody Component
-const TableBody: React.FC<TableBodyProps> = ({ children, className }) => {
+export const TableBody: React.FC<TableBodyProps> = ({ children, className }) => {
   return <tbody className={className}>{children}</tbody>;
 };
 
 // TableRow Component
-const TableRow: React.FC<TableRowProps> = ({ children, className, onClick }) => {
+export const TableRow: React.FC<TableRowProps> = ({ children, className, onClick }) => {
   return <tr className={className} onClick={onClick}>{children}</tr>;
 };
 
 // TableCell Component
-const TableCell: React.FC<TableCellProps> = ({
+export const TableCell: React.FC<TableCellProps> = ({
   children,
   className = '',
   isHeader = false,
@@ -78,5 +118,3 @@ const TableCell: React.FC<TableCellProps> = ({
     </Component>
   );
 };
-
-export { Table, TableHeader, TableBody, TableRow, TableCell };
