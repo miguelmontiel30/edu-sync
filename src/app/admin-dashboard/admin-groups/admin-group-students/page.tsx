@@ -186,6 +186,7 @@ export default function GroupStudentsDashboard() {
                 return;
             }
 
+            // Obtener todos los estudiantes que no están activos en ningún grupo del ciclo escolar
             const { data, error } = await supabaseClient
                 .from('students')
                 .select('*')
@@ -212,72 +213,52 @@ export default function GroupStudentsDashboard() {
         if (!selectedGroup || selectedStudents.length === 0) return;
         setIsSaving(true);
         try {
-            // Verificamos si los estudiantes ya existen en cualquier grupo del mismo ciclo escolar (incluyendo los eliminados)
+            // Verificamos si los estudiantes ya tienen un registro activo en el mismo ciclo escolar
             const { data: existingStudents, error: checkError } = await supabaseClient
                 .from('student_groups')
                 .select(`
                     student_id,
                     delete_flag,
+                    group_id,
+                    student_group_id,
                     groups!inner (
                         school_year_id
                     )
                 `)
                 .eq('groups.school_year_id', selectedGroup.school_year_id)
+                .eq('delete_flag', false)
                 .in('student_id', selectedStudents);
 
             if (checkError) throw checkError;
 
-            // Si hay estudiantes que ya existen en algún grupo del ciclo escolar
+            // Si hay estudiantes activos en otro grupo del mismo ciclo, los marcamos como eliminados
             if (existingStudents && existingStudents.length > 0) {
-                const existingStudentIds = existingStudents.map(es => es.student_id);
-                const newStudents = selectedStudents.filter(id => !existingStudentIds.includes(id));
-
-                // Reactivamos los estudiantes eliminados
-                const deletedStudents = existingStudents.filter(es => es.delete_flag);
-                if (deletedStudents.length > 0) {
-                    const { error: updateError } = await supabaseClient
-                        .from('student_groups')
-                        .update({
-                            delete_flag: false,
-                            deleted_at: null,
-                            status: 'active'
-                        })
-                        .eq('group_id', selectedGroup.group_id)
-                        .in('student_id', deletedStudents.map(es => es.student_id));
-
-                    if (updateError) throw updateError;
-                }
-
-                // Si hay nuevos estudiantes, los insertamos
-                if (newStudents.length > 0) {
-                    const { error: insertError } = await supabaseClient
-                        .from('student_groups')
-                        .insert(
-                            newStudents.map(studentId => ({
-                                student_id: studentId,
-                                group_id: selectedGroup.group_id,
-                                status: 'active',
-                                enrollment_date: new Date().toISOString()
-                            }))
-                        );
-
-                    if (insertError) throw insertError;
-                }
-            } else {
-                // Si no hay estudiantes existentes, insertamos todos
-                const { error: insertError } = await supabaseClient
+                const { error: deleteError } = await supabaseClient
                     .from('student_groups')
-                    .insert(
-                        selectedStudents.map(studentId => ({
-                            student_id: studentId,
-                            group_id: selectedGroup.group_id,
-                            status: 'active',
-                            enrollment_date: new Date().toISOString()
-                        }))
-                    );
+                    .update({
+                        delete_flag: true,
+                        deleted_at: new Date().toISOString()
+                    })
+                    .in('student_group_id', existingStudents.map(es => es.student_group_id));
 
-                if (insertError) throw insertError;
+                if (deleteError) throw deleteError;
             }
+
+            // Creamos nuevos registros activos para todos los estudiantes seleccionados
+            const { error: insertError } = await supabaseClient
+                .from('student_groups')
+                .insert(
+                    selectedStudents.map(studentId => ({
+                        student_id: studentId,
+                        group_id: selectedGroup.group_id,
+                        status: 'active',
+                        enrollment_date: new Date().toISOString(),
+                        delete_flag: false,
+                        deleted_at: null
+                    }))
+                );
+
+            if (insertError) throw insertError;
 
             // Actualizar la lista de estudiantes
             await loadGroupStudents();
