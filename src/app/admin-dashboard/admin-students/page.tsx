@@ -73,6 +73,8 @@ export default function StudentDashboard() {
         email: '',
         grade_level: ''
     });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
 
     useEffect(() => {
         loadStudents();
@@ -293,8 +295,20 @@ export default function StudentDashboard() {
     const totalStudents = students.length;
     const activeStudents = students.filter(student => !student.delete_flag).length;
     const inactiveStudents = students.filter(student => student.delete_flag).length;
+
+    // Obtener el ciclo escolar activo actual
+    const currentSchoolYear = activeGroups[0]?.school_year_name;
+
+    // Calcular estudiantes por grado solo del ciclo actual
     const studentsByGrade = students.reduce((acc: { [key: string]: number }, student) => {
-        acc[student.grade_level] = (acc[student.grade_level] || 0) + 1;
+        // Solo incluir estudiantes que estén en grupos del ciclo actual
+        const isInCurrentYear = activeGroups.some(group =>
+            `${group.grade}${group.group_name}` === student.grade_level &&
+            group.school_year_name === currentSchoolYear
+        );
+        if (isInCurrentYear) {
+            acc[student.grade_level] = (acc[student.grade_level] || 0) + 1;
+        }
         return acc;
     }, {});
 
@@ -304,8 +318,8 @@ export default function StudentDashboard() {
             type: 'donut',
             height: 180,
         },
-        labels: ['Masculino', 'Femenino', 'Otro'],
-        colors: ['#465fff', '#10B981', '#F59E0B'],
+        labels: ['Masculino', 'Femenino'],
+        colors: ['#465fff', '#10B981'],
         legend: {
             position: 'bottom',
         },
@@ -323,9 +337,8 @@ export default function StudentDashboard() {
     };
 
     const genderSeries = [
-        students.filter(s => s.gender === 'M').length,
-        students.filter(s => s.gender === 'F').length,
-        students.filter(s => s.gender === 'O').length
+        students.filter(s => s.gender === 'Masculino').length,
+        students.filter(s => s.gender === 'Femenino').length
     ];
 
     const gradeOptions: ApexOptions = {
@@ -382,6 +395,12 @@ export default function StudentDashboard() {
         data: Object.keys(studentsByGrade).sort().map(grade => studentsByGrade[grade])
     }];
 
+    // Calcular estudiantes paginados
+    const indexOfLastStudent = currentPage * itemsPerPage;
+    const indexOfFirstStudent = indexOfLastStudent - itemsPerPage;
+    const currentStudents = sortStudents(filterStudents(students, searchTerm)).slice(indexOfFirstStudent, indexOfLastStudent);
+    const totalPages = Math.ceil(sortStudents(filterStudents(students, searchTerm)).length / itemsPerPage);
+
     return (
         <div className="container mx-auto p-6">
             <PageBreadcrumb pageTitle="Gestión de Estudiantes" />
@@ -415,7 +434,7 @@ export default function StudentDashboard() {
                     </div>
                 </div>
 
-                {/* Estudiantes por Género */}
+                {/* Promedio de Estudiantes por Grado */}
                 <div className="relative rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                     {totalStudents === 0 && (
                         <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
@@ -423,20 +442,22 @@ export default function StudentDashboard() {
                         </div>
                     )}
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                        <i className="fa-duotone fa-solid fa-venus-mars fa-xl text-gray-800 dark:text-white/90"></i>
+                        <i className="fa-duotone fa-solid fa-graduation-cap fa-xl text-gray-800 dark:text-white/90"></i>
                     </div>
                     <div className="mt-5 flex items-end justify-between">
                         <div>
                             <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                Distribución por Género
+                                Promedio por Grado
                             </span>
                             <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
-                                {genderSeries[0] + genderSeries[1]} estudiantes
+                                {Object.keys(studentsByGrade).length > 0
+                                    ? (Object.values(studentsByGrade).reduce((a, b) => a + b, 0) / Object.keys(studentsByGrade).length).toFixed(1)
+                                    : '0'} estudiantes
                             </h4>
                         </div>
                         <Badge color="success">
                             <span className="font-outfit">
-                                {((genderSeries[0] + genderSeries[1]) / totalStudents * 100).toFixed(1)}% registrados
+                                {Object.keys(studentsByGrade).length} grados
                             </span>
                         </Badge>
                     </div>
@@ -539,7 +560,15 @@ export default function StudentDashboard() {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <Table className="min-w-full">
+                    <Table
+                        className="min-w-full"
+                        maxHeight="500px"
+                        pagination={{
+                            currentPage,
+                            totalPages,
+                            onPageChange: setCurrentPage
+                        }}
+                    >
                         <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                             <TableRow>
                                 <TableCell
@@ -593,7 +622,7 @@ export default function StudentDashboard() {
                             </TableRow>
                         </TableHeader>
                         <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                            {sortStudents(filterStudents(students, searchTerm)).map((student) => (
+                            {currentStudents.map((student) => (
                                 <TableRow key={student.student_id}>
                                     <TableCell className="px-5 py-4 text-center sm:px-6">
                                         <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
@@ -792,8 +821,8 @@ export default function StudentDashboard() {
                                 <Select
                                     options={[
                                         { value: "", label: "Selecciona un género" },
-                                        { value: "M", label: "Masculino" },
-                                        { value: "F", label: "Femenino" },
+                                        { value: "Masculino", label: "Masculino" },
+                                        { value: "Femenino", label: "Femenino" },
                                     ]}
                                     placeholder="Selecciona un género"
                                     onChange={handleInputChange}
