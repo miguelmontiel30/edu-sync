@@ -1,16 +1,16 @@
 'use client';
 
 // React
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
 // Next
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 
 // Store
-import { useAuthStore } from '@/store/useAuthStore';
+import {useAuthStore} from '@/store/useAuthStore';
 
 // Auth Context
-import { useAuth } from '@/context/AuthContext';
+import {useAuth} from '@/context/AuthContext';
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -18,8 +18,8 @@ const LoginPage: React.FC = () => {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const { login: storeLogin } = useAuthStore();
-    const { login: contextLogin } = useAuth();
+    const {login: storeLogin} = useAuthStore();
+    const {login: contextLogin} = useAuth();
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -47,7 +47,9 @@ const LoginPage: React.FC = () => {
     return (
         <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900">
             <div className="w-full max-w-md space-y-6 rounded bg-white p-8 shadow-md dark:bg-gray-800">
-                <h2 className="text-center text-2xl font-bold text-gray-800 dark:text-white">Iniciar sesión</h2>
+                <h2 className="text-center text-2xl font-bold text-gray-800 dark:text-white">
+                    Iniciar sesión
+                </h2>
 
                 {error && (
                     <div className="rounded-md bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/50 dark:text-red-200">
@@ -95,11 +97,21 @@ const LoginPage: React.FC = () => {
                         className="w-full rounded bg-indigo-600 px-4 py-2 font-bold text-white hover:bg-indigo-700 focus:outline-none focus:ring focus:ring-indigo-200 disabled:bg-indigo-400"
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+                        {isLoading ? (
+                            <>
+                                <i className="fa-duotone fa-solid fa-spinner fa-spin mr-2"></i>
+                                <span>Iniciando sesión...</span>
+                            </>
+                        ) : (
+                            'Iniciar sesión'
+                        )}
                     </button>
                 </form>
                 <div className="text-center">
-                    <a href="/register" className="text-sm text-indigo-600 hover:underline dark:text-indigo-400">
+                    <a
+                        href="/register"
+                        className="text-sm text-indigo-600 hover:underline dark:text-indigo-400"
+                    >
                         ¿No tienes una cuenta? Regístrate aquí
                     </a>
                 </div>

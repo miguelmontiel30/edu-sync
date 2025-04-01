@@ -5,6 +5,7 @@ import React, {useState} from 'react';
 // Next.js
 import Image from 'next/image';
 import Link from 'next/link';
+import {useRouter} from 'next/navigation';
 
 // Components
 import {Dropdown} from '../ui/dropdown/Dropdown';
@@ -16,7 +17,8 @@ import {useAuth} from '@/context/AuthContext';
 export default function UserDropdown() {
     // States
     const [isOpen, setIsOpen] = useState(false);
-    const {profile} = useAuth();
+    const {profile, logout} = useAuth();
+    const router = useRouter();
 
     function toggleDropdown(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         event.stopPropagation();
@@ -25,6 +27,15 @@ export default function UserDropdown() {
 
     function closeDropdown() {
         setIsOpen(false);
+    }
+
+    async function handleLogout() {
+        try {
+            await logout();
+            router.push('/login');
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+        }
     }
 
     if (!profile) return null;
@@ -40,7 +51,7 @@ export default function UserDropdown() {
                         width={44}
                         height={44}
                         src="/images/user1.jpeg"
-                        alt="User profile picture"
+                        alt="Foto de perfil del usuario"
                     />
                 </span>
 
@@ -74,7 +85,7 @@ export default function UserDropdown() {
                             className="group flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                         >
                             <i className="fa-duotone fa-solid fa-user text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300"></i>
-                            Edit profile
+                            Editar perfil
                         </DropdownItem>
                     </li>
                     <li>
@@ -85,7 +96,7 @@ export default function UserDropdown() {
                             className="group flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                         >
                             <i className="fa-duotone fa-solid fa-gear text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300"></i>
-                            Account settings
+                            Configuración de cuenta
                         </DropdownItem>
                     </li>
                     <li>
@@ -96,17 +107,17 @@ export default function UserDropdown() {
                             className="group flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                         >
                             <i className="fa-duotone fa-solid fa-circle-info text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300"></i>
-                            Support
+                            Soporte
                         </DropdownItem>
                     </li>
                 </ul>
-                <Link
-                    href="/signin"
+                <button
+                    onClick={handleLogout}
                     className="group mt-3 flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                 >
                     <i className="fa-duotone fa-solid fa-right-from-bracket text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300"></i>
-                    Sign out
-                </Link>
+                    Cerrar sesión
+                </button>
             </Dropdown>
         </div>
     );
