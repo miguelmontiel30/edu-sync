@@ -1,16 +1,16 @@
 'use client';
-import React, {useState, useEffect, useRef} from 'react';
-import {ThemeToggleButton} from '@/components/common/ThemeToggleButton';
+import React, { useState, useEffect, useRef } from 'react';
+import { ThemeToggleButton } from '@/components/common/ThemeToggleButton';
 import NotificationDropdown from '@/components/header/NotificationDropdown';
 import UserDropdown from '@/components/header/UserDropdown';
-import {useSidebar} from '../../context/SidebarContext';
+import { useSidebar } from '../../context/SidebarContext';
 import Image from 'next/image';
 import Link from 'next/link';
 
 // Renombramos el componente a AdminNavbar
 const AdminNavbar: React.FC = () => {
     const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
-    const {isMobileOpen, toggleSidebar, toggleMobileSidebar} = useSidebar();
+    const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
 
     // Para manejar el atajo "⌘ + K" o "Ctrl + K"
     const inputRef = useRef<HTMLInputElement>(null);
@@ -90,16 +90,16 @@ const AdminNavbar: React.FC = () => {
                     {/* Logo en mobile */}
                     <Link href="/" className="lg:hidden">
                         <Image
-                            width={154}
-                            height={32}
-                            className="dark:hidden"
+                            width={120}
+                            height={25}
+                            className="dark:hidden sm:w-[154px] sm:h-[32px]"
                             src="/images/EduSync-logo.png"
                             alt="Logo"
                         />
                         <Image
-                            width={154}
-                            height={32}
-                            className="hidden dark:block"
+                            width={120}
+                            height={25}
+                            className="hidden dark:block sm:w-[154px] sm:h-[32px]"
                             src="/images/EduSync-logo.png"
                             alt="Logo"
                         />
@@ -168,9 +168,8 @@ const AdminNavbar: React.FC = () => {
 
                 {/* Sección derecha: menús de notificación y usuario */}
                 <div
-                    className={`${
-                        isApplicationMenuOpen ? 'flex' : 'hidden'
-                    } w-full items-center justify-between gap-4 px-5 py-4 shadow-theme-md lg:flex lg:justify-end lg:px-0 lg:shadow-none`}
+                    className={`${isApplicationMenuOpen ? 'flex' : 'hidden'
+                        } w-full items-center justify-between gap-4 px-5 py-4 shadow-theme-md lg:flex lg:justify-end lg:px-0 lg:shadow-none`}
                 >
                     <div className="flex items-center gap-2 2xsm:gap-3">
                         {/* Botón de modo oscuro */}
