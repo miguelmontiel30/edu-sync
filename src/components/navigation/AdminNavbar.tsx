@@ -90,16 +90,16 @@ const AdminNavbar: React.FC = () => {
                     {/* Logo en mobile */}
                     <Link href="/" className="lg:hidden">
                         <Image
-                            width={120}
-                            height={25}
-                            className="dark:hidden sm:w-[154px] sm:h-[32px]"
+                            width={50}
+                            height={50}
+                            className="dark:hidden w-[50px] h-[50px]"
                             src="/images/EduSync-logo.png"
                             alt="Logo"
                         />
                         <Image
-                            width={120}
-                            height={25}
-                            className="hidden dark:block sm:w-[154px] sm:h-[32px]"
+                            width={50}
+                            height={50}
+                            className="hidden dark:block w-[50px] h-[50px]"
                             src="/images/EduSync-logo.png"
                             alt="Logo"
                         />
