@@ -19,6 +19,7 @@ import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import Select from '@/components/form/Select';
 import SelectWithCategories from '@/components/core/select/SelectWithCategories';
+import Switch from '@/components/form/switch/Switch';
 
 export default function GroupDashboard() {
     const [groups, setGroups] = useState<Group[]>([]);
@@ -26,6 +27,7 @@ export default function GroupDashboard() {
     const [deletedGroups, setDeletedGroups] = useState<Group[]>([]);
     const [showDeleted, setShowDeleted] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showOnlyActiveCycles, setShowOnlyActiveCycles] = useState(true);
     const [sortField, setSortField] = useState<'grade' | 'group' | 'studentsNumber' | 'subjectsNumber' | 'generalAverage' | 'status'>('grade');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [schoolYears, setSchoolYears] = useState<Array<{ id: number; name: string; status: string }>>([]);
@@ -351,13 +353,26 @@ export default function GroupDashboard() {
 
     // Función para filtrar los grupos
     const filterGroups = (groups: Group[], term: string) => {
-        if (!term) return groups;
-        const searchTermLower = term.toLowerCase();
-        return groups.filter(group =>
-            group.group.toLowerCase().includes(searchTermLower) ||
-            group.grade.toString().includes(searchTermLower) ||
-            group.status.toLowerCase().includes(searchTermLower)
-        );
+        let filtered = groups;
+
+        // Filtrar por término de búsqueda
+        if (term) {
+            const searchTermLower = term.toLowerCase();
+            filtered = filtered.filter(group =>
+                group.group.toLowerCase().includes(searchTermLower) ||
+                group.grade.toString().includes(searchTermLower) ||
+                group.status.toLowerCase().includes(searchTermLower)
+            );
+        }
+
+        // Filtrar por ciclos activos si está habilitado
+        if (showOnlyActiveCycles) {
+            filtered = filtered.filter(group =>
+                group.schoolYear?.status === 'active' || group.schoolYear?.status === 'vigent'
+            );
+        }
+
+        return filtered;
     };
 
     // Efecto para actualizar los grupos filtrados y ordenados
@@ -365,7 +380,7 @@ export default function GroupDashboard() {
         const filtered = filterGroups(groups, searchTerm);
         const sorted = sortGroups(filtered);
         setFilteredGroups(sorted);
-    }, [groups, searchTerm, sortField, sortDirection]);
+    }, [groups, searchTerm, sortField, sortDirection, showOnlyActiveCycles]);
 
     function openModal() {
         setSelectedGroup(null);
@@ -709,8 +724,11 @@ export default function GroupDashboard() {
                         )}
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
-                                Distribución de Alumnos por Grupo
+                                Distribución de alumnos por grupo
                             </h3>
+                            <Badge color="success">
+                                <span className="font-outfit">Grupos activos: {groups.filter(group => group.status === GroupStatus.Active).length}</span>
+                            </Badge>
                         </div>
 
                         <div className="custom-scrollbar max-w-full overflow-x-auto">
@@ -725,12 +743,18 @@ export default function GroupDashboard() {
                                             },
                                         },
                                         xaxis: {
-                                            categories: groups.map(group => `${group.grade}° ${group.group}`),
+                                            categories: groups
+                                                .filter(group => group.status === GroupStatus.Active)
+                                                .sort((a, b) => a.grade - b.grade || a.group.localeCompare(b.group))
+                                                .map(group => `${group.grade}° ${group.group}`),
                                         },
                                     }}
                                     series={[{
                                         name: 'Alumnos',
-                                        data: groups.map(group => group.studentsNumber)
+                                        data: groups
+                                            .filter(group => group.status === GroupStatus.Active)
+                                            .sort((a, b) => a.grade - b.grade || a.group.localeCompare(b.group))
+                                            .map(group => group.studentsNumber)
                                     }]}
                                     type="bar"
                                     height={180}
@@ -787,17 +811,22 @@ export default function GroupDashboard() {
 
                 {/* Historical */}
                 <ComponentCard title="Lista de grupos" desc='Aquí podrás ver todos los grupos registrados, su información y gestionarlos. Puedes crear nuevos grupos, editar los existentes o eliminarlos según sea necesario.' className={`w-100 p-4`}>
+
                     <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="relative w-full sm:w-64">
-                            <Input
-                                type="text"
-                                placeholder="Buscar grupos..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10"
-                                startIcon={<i className="fa-duotone fa-solid fa-search text-gray-400"></i>}
-                            />
+
+                        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                            <div className="relative w-full sm:w-64">
+                                <Input
+                                    type="text"
+                                    placeholder="Buscar grupos..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-10"
+                                    startIcon={<i className="fa-duotone fa-solid fa-search text-gray-400"></i>}
+                                />
+                            </div>
                         </div>
+
                         <Button
                             variant="primary"
                             startIcon={<i className="fa-duotone fa-solid fa-users-medical"></i>}
@@ -805,6 +834,18 @@ export default function GroupDashboard() {
                         >
                             <span className="font-outfit">Nuevo Grupo</span>
                         </Button>
+                    </div>
+
+                    <div className="flex justify-end">
+                        <div className="flex items-center gap-2">
+                            <Label className="font-outfit text-sm">Solo ciclos activos</Label>
+                            <Switch
+                                label=""
+                                defaultChecked={showOnlyActiveCycles}
+                                onChange={(checked) => setShowOnlyActiveCycles(checked)}
+                                color="blue"
+                            />
+                        </div>
                     </div>
 
                     <div className="overflow-x-auto">
