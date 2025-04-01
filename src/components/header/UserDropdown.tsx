@@ -10,24 +10,30 @@ import Link from 'next/link';
 import {Dropdown} from '../ui/dropdown/Dropdown';
 import {DropdownItem} from '../ui/dropdown/DropdownItem';
 
+// Context
+import {useAuth} from '@/context/AuthContext';
+
 export default function UserDropdown() {
     // States
     const [isOpen, setIsOpen] = useState(false);
+    const {profile} = useAuth();
 
     function toggleDropdown(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         event.stopPropagation();
-
         setIsOpen(prev => !prev);
     }
 
     function closeDropdown() {
         setIsOpen(false);
     }
+
+    if (!profile) return null;
+
     return (
         <div className="relative">
             <button
                 onClick={toggleDropdown}
-                className="dropdown-toggle flex items-center text-gray-700 dark:text-gray-400"
+                className="dropdown-toggle flex items-center font-outfit text-gray-700 dark:text-gray-400"
             >
                 <span className="mr-3 h-11 w-11 overflow-hidden rounded-full">
                     <Image
@@ -38,7 +44,7 @@ export default function UserDropdown() {
                     />
                 </span>
 
-                <span className="mr-1 block text-theme-sm font-medium">Miguel</span>
+                <span className="mr-1 block text-theme-sm font-medium">{profile.first_name}</span>
 
                 <i
                     className={`fa-duotone fa-solid fa-chevron-${isOpen ? 'up' : 'down'} text-gray-500 transition-transform duration-200 dark:text-gray-400`}
@@ -48,14 +54,14 @@ export default function UserDropdown() {
             <Dropdown
                 isOpen={isOpen}
                 onClose={closeDropdown}
-                className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+                className="absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 font-outfit shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
             >
                 <div>
                     <span className="block text-theme-sm font-medium text-gray-700 dark:text-gray-400">
-                        Musharof Chowdhury
+                        {`${profile.first_name} ${profile.last_name}`}
                     </span>
                     <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-                        randomuser@pimjo.com
+                        {profile.email}
                     </span>
                 </div>
 
