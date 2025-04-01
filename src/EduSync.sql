@@ -1507,4 +1507,164 @@ VALUES
         null
     );
 
+-- Insertar profesores
+INSERT INTO
+    "public"."teachers" (
+        "teacher_id",
+        "school_id",
+        "name",
+        "role",
+        "image",
+        "email",
+        "phone",
+        "delete_flag",
+        "created_at",
+        "updated_at",
+        "deleted_at"
+    )
+VALUES
+    (
+        '1',
+        '1',
+        'Luis Ernesto',
+        'profesor',
+        '',
+        'luisernesto@mail.com',
+        '321132432',
+        'false',
+        '2025-04-01 04:32:31.508109+00',
+        '2025-04-01 04:32:31.508109+00',
+        null
+    ),
+    (
+        '2',
+        '1',
+        'Laura Ramírez',
+        'Docente de Matemáticas',
+        'laura.jpg',
+        'laura.ramirez@example.com',
+        '5552001001',
+        'false',
+        '2025-04-01 16:14:09.459949+00',
+        '2025-04-01 16:14:09.459949+00',
+        null
+    ),
+    (
+        '3',
+        '1',
+        'Miguel Torres',
+        'Docente de Ciencias',
+        'miguel.jpg',
+        'miguel.torres@example.com',
+        '5552001002',
+        'false',
+        '2025-04-01 16:14:09.459949+00',
+        '2025-04-01 16:14:09.459949+00',
+        null
+    ),
+    (
+        '4',
+        '1',
+        'Patricia Gómez',
+        'Docente de Español',
+        'patricia.jpg',
+        'patricia.gomez@example.com',
+        '5552001003',
+        'false',
+        '2025-04-01 16:14:09.459949+00',
+        '2025-04-01 16:14:09.459949+00',
+        null
+    ),
+    (
+        '5',
+        '1',
+        'Andrés Navarro',
+        'Docente de Historia',
+        'andres.jpg',
+        'andres.navarro@example.com',
+        '5552001004',
+        'false',
+        '2025-04-01 16:14:09.459949+00',
+        '2025-04-01 16:14:09.459949+00',
+        null
+    ),
+    (
+        '6',
+        '1',
+        'Rocío Sánchez',
+        'Docente de Geografía',
+        'rocio.jpg',
+        'rocio.sanchez@example.com',
+        '5552001005',
+        'false',
+        '2025-04-01 16:14:09.459949+00',
+        '2025-04-01 16:14:09.459949+00',
+        null
+    ),
+    (
+        '7',
+        '1',
+        'Javier Martínez',
+        'Docente de Educación Física',
+        'javier.jpg',
+        'javier.martinez@example.com',
+        '5552001006',
+        'false',
+        '2025-04-01 16:14:09.459949+00',
+        '2025-04-01 16:14:09.459949+00',
+        null
+    ),
+    (
+        '8',
+        '1',
+        'Claudia Vega',
+        'Docente de Inglés',
+        'claudia.jpg',
+        'claudia.vega@example.com',
+        '5552001007',
+        'false',
+        '2025-04-01 16:14:09.459949+00',
+        '2025-04-01 16:14:09.459949+00',
+        null
+    ),
+    (
+        '9',
+        '1',
+        'Daniela Cruz',
+        'Docente de Música',
+        'daniela.jpg',
+        'daniela.cruz@example.com',
+        '5552001008',
+        'false',
+        '2025-04-01 16:14:09.459949+00',
+        '2025-04-01 16:14:09.459949+00',
+        null
+    ),
+    (
+        '10',
+        '1',
+        'Fernando Morales',
+        'Docente de Computación',
+        'fernando.jpg',
+        'fernando.morales@example.com',
+        '5552001009',
+        'false',
+        '2025-04-01 16:14:09.459949+00',
+        '2025-04-01 16:14:09.459949+00',
+        null
+    ),
+    (
+        '11',
+        '1',
+        'Gabriela Jiménez',
+        'Docente de Formación Cívica',
+        'gabriela.jpg',
+        'gabriela.jimenez@example.com',
+        '5552001010',
+        'false',
+        '2025-04-01 16:14:09.459949+00',
+        '2025-04-01 16:14:09.459949+00',
+        null
+    );
+
 COMMIT;
