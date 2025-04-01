@@ -79,14 +79,20 @@ export default function SchoolYearDashboard() {
         endDate: '',
         status: 'inactive' as 'active' | 'inactive' | 'completed'
     });
+    const [isLoadingCycles, setIsLoadingCycles] = useState(true);
+    const [isLoadingDeleted, setIsLoadingDeleted] = useState(true);
+    const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Cargar ciclos escolares al montar el componente
     useEffect(() => {
         loadSchoolYears();
+        loadDeletedCycles();
     }, []);
 
     // Cargar ciclos eliminados
     async function loadDeletedCycles() {
+        setIsLoadingDeleted(true);
         try {
             const { data, error } = await supabaseClient
                 .from('school_years')
@@ -126,10 +132,14 @@ export default function SchoolYearDashboard() {
             }
         } catch (error) {
             console.error('Error al cargar los ciclos eliminados:', error);
+        } finally {
+            setIsLoadingDeleted(false);
         }
     }
 
     async function loadSchoolYears() {
+        setIsLoadingCycles(true);
+        setIsLoadingMetrics(true);
         try {
             const { data, error } = await supabaseClient
                 .from('school_years')
@@ -148,7 +158,6 @@ export default function SchoolYearDashboard() {
 
             if (data) {
                 const formattedCycles: SchoolCycle[] = data.map(cycle => {
-                    // Calcular métricas
                     const groups = cycle.groups || [];
                     const totalStudents = groups.reduce((acc: number, group: any) => acc + (group.students_number || 0), 0);
                     const averageGrade = groups.length > 0
@@ -171,6 +180,9 @@ export default function SchoolYearDashboard() {
         } catch (error) {
             console.error('Error al cargar los ciclos escolares:', error);
             alert('Error al cargar los ciclos escolares. Por favor recarga la página.');
+        } finally {
+            setIsLoadingCycles(false);
+            setIsLoadingMetrics(false);
         }
     }
 
@@ -197,6 +209,8 @@ export default function SchoolYearDashboard() {
     };
 
     async function handleDelete(id: number) {
+        if (!confirm('¿Estás seguro de que deseas eliminar este ciclo escolar?')) return;
+        setIsSaving(true);
         try {
             const { error } = await supabaseClient
                 .from('school_years')
@@ -217,6 +231,8 @@ export default function SchoolYearDashboard() {
         } catch (error) {
             console.error('Error al eliminar el ciclo escolar:', error);
             alert('Error al eliminar el ciclo escolar. Por favor intenta nuevamente.');
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -260,6 +276,7 @@ export default function SchoolYearDashboard() {
     }
 
     async function handleSaveCycle() {
+        setIsSaving(true);
         try {
             // Validar que todos los campos estén completados
             if (!cycleForm.name || !cycleForm.startDate || !cycleForm.endDate) {
@@ -326,9 +343,12 @@ export default function SchoolYearDashboard() {
                 }
             }
             closeModal();
+            await loadSchoolYears();
         } catch (error) {
             console.error('Error al guardar el ciclo escolar:', error);
             alert('Error al guardar el ciclo escolar. Por favor intenta nuevamente.');
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -564,11 +584,6 @@ export default function SchoolYearDashboard() {
         setFilteredCycles(sorted);
     }, [cycles, searchTerm, sortField, sortDirection]);
 
-    // Cargar ciclos eliminados al montar el componente
-    useEffect(() => {
-        loadDeletedCycles();
-    }, []);
-
     return (
         <div className="mx-auto max-w-screen-2xl p-4 md:p-6">
             {/* Breadcrumb */}
@@ -579,87 +594,107 @@ export default function SchoolYearDashboard() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">
                     {/* Total de Ciclos */}
                     <div className="relative rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                        {cycles.length === 0 && (
+                        {isLoadingMetrics ? (
+                            <div className="flex items-center justify-center h-full">
+                                <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                            </div>
+                        ) : cycles.length === 0 ? (
                             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
                                 <span className="text-lg font-semibold text-white font-outfit">Sin datos</span>
                             </div>
+                        ) : (
+                            <>
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+                                    <i className="fa-duotone fa-solid fa-calendar fa-xl text-gray-800 dark:text-white/90"></i>
+                                </div>
+                                <div className="mt-5 flex items-end justify-between">
+                                    <div>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                            Total de Ciclos
+                                        </span>
+                                        <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
+                                            {cycles.length}
+                                        </h4>
+                                    </div>
+                                    <Badge color="info">
+                                        <span className="font-outfit">
+                                            {cycles.filter(cycle => cycle.status === 'active').length} activos
+                                        </span>
+                                    </Badge>
+                                </div>
+                            </>
                         )}
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                            <i className="fa-duotone fa-solid fa-calendar fa-xl text-gray-800 dark:text-white/90"></i>
-                        </div>
-
-                        <div className="mt-5 flex items-end justify-between">
-                            <div>
-                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                    Total de Ciclos
-                                </span>
-                                <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
-                                    {cycles.length}
-                                </h4>
-                            </div>
-                            <Badge color="info">
-                                <span className="font-outfit">
-                                    {cycles.filter(cycle => cycle.status === 'active').length} activos
-                                </span>
-                            </Badge>
-                        </div>
                     </div>
 
                     {/* Total de Alumnos en Ciclos Activos */}
                     <div className="relative rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                        {cycles.length === 0 && (
+                        {isLoadingMetrics ? (
+                            <div className="flex items-center justify-center h-full">
+                                <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                            </div>
+                        ) : cycles.length === 0 ? (
                             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
                                 <span className="text-lg font-semibold text-white font-outfit">Sin datos</span>
                             </div>
+                        ) : (
+                            <>
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+                                    <i className="fa-duotone fa-solid fa-user-graduate fa-xl text-gray-800 dark:text-white/90"></i>
+                                </div>
+                                <div className="mt-5 flex items-end justify-between">
+                                    <div>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                            Alumnos en Ciclos Activos
+                                        </span>
+                                        <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
+                                            {cycles.filter(cycle => cycle.status === 'active').reduce((acc, cycle) => acc + cycle.studentsCount, 0)}
+                                        </h4>
+                                    </div>
+                                    <Badge color="success">
+                                        <span className="font-outfit">
+                                            {cycles.filter(cycle => cycle.status === 'active').length} ciclos
+                                        </span>
+                                    </Badge>
+                                </div>
+                            </>
                         )}
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                            <i className="fa-duotone fa-solid fa-user-graduate fa-xl text-gray-800 dark:text-white/90"></i>
-                        </div>
-                        <div className="mt-5 flex items-end justify-between">
-                            <div>
-                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                    Alumnos en Ciclos Activos
-                                </span>
-                                <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
-                                    {cycles.filter(cycle => cycle.status === 'active').reduce((acc, cycle) => acc + cycle.studentsCount, 0)}
-                                </h4>
-                            </div>
-                            <Badge color="success">
-                                <span className="font-outfit">
-                                    {cycles.filter(cycle => cycle.status === 'active').length} ciclos
-                                </span>
-                            </Badge>
-                        </div>
                     </div>
 
                     {/* Promedio General de Ciclos Activos */}
                     <div className="relative rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
-                        {cycles.length === 0 && (
+                        {isLoadingMetrics ? (
+                            <div className="flex items-center justify-center h-full">
+                                <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                            </div>
+                        ) : cycles.length === 0 ? (
                             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
                                 <span className="text-lg font-semibold text-white font-outfit">Sin datos</span>
                             </div>
+                        ) : (
+                            <>
+                                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+                                    <i className="fa-duotone fa-solid fa-graduation-cap fa-xl text-gray-800 dark:text-white/90"></i>
+                                </div>
+                                <div className="mt-5 flex items-end justify-between">
+                                    <div>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                            Promedio General
+                                        </span>
+                                        <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
+                                            {cycles.filter(cycle => cycle.status === 'active').length > 0
+                                                ? (cycles.filter(cycle => cycle.status === 'active').reduce((acc, cycle) => acc + cycle.averageGrade, 0) / cycles.filter(cycle => cycle.status === 'active').length).toFixed(2)
+                                                : '0.00'
+                                            }
+                                        </h4>
+                                    </div>
+                                    <Badge color="warning">
+                                        <span className="font-outfit">
+                                            {cycles.filter(cycle => cycle.status === 'active' && cycle.averageGrade >= 8).length} ciclos
+                                        </span>
+                                    </Badge>
+                                </div>
+                            </>
                         )}
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                            <i className="fa-duotone fa-solid fa-graduation-cap fa-xl text-gray-800 dark:text-white/90"></i>
-                        </div>
-                        <div className="mt-5 flex items-end justify-between">
-                            <div>
-                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                    Promedio General
-                                </span>
-                                <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
-                                    {cycles.filter(cycle => cycle.status === 'active').length > 0
-                                        ? (cycles.filter(cycle => cycle.status === 'active').reduce((acc, cycle) => acc + cycle.averageGrade, 0) / cycles.filter(cycle => cycle.status === 'active').length).toFixed(2)
-                                        : '0.00'
-                                    }
-                                </h4>
-                            </div>
-                            <Badge color="warning">
-                                <span className="font-outfit">
-                                    {cycles.filter(cycle => cycle.status === 'active' && cycle.averageGrade >= 8).length} ciclos
-                                </span>
-                            </Badge>
-                        </div>
                     </div>
                 </div>
 
@@ -667,80 +702,92 @@ export default function SchoolYearDashboard() {
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {/* Alumnos por Ciclo */}
                     <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
-                        {cycles.length === 0 && (
+                        {isLoadingMetrics ? (
+                            <div className="flex items-center justify-center h-[180px]">
+                                <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                            </div>
+                        ) : cycles.length === 0 ? (
                             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
                                 <span className="text-lg font-semibold text-white font-outfit">Sin datos</span>
                             </div>
+                        ) : (
+                            <>
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
+                                        Distribución de Alumnos por Ciclo
+                                    </h3>
+                                </div>
+                                <div className="custom-scrollbar max-w-full overflow-x-auto">
+                                    <div className="-ml-5 min-w-[650px] pl-2 xl:min-w-full">
+                                        <ReactApexChart
+                                            options={{
+                                                ...barOptions,
+                                                colors: ['#465fff'],
+                                                yaxis: {
+                                                    title: {
+                                                        text: 'Número de Alumnos',
+                                                    },
+                                                },
+                                                xaxis: {
+                                                    categories: cycles.map(cycle => cycle.name),
+                                                },
+                                            }}
+                                            series={[{
+                                                name: 'Alumnos',
+                                                data: cycles.map(cycle => cycle.studentsCount)
+                                            }]}
+                                            type="bar"
+                                            height={180}
+                                        />
+                                    </div>
+                                </div>
+                            </>
                         )}
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
-                                Distribución de Alumnos por Ciclo
-                            </h3>
-                        </div>
-
-                        <div className="custom-scrollbar max-w-full overflow-x-auto">
-                            <div className="-ml-5 min-w-[650px] pl-2 xl:min-w-full">
-                                <ReactApexChart
-                                    options={{
-                                        ...barOptions,
-                                        colors: ['#465fff'],
-                                        yaxis: {
-                                            title: {
-                                                text: 'Número de Alumnos',
-                                            },
-                                        },
-                                        xaxis: {
-                                            categories: cycles.map(cycle => cycle.name),
-                                        },
-                                    }}
-                                    series={[{
-                                        name: 'Alumnos',
-                                        data: cycles.map(cycle => cycle.studentsCount)
-                                    }]}
-                                    type="bar"
-                                    height={180}
-                                />
-                            </div>
-                        </div>
                     </div>
 
                     {/* Promedios por Ciclo */}
                     <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
-                        {cycles.length === 0 && (
+                        {isLoadingMetrics ? (
+                            <div className="flex items-center justify-center h-[180px]">
+                                <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                            </div>
+                        ) : cycles.length === 0 ? (
                             <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
                                 <span className="text-lg font-semibold text-white font-outfit">Sin datos</span>
                             </div>
+                        ) : (
+                            <>
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
+                                        Promedios por Ciclo Escolar
+                                    </h3>
+                                </div>
+                                <div className="custom-scrollbar max-w-full overflow-x-auto">
+                                    <div className="-ml-5 min-w-[650px] pl-2 xl:min-w-full">
+                                        <ReactApexChart
+                                            options={{
+                                                ...barOptions,
+                                                colors: ['#10B981'],
+                                                yaxis: {
+                                                    title: {
+                                                        text: 'Promedio General',
+                                                    },
+                                                },
+                                                xaxis: {
+                                                    categories: cycles.map(cycle => cycle.name),
+                                                },
+                                            }}
+                                            series={[{
+                                                name: 'Promedio',
+                                                data: cycles.map(cycle => cycle.averageGrade)
+                                            }]}
+                                            type="bar"
+                                            height={180}
+                                        />
+                                    </div>
+                                </div>
+                            </>
                         )}
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
-                                Promedios por Ciclo Escolar
-                            </h3>
-                        </div>
-
-                        <div className="custom-scrollbar max-w-full overflow-x-auto">
-                            <div className="-ml-5 min-w-[650px] pl-2 xl:min-w-full">
-                                <ReactApexChart
-                                    options={{
-                                        ...barOptions,
-                                        colors: ['#10B981'],
-                                        yaxis: {
-                                            title: {
-                                                text: 'Promedio General',
-                                            },
-                                        },
-                                        xaxis: {
-                                            categories: cycles.map(cycle => cycle.name),
-                                        },
-                                    }}
-                                    series={[{
-                                        name: 'Promedio',
-                                        data: cycles.map(cycle => cycle.averageGrade)
-                                    }]}
-                                    type="bar"
-                                    height={180}
-                                />
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -761,221 +808,115 @@ export default function SchoolYearDashboard() {
                             variant="primary"
                             startIcon={<i className="fa-duotone fa-solid fa-calendar-pen"></i>}
                             onClick={openModal}
+                            disabled={isSaving}
                         >
                             <span className="font-outfit">Nuevo Ciclo Escolar</span>
                         </Button>
                     </div>
 
                     <div className="overflow-x-auto">
-                        <Table className="min-w-full">
-                            <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                                <TableRow>
-                                    <TableCell
-                                        isHeader
-                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                        onClick={() => handleSort('name')}
-                                    >
-                                        <div className="flex items-center justify-center gap-1">
-                                            Nombre
-                                            {sortField === 'name' && (
-                                                <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell
-                                        isHeader
-                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                        onClick={() => handleSort('startDate')}
-                                    >
-                                        <div className="flex items-center justify-center gap-1">
-                                            Fecha de Inicio
-                                            {sortField === 'startDate' && (
-                                                <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell
-                                        isHeader
-                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                        onClick={() => handleSort('endDate')}
-                                    >
-                                        <div className="flex items-center justify-center gap-1">
-                                            Fecha de Fin
-                                            {sortField === 'endDate' && (
-                                                <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell
-                                        isHeader
-                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                        onClick={() => handleSort('groupsCount')}
-                                    >
-                                        <div className="flex items-center justify-center gap-1">
-                                            Grupos
-                                            {sortField === 'groupsCount' && (
-                                                <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell
-                                        isHeader
-                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                        onClick={() => handleSort('studentsCount')}
-                                    >
-                                        <div className="flex items-center justify-center gap-1">
-                                            Alumnos
-                                            {sortField === 'studentsCount' && (
-                                                <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell
-                                        isHeader
-                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                        onClick={() => handleSort('averageGrade')}
-                                    >
-                                        <div className="flex items-center justify-center gap-1">
-                                            Promedio
-                                            {sortField === 'averageGrade' && (
-                                                <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell
-                                        isHeader
-                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                        onClick={() => handleSort('status')}
-                                    >
-                                        <div className="flex items-center justify-center gap-1">
-                                            Estado
-                                            {sortField === 'status' && (
-                                                <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                    <TableCell
-                                        isHeader
-                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit"
-                                    >
-                                        Acciones
-                                    </TableCell>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                                {filteredCycles.map(cycle => (
-                                    <TableRow key={cycle.id}>
-                                        <TableCell className="px-5 py-4 text-center sm:px-6">
-                                            <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
-                                                {cycle.name}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="px-5 py-4 text-center sm:px-6">
-                                            <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                {new Date(cycle.startDate).toLocaleDateString()}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="px-5 py-4 text-center sm:px-6">
-                                            <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                {new Date(cycle.endDate).toLocaleDateString()}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="px-5 py-4 text-center sm:px-6">
-                                            <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                {cycle.groupsCount}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="px-5 py-4 text-center sm:px-6">
-                                            <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                {cycle.studentsCount}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="px-5 py-4 text-center sm:px-6">
-                                            <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                {cycle.averageGrade.toFixed(2)}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="px-5 py-4 text-center sm:px-6">
-                                            <Badge
-                                                size="sm"
-                                                color={cycle.status === 'active' ? 'success' : (cycle.status === 'completed' ? 'warning' : 'light')}
-                                            >
-                                                <span className="font-outfit">
-                                                    {cycle.status === 'active' ? 'activo' : (cycle.status === 'completed' ? 'finalizado' : 'inactivo')}
-                                                </span>
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="px-5 py-4 text-center sm:px-6">
-                                            <Button
-                                                className="mr-2"
-                                                variant="outline"
-                                                size="sm"
-                                                startIcon={<i className="fa-duotone fa-solid fa-calendar-pen"></i>}
-                                                onClick={() => handleEdit(cycle.id)}
-                                            >
-                                                <span className="font-outfit">Editar</span>
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                startIcon={<i className="fa-duotone fa-solid fa-calendar-xmark"></i>}
-                                                onClick={() => handleDelete(cycle.id)}
-                                            >
-                                                <span className="font-outfit">Eliminar</span>
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {filteredCycles.length === 0 && (
-                                    <TableRow>
-                                        <TableCell className="px-5 py-4 text-center sm:px-6">
-                                            <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                                {searchTerm ? 'No se encontraron ciclos que coincidan con la búsqueda.' : 'No se encontraron ciclos escolares.'}
-                                            </span>
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </div>
-                </ComponentCard>
-            </div>
-
-            {/* Ciclos Eliminados */}
-            <div className="mt-6">
-                <button
-                    onClick={() => setShowDeleted(!showDeleted)}
-                    className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white p-4 text-left dark:border-gray-800 dark:bg-white/[0.03]"
-                >
-                    <div>
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
-                            Ciclos Eliminados
-                        </h3>
-                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                            {deletedCycles.length} ciclos en la papelera
-                        </p>
-                    </div>
-                    <i className={`fa-duotone fa-solid fa-chevron-${showDeleted ? 'up' : 'down'} text-gray-500 dark:text-gray-400`}></i>
-                </button>
-
-                {showDeleted && (
-                    <div className="mt-4">
-                        <div className="overflow-x-auto">
+                        {isLoadingCycles ? (
+                            <div className="flex items-center justify-center h-[200px]">
+                                <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                            </div>
+                        ) : (
                             <Table className="min-w-full">
                                 <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                                     <TableRow>
-                                        <TableCell isHeader>Nombre</TableCell>
-                                        <TableCell isHeader>Fecha de Inicio</TableCell>
-                                        <TableCell isHeader>Fecha de Fin</TableCell>
-                                        <TableCell isHeader>Grupos</TableCell>
-                                        <TableCell isHeader>Alumnos</TableCell>
-                                        <TableCell isHeader>Promedio</TableCell>
-                                        <TableCell isHeader>Estado</TableCell>
-                                        <TableCell isHeader>Acciones</TableCell>
+                                        <TableCell
+                                            isHeader
+                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                            onClick={() => handleSort('name')}
+                                        >
+                                            <div className="flex items-center justify-center gap-1">
+                                                Nombre
+                                                {sortField === 'name' && (
+                                                    <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell
+                                            isHeader
+                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                            onClick={() => handleSort('startDate')}
+                                        >
+                                            <div className="flex items-center justify-center gap-1">
+                                                Fecha de Inicio
+                                                {sortField === 'startDate' && (
+                                                    <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell
+                                            isHeader
+                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                            onClick={() => handleSort('endDate')}
+                                        >
+                                            <div className="flex items-center justify-center gap-1">
+                                                Fecha de Fin
+                                                {sortField === 'endDate' && (
+                                                    <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell
+                                            isHeader
+                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                            onClick={() => handleSort('groupsCount')}
+                                        >
+                                            <div className="flex items-center justify-center gap-1">
+                                                Grupos
+                                                {sortField === 'groupsCount' && (
+                                                    <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell
+                                            isHeader
+                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                            onClick={() => handleSort('studentsCount')}
+                                        >
+                                            <div className="flex items-center justify-center gap-1">
+                                                Alumnos
+                                                {sortField === 'studentsCount' && (
+                                                    <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell
+                                            isHeader
+                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                            onClick={() => handleSort('averageGrade')}
+                                        >
+                                            <div className="flex items-center justify-center gap-1">
+                                                Promedio
+                                                {sortField === 'averageGrade' && (
+                                                    <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell
+                                            isHeader
+                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                            onClick={() => handleSort('status')}
+                                        >
+                                            <div className="flex items-center justify-center gap-1">
+                                                Estado
+                                                {sortField === 'status' && (
+                                                    <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell
+                                            isHeader
+                                            className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit"
+                                        >
+                                            Acciones
+                                        </TableCell>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                                    {deletedCycles.map(cycle => (
+                                    {filteredCycles.map(cycle => (
                                         <TableRow key={cycle.id}>
                                             <TableCell className="px-5 py-4 text-center sm:px-6">
                                                 <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
@@ -1019,27 +960,146 @@ export default function SchoolYearDashboard() {
                                             </TableCell>
                                             <TableCell className="px-5 py-4 text-center sm:px-6">
                                                 <Button
+                                                    className="mr-2"
                                                     variant="outline"
                                                     size="sm"
-                                                    startIcon={<i className="fa-duotone fa-solid fa-rotate-left"></i>}
-                                                    onClick={() => handleRestore(cycle.id)}
+                                                    startIcon={<i className="fa-duotone fa-solid fa-calendar-pen"></i>}
+                                                    onClick={() => handleEdit(cycle.id)}
                                                 >
-                                                    <span className="font-outfit">Restaurar</span>
+                                                    <span className="font-outfit">Editar</span>
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    startIcon={<i className="fa-duotone fa-solid fa-calendar-xmark"></i>}
+                                                    onClick={() => handleDelete(cycle.id)}
+                                                >
+                                                    <span className="font-outfit">Eliminar</span>
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
                                     ))}
-                                    {deletedCycles.length === 0 && (
+                                    {filteredCycles.length === 0 && (
                                         <TableRow>
-                                            <TableCell colSpan={8} className="px-5 py-4 text-center sm:px-6">
+                                            <TableCell className="px-5 py-4 text-center sm:px-6">
                                                 <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                                    No hay ciclos eliminados
+                                                    {searchTerm ? 'No se encontraron ciclos que coincidan con la búsqueda.' : 'No se encontraron ciclos escolares.'}
                                                 </span>
                                             </TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
                             </Table>
+                        )}
+                    </div>
+                </ComponentCard>
+            </div>
+
+            {/* Ciclos Eliminados */}
+            <div className="mt-6">
+                <button
+                    onClick={() => setShowDeleted(!showDeleted)}
+                    className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white p-4 text-left dark:border-gray-800 dark:bg-white/[0.03]"
+                >
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
+                            Ciclos Eliminados
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                            {deletedCycles.length} ciclos en la papelera
+                        </p>
+                    </div>
+                    <i className={`fa-duotone fa-solid fa-chevron-${showDeleted ? 'up' : 'down'} text-gray-500 dark:text-gray-400`}></i>
+                </button>
+
+                {showDeleted && (
+                    <div className="mt-4">
+                        <div className="overflow-x-auto">
+                            {isLoadingDeleted ? (
+                                <div className="flex items-center justify-center h-[200px]">
+                                    <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                                </div>
+                            ) : (
+                                <Table className="min-w-full">
+                                    <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                                        <TableRow>
+                                            <TableCell isHeader>Nombre</TableCell>
+                                            <TableCell isHeader>Fecha de Inicio</TableCell>
+                                            <TableCell isHeader>Fecha de Fin</TableCell>
+                                            <TableCell isHeader>Grupos</TableCell>
+                                            <TableCell isHeader>Alumnos</TableCell>
+                                            <TableCell isHeader>Promedio</TableCell>
+                                            <TableCell isHeader>Estado</TableCell>
+                                            <TableCell isHeader>Acciones</TableCell>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                                        {deletedCycles.map(cycle => (
+                                            <TableRow key={cycle.id}>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                                                        {cycle.name}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                        {new Date(cycle.startDate).toLocaleDateString()}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                        {new Date(cycle.endDate).toLocaleDateString()}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                        {cycle.groupsCount}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                        {cycle.studentsCount}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                        {cycle.averageGrade.toFixed(2)}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <Badge
+                                                        size="sm"
+                                                        color={cycle.status === 'active' ? 'success' : (cycle.status === 'completed' ? 'warning' : 'light')}
+                                                    >
+                                                        <span className="font-outfit">
+                                                            {cycle.status === 'active' ? 'activo' : (cycle.status === 'completed' ? 'finalizado' : 'inactivo')}
+                                                        </span>
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        startIcon={<i className="fa-duotone fa-solid fa-rotate-left"></i>}
+                                                        onClick={() => handleRestore(cycle.id)}
+                                                    >
+                                                        <span className="font-outfit">Restaurar</span>
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {deletedCycles.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={8} className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                                        No hay ciclos eliminados
+                                                    </span>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            )}
                         </div>
                     </div>
                 )}
@@ -1125,6 +1185,7 @@ export default function SchoolYearDashboard() {
                             onClick={closeModal}
                             variant="outline"
                             className="sm:w-auto"
+                            disabled={isSaving}
                         >
                             <span className="font-outfit">Cancelar</span>
                         </Button>
@@ -1132,8 +1193,16 @@ export default function SchoolYearDashboard() {
                             onClick={handleSaveCycle}
                             variant="primary"
                             className="sm:w-auto"
+                            disabled={isSaving}
                         >
-                            <span className="font-outfit">{selectedCycle ? "Actualizar Ciclo" : "Crear Ciclo"}</span>
+                            {isSaving ? (
+                                <>
+                                    <i className="fa-duotone fa-solid fa-spinner fa-spin mr-2"></i>
+                                    <span className="font-outfit">Guardando...</span>
+                                </>
+                            ) : (
+                                <span className="font-outfit">{selectedCycle ? "Actualizar Ciclo" : "Crear Ciclo"}</span>
+                            )}
                         </Button>
                     </div>
                 </div>

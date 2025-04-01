@@ -75,6 +75,11 @@ export default function StudentDashboard() {
     });
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
+    const [isLoadingStudents, setIsLoadingStudents] = useState(true);
+    const [isLoadingDeleted, setIsLoadingDeleted] = useState(true);
+    const [isLoadingGroups, setIsLoadingGroups] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [studentsByGroup, setStudentsByGroup] = useState<{ [key: string]: number }>({});
 
     useEffect(() => {
         loadStudents();
@@ -82,7 +87,45 @@ export default function StudentDashboard() {
         loadActiveGroups();
     }, []);
 
+    useEffect(() => {
+        async function loadStudentsByGroup() {
+            if (!activeGroups[0]?.school_year_name) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('student_groups')
+                    .select(`
+                        groups!inner (
+                            grade,
+                            group_name,
+                            school_years!inner (
+                                name
+                            )
+                        )
+                    `)
+                    .eq('delete_flag', false)
+                    .eq('groups.school_years.name', activeGroups[0]?.school_year_name);
+
+                if (error) throw error;
+
+                if (data) {
+                    const groupCounts: { [key: string]: number } = {};
+                    data.forEach((item: any) => {
+                        const groupKey = `${item.groups.grade}${item.groups.group_name}`;
+                        groupCounts[groupKey] = (groupCounts[groupKey] || 0) + 1;
+                    });
+                    setStudentsByGroup(groupCounts);
+                }
+            } catch (error) {
+                console.error('Error al cargar estudiantes por grupo:', error);
+            }
+        }
+
+        loadStudentsByGroup();
+    }, [activeGroups]);
+
     async function loadStudents() {
+        setIsLoadingStudents(true);
         try {
             const { data, error } = await supabaseClient
                 .from('students')
@@ -96,10 +139,13 @@ export default function StudentDashboard() {
         } catch (error) {
             console.error('Error al cargar los estudiantes:', error);
             alert('Error al cargar los estudiantes. Por favor recarga la página.');
+        } finally {
+            setIsLoadingStudents(false);
         }
     }
 
     async function loadDeletedStudents() {
+        setIsLoadingDeleted(true);
         try {
             const { data, error } = await supabaseClient
                 .from('students')
@@ -111,10 +157,13 @@ export default function StudentDashboard() {
             setDeletedStudents(data || []);
         } catch (error) {
             console.error('Error al cargar los estudiantes eliminados:', error);
+        } finally {
+            setIsLoadingDeleted(false);
         }
     }
 
     async function loadActiveGroups() {
+        setIsLoadingGroups(true);
         try {
             const { data, error } = await supabaseClient
                 .from('groups')
@@ -146,6 +195,8 @@ export default function StudentDashboard() {
             }
         } catch (error) {
             console.error('Error al cargar los grupos activos:', error);
+        } finally {
+            setIsLoadingGroups(false);
         }
     }
 
@@ -167,7 +218,7 @@ export default function StudentDashboard() {
 
     async function handleDelete(id: number) {
         if (!confirm('¿Estás seguro de que deseas eliminar este estudiante?')) return;
-
+        setIsSaving(true);
         try {
             const { error } = await supabaseClient
                 .from('students')
@@ -175,15 +226,18 @@ export default function StudentDashboard() {
                 .eq('student_id', id);
 
             if (error) throw error;
-            loadStudents();
-            loadDeletedStudents();
+            await loadStudents();
+            await loadDeletedStudents();
         } catch (error) {
             console.error('Error al eliminar el estudiante:', error);
             alert('Error al eliminar el estudiante. Por favor intenta de nuevo.');
+        } finally {
+            setIsSaving(false);
         }
     }
 
     async function handleRestore(id: number) {
+        setIsSaving(true);
         try {
             const { error } = await supabaseClient
                 .from('students')
@@ -191,11 +245,13 @@ export default function StudentDashboard() {
                 .eq('student_id', id);
 
             if (error) throw error;
-            loadStudents();
-            loadDeletedStudents();
+            await loadStudents();
+            await loadDeletedStudents();
         } catch (error) {
             console.error('Error al restaurar el estudiante:', error);
             alert('Error al restaurar el estudiante. Por favor intenta de nuevo.');
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -262,6 +318,7 @@ export default function StudentDashboard() {
     }
 
     async function handleSaveStudent() {
+        setIsSaving(true);
         try {
             if (selectedStudent) {
                 const { error } = await supabaseClient
@@ -284,10 +341,12 @@ export default function StudentDashboard() {
                 }
             }
             closeModal();
-            loadStudents();
+            await loadStudents();
         } catch (error) {
             console.error('Error al guardar el estudiante:', error);
             alert('Error al guardar el estudiante. Por favor intenta de nuevo.');
+        } finally {
+            setIsSaving(false);
         }
     }
 
@@ -298,19 +357,6 @@ export default function StudentDashboard() {
 
     // Obtener el ciclo escolar activo actual
     const currentSchoolYear = activeGroups[0]?.school_year_name;
-
-    // Calcular estudiantes por grado solo del ciclo actual
-    const studentsByGrade = students.reduce((acc: { [key: string]: number }, student) => {
-        // Solo incluir estudiantes que estén en grupos del ciclo actual
-        const isInCurrentYear = activeGroups.some(group =>
-            `${group.grade}${group.group_name}` === student.grade_level &&
-            group.school_year_name === currentSchoolYear
-        );
-        if (isInCurrentYear) {
-            acc[student.grade_level] = (acc[student.grade_level] || 0) + 1;
-        }
-        return acc;
-    }, {});
 
     // Configuración de gráficas
     const genderOptions: ApexOptions = {
@@ -358,7 +404,8 @@ export default function StudentDashboard() {
             },
         },
         dataLabels: {
-            enabled: false
+            enabled: true,
+            formatter: (val: number) => val.toString()
         },
         stroke: {
             show: true,
@@ -366,12 +413,17 @@ export default function StudentDashboard() {
             colors: ['transparent']
         },
         xaxis: {
-            categories: Object.keys(studentsByGrade).sort(),
+            categories: Object.keys(studentsByGroup).sort(),
             axisBorder: {
                 show: false
             },
             axisTicks: {
                 show: false
+            },
+            labels: {
+                style: {
+                    fontSize: '12px'
+                }
             }
         },
         yaxis: {
@@ -392,7 +444,7 @@ export default function StudentDashboard() {
 
     const gradeSeries = [{
         name: 'Estudiantes',
-        data: Object.keys(studentsByGrade).sort().map(grade => studentsByGrade[grade])
+        data: Object.keys(studentsByGroup).sort().map(group => studentsByGroup[group])
     }];
 
     // Calcular estudiantes paginados
@@ -403,7 +455,7 @@ export default function StudentDashboard() {
 
     return (
         <div className="container mx-auto p-6">
-            <PageBreadcrumb pageTitle="Gestión de Estudiantes" />
+            <PageBreadcrumb pageTitle="Mis alumnos" />
 
             {/* Métricas */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6 mb-6">
@@ -450,14 +502,14 @@ export default function StudentDashboard() {
                                 Promedio por Grado
                             </span>
                             <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
-                                {Object.keys(studentsByGrade).length > 0
-                                    ? (Object.values(studentsByGrade).reduce((a, b) => a + b, 0) / Object.keys(studentsByGrade).length).toFixed(1)
+                                {Object.keys(studentsByGroup).length > 0
+                                    ? (Object.values(studentsByGroup).reduce((a, b) => a + b, 0) / Object.keys(studentsByGroup).length).toFixed(1)
                                     : '0'} estudiantes
                             </h4>
                         </div>
                         <Badge color="success">
                             <span className="font-outfit">
-                                {Object.keys(studentsByGrade).length} grados
+                                {Object.keys(studentsByGroup).length} grados
                             </span>
                         </Badge>
                     </div>
@@ -515,22 +567,34 @@ export default function StudentDashboard() {
 
                 {/* Estudiantes por Grado */}
                 <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
-                    {totalStudents === 0 && (
+                    {isLoadingGroups ? (
+                        <div className="flex items-center justify-center h-[180px]">
+                            <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                        </div>
+                    ) : Object.keys(studentsByGroup).length === 0 ? (
                         <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
                             <span className="text-lg font-semibold text-white font-outfit">Sin datos</span>
                         </div>
+                    ) : (
+                        <>
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
+                                    Estudiantes por Grupo
+                                </h3>
+                                <Badge color="info">
+                                    <span className="font-outfit">
+                                        {currentSchoolYear}
+                                    </span>
+                                </Badge>
+                            </div>
+                            <ReactApexChart
+                                options={gradeOptions}
+                                series={gradeSeries}
+                                type="bar"
+                                height={180}
+                            />
+                        </>
                     )}
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
-                            Estudiantes por Grado
-                        </h3>
-                    </div>
-                    <ReactApexChart
-                        options={gradeOptions}
-                        series={gradeSeries}
-                        type="bar"
-                        height={180}
-                    />
                 </div>
             </div>
 
@@ -554,133 +618,140 @@ export default function StudentDashboard() {
                         variant="primary"
                         startIcon={<i className="fa-duotone fa-solid fa-user-plus"></i>}
                         onClick={openModal}
+                        disabled={isSaving}
                     >
                         <span className="font-outfit">Nuevo Estudiante</span>
                     </Button>
                 </div>
 
                 <div className="overflow-x-auto">
-                    <Table
-                        className="min-w-full"
-                        maxHeight="500px"
-                        pagination={{
-                            currentPage,
-                            totalPages,
-                            onPageChange: setCurrentPage
-                        }}
-                    >
-                        <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                            <TableRow>
-                                <TableCell
-                                    isHeader
-                                    className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                    onClick={() => handleSort('first_name')}
-                                >
-                                    <div className="flex items-center justify-center gap-1">
-                                        Nombre
-                                        {sortField === 'first_name' && (
-                                            <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                        )}
-                                    </div>
-                                </TableCell>
-                                <TableCell
-                                    isHeader
-                                    className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                    onClick={() => handleSort('curp')}
-                                >
-                                    <div className="flex items-center justify-center gap-1">
-                                        CURP
-                                        {sortField === 'curp' && (
-                                            <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                        )}
-                                    </div>
-                                </TableCell>
-                                <TableCell
-                                    isHeader
-                                    className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
-                                    onClick={() => handleSort('grade_level')}
-                                >
-                                    <div className="flex items-center justify-center gap-1">
-                                        Grado
-                                        {sortField === 'grade_level' && (
-                                            <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
-                                        )}
-                                    </div>
-                                </TableCell>
-                                <TableCell
-                                    isHeader
-                                    className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit"
-                                >
-                                    Estado
-                                </TableCell>
-                                <TableCell
-                                    isHeader
-                                    className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit"
-                                >
-                                    Acciones
-                                </TableCell>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                            {currentStudents.map((student) => (
-                                <TableRow key={student.student_id}>
-                                    <TableCell className="px-5 py-4 text-center sm:px-6">
-                                        <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
-                                            {student.first_name} {student.father_last_name} {student.mother_last_name}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="px-5 py-4 text-center sm:px-6">
-                                        <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                            {student.curp}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="px-5 py-4 text-center sm:px-6">
-                                        <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                            {student.grade_level}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell className="px-5 py-4 text-center sm:px-6">
-                                        <Badge
-                                            color={student.delete_flag ? 'error' : 'success'}
-                                            variant="light"
-                                        >
-                                            <span className="font-outfit">
-                                                {student.delete_flag ? 'Eliminado' : 'Activo'}
-                                            </span>
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="px-5 py-4 text-center sm:px-6">
-                                        <Button
-                                            className="mr-2"
-                                            variant="outline"
-                                            size="sm"
-                                            startIcon={<i className="fa-duotone fa-solid fa-pen-to-square"></i>}
-                                            onClick={() => handleEdit(student)}
-                                        >
-                                            <span className="font-outfit">Editar</span>
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            startIcon={<i className="fa-duotone fa-solid fa-trash"></i>}
-                                            onClick={() => handleDelete(student.student_id)}
-                                        >
-                                            <span className="font-outfit">Eliminar</span>
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {students.length === 0 && (
+                    {isLoadingStudents ? (
+                        <div className="flex items-center justify-center h-[200px]">
+                            <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                        </div>
+                    ) : (
+                        <Table
+                            className="min-w-full"
+                            maxHeight="500px"
+                            pagination={{
+                                currentPage,
+                                totalPages,
+                                onPageChange: setCurrentPage
+                            }}
+                        >
+                            <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                                 <TableRow>
-                                    <TableCell colSpan={5} className="px-5 py-4 text-center sm:px-6">
-                                        <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                            {searchTerm ? 'No se encontraron estudiantes que coincidan con la búsqueda.' : 'No se encontraron estudiantes.'}
-                                        </span>
+                                    <TableCell
+                                        isHeader
+                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                        onClick={() => handleSort('first_name')}
+                                    >
+                                        <div className="flex items-center justify-center gap-1">
+                                            Nombre
+                                            {sortField === 'first_name' && (
+                                                <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell
+                                        isHeader
+                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                        onClick={() => handleSort('curp')}
+                                    >
+                                        <div className="flex items-center justify-center gap-1">
+                                            CURP
+                                            {sortField === 'curp' && (
+                                                <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell
+                                        isHeader
+                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit cursor-pointer hover:text-gray-700 dark:hover:text-gray-300"
+                                        onClick={() => handleSort('grade_level')}
+                                    >
+                                        <div className="flex items-center justify-center gap-1">
+                                            Grado
+                                            {sortField === 'grade_level' && (
+                                                <i className={`fa-duotone fa-solid fa-arrow-${sortDirection === 'asc' ? 'up' : 'down'}`}></i>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell
+                                        isHeader
+                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit"
+                                    >
+                                        Estado
+                                    </TableCell>
+                                    <TableCell
+                                        isHeader
+                                        className="px-5 py-3 text-center text-theme-xs font-medium text-gray-500 dark:text-gray-400 font-outfit"
+                                    >
+                                        Acciones
                                     </TableCell>
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                                {currentStudents.map((student) => (
+                                    <TableRow key={student.student_id}>
+                                        <TableCell className="px-5 py-4 text-center sm:px-6">
+                                            <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                                                {student.first_name} {student.father_last_name} {student.mother_last_name}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4 text-center sm:px-6">
+                                            <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                {student.curp}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4 text-center sm:px-6">
+                                            <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                {student.grade_level}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4 text-center sm:px-6">
+                                            <Badge
+                                                color={student.delete_flag ? 'error' : 'success'}
+                                                variant="light"
+                                            >
+                                                <span className="font-outfit">
+                                                    {student.delete_flag ? 'Eliminado' : 'Activo'}
+                                                </span>
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4 text-center sm:px-6">
+                                            <Button
+                                                className="mr-2"
+                                                variant="outline"
+                                                size="sm"
+                                                startIcon={<i className="fa-duotone fa-solid fa-pen-to-square"></i>}
+                                                onClick={() => handleEdit(student)}
+                                            >
+                                                <span className="font-outfit">Editar</span>
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                startIcon={<i className="fa-duotone fa-solid fa-trash"></i>}
+                                                onClick={() => handleDelete(student.student_id)}
+                                            >
+                                                <span className="font-outfit">Eliminar</span>
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                {students.length === 0 && (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="px-5 py-4 text-center sm:px-6">
+                                            <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                                {searchTerm ? 'No se encontraron estudiantes que coincidan con la búsqueda.' : 'No se encontraron estudiantes.'}
+                                            </span>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    )}
                 </div>
             </ComponentCard>
 
@@ -704,56 +775,62 @@ export default function StudentDashboard() {
                 {showDeleted && (
                     <div className="mt-4">
                         <div className="overflow-x-auto">
-                            <Table className="min-w-full">
-                                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                                    <TableRow>
-                                        <TableCell isHeader>Nombre</TableCell>
-                                        <TableCell isHeader>CURP</TableCell>
-                                        <TableCell isHeader>Grado</TableCell>
-                                        <TableCell isHeader>Acciones</TableCell>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                                    {deletedStudents.map((student) => (
-                                        <TableRow key={student.student_id}>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
-                                                    {student.first_name} {student.father_last_name} {student.mother_last_name}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                    {student.curp}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                    {student.grade_level}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    startIcon={<i className="fa-duotone fa-solid fa-rotate-left"></i>}
-                                                    onClick={() => handleRestore(student.student_id)}
-                                                >
-                                                    <span className="font-outfit">Restaurar</span>
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    {deletedStudents.length === 0 && (
+                            {isLoadingDeleted ? (
+                                <div className="flex items-center justify-center h-[200px]">
+                                    <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
+                                </div>
+                            ) : (
+                                <Table className="min-w-full">
+                                    <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                                         <TableRow>
-                                            <TableCell colSpan={5} className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                                    No hay estudiantes eliminados
-                                                </span>
-                                            </TableCell>
+                                            <TableCell isHeader>Nombre</TableCell>
+                                            <TableCell isHeader>CURP</TableCell>
+                                            <TableCell isHeader>Grado</TableCell>
+                                            <TableCell isHeader>Acciones</TableCell>
                                         </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
+                                    </TableHeader>
+                                    <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                                        {deletedStudents.map((student) => (
+                                            <TableRow key={student.student_id}>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                                                        {student.first_name} {student.father_last_name} {student.mother_last_name}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                        {student.curp}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                        {student.grade_level}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="px-5 py-4 text-center sm:px-6">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        startIcon={<i className="fa-duotone fa-solid fa-rotate-left"></i>}
+                                                        onClick={() => handleRestore(student.student_id)}
+                                                    >
+                                                        <span className="font-outfit">Restaurar</span>
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                        {deletedStudents.length === 0 && (
+                                            <TableRow>
+                                                <TableCell colSpan={5} className="px-5 py-4 text-center sm:px-6">
+                                                    <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                                        No hay estudiantes eliminados
+                                                    </span>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            )}
                         </div>
                     </div>
                 )}
@@ -881,6 +958,7 @@ export default function StudentDashboard() {
                                 onClick={closeModal}
                                 variant="outline"
                                 className="sm:w-auto"
+                                disabled={isSaving}
                             >
                                 <span className="font-outfit">Cancelar</span>
                             </Button>
@@ -888,8 +966,16 @@ export default function StudentDashboard() {
                                 onClick={handleSaveStudent}
                                 variant="primary"
                                 className="sm:w-auto"
+                                disabled={isSaving}
                             >
-                                <span className="font-outfit">{selectedStudent ? "Actualizar Estudiante" : "Crear Estudiante"}</span>
+                                {isSaving ? (
+                                    <>
+                                        <i className="fa-duotone fa-solid fa-spinner fa-spin mr-2"></i>
+                                        <span className="font-outfit">Guardando...</span>
+                                    </>
+                                ) : (
+                                    <span className="font-outfit">{selectedStudent ? "Actualizar Estudiante" : "Crear Estudiante"}</span>
+                                )}
                             </Button>
                         </div>
                     </form>
