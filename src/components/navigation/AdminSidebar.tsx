@@ -28,6 +28,30 @@ const navItems: NavItem[] = [
         path: '/admin-dashboard/admin-school-year',
     },
     {
+        name: 'Profesores',
+        icon: <i className="fa-duotone fa-solid fa-person-chalkboard fa-xl"></i>,
+        subItems: [
+            {
+                name: 'Mis profesores',
+                path: '/admin-dashboard/admin-teachers/',
+                pro: false,
+                icon: 'fa-solid fa-chalkboard-teacher'
+            },
+        ],
+    },
+    {
+        name: 'Alumnos',
+        icon: <i className="fa-duotone fa-solid fa-user-graduate fa-xl"></i>,
+        subItems: [
+            {
+                name: 'Mis alumnos',
+                path: '/admin-dashboard/admin-students',
+                pro: false,
+                icon: 'fa-solid fa-list'
+            }
+        ],
+    },
+    {
         name: 'Grupos',
         icon: <i className="fa-duotone fa-solid fa-people-group fa-xl"></i>,
         subItems: [
@@ -48,36 +72,6 @@ const navItems: NavItem[] = [
                 path: '/admin-dashboard/admin-groups/admin-group-students',
                 pro: false,
                 icon: 'fa-solid fa-user-graduate'
-            },
-        ],
-    },
-    {
-        name: 'Alumnos',
-        icon: <i className="fa-duotone fa-solid fa-user-graduate fa-xl"></i>,
-        subItems: [
-            {
-                name: 'Ver alumnos',
-                path: '/admin-dashboard/admin-students',
-                pro: false,
-                icon: 'fa-solid fa-list'
-            }
-        ],
-    },
-    {
-        name: 'Maestros',
-        icon: <i className="fa-duotone fa-solid fa-person-chalkboard fa-xl"></i>,
-        subItems: [
-            {
-                name: 'Mis profesores',
-                path: '/admin-dashboard/admin-teachers/list',
-                pro: false,
-                icon: 'fa-solid fa-chalkboard-teacher'
-            },
-            {
-                name: 'Gestión de profesores',
-                path: '/admin-dashboard/admin-teachers/manage',
-                pro: false,
-                icon: 'fa-solid fa-user-gear'
             },
         ],
     },
