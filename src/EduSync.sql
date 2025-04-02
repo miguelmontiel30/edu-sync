@@ -23,7 +23,7 @@ DELETE ON TABLES TO public;
 CREATE TABLE
     IF NOT EXISTS status (
         status_id SERIAL PRIMARY KEY,
-        code VARCHAR(20) NOT NULL UNIQUE,
+        code VARCHAR(50) NOT NULL UNIQUE,
         name VARCHAR(50) NOT NULL,
         category VARCHAR(50) NOT NULL,
         delete_flag BOOLEAN DEFAULT FALSE,
@@ -44,7 +44,7 @@ COMMENT ON COLUMN status.category IS 'Categoría del estado (ej: school_year, gr
 CREATE TABLE
     IF NOT EXISTS address_types (
         type_id SERIAL PRIMARY KEY,
-        code VARCHAR(20) NOT NULL UNIQUE,
+        code VARCHAR(50) NOT NULL UNIQUE,
         name VARCHAR(50) NOT NULL,
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
@@ -238,7 +238,7 @@ CREATE TABLE
         father_last_name VARCHAR(100) NOT NULL,
         mother_last_name VARCHAR(100),
         birth_date DATE NOT NULL,
-        gender VARCHAR(20) NOT NULL,
+        gender_id INTEGER REFERENCES genders (gender_id) NOT NULL,
         curp VARCHAR(18) NOT NULL,
         phone VARCHAR(15),
         email VARCHAR(100),
@@ -261,11 +261,11 @@ CREATE TABLE
     IF NOT EXISTS teachers (
         teacher_id SERIAL PRIMARY KEY,
         school_id INTEGER REFERENCES schools (school_id),
-        name VARCHAR(255) NOT NULL,
+        first_name VARCHAR(255) NOT NULL,
         father_last_name VARCHAR(100) NOT NULL,
         mother_last_name VARCHAR(100),
         birth_date DATE NOT NULL,
-        gender VARCHAR(20) NOT NULL,
+        gender_id INTEGER REFERENCES genders (gender_id) NOT NULL,
         curp VARCHAR(18) NULL,
         image_url VARCHAR(255),
         email VARCHAR(100),
@@ -482,6 +482,7 @@ CREATE TABLE
         father_last_name VARCHAR(100) NOT NULL,
         mother_last_name VARCHAR(100),
         relationship VARCHAR(50) NOT NULL,
+        gender_id INTEGER REFERENCES genders (gender_id) NOT NULL,
         phone VARCHAR(15),
         alternative_phone VARCHAR(15),
         email VARCHAR(100),
@@ -525,7 +526,7 @@ COMMENT ON COLUMN student_tutors.can_pickup IS 'Indica si puede recoger al estud
 -- Índices para búsqueda por nombre
 CREATE INDEX IF NOT EXISTS idx_students_names ON students (first_name, father_last_name, mother_last_name);
 
-CREATE INDEX IF NOT EXISTS idx_teachers_names ON teachers (name, father_last_name, mother_last_name);
+CREATE INDEX IF NOT EXISTS idx_teachers_names ON teachers (first_name, father_last_name, mother_last_name);
 
 CREATE INDEX IF NOT EXISTS idx_tutors_names ON tutors (first_name, father_last_name, mother_last_name);
 
