@@ -1,5 +1,16 @@
 /************ Generar datos para las tablas ************/
--- Insertar estados iniciales
+-- =============================================
+-- Datos iniciales para la tabla genders
+-- =============================================
+INSERT INTO
+    genders (code, name, delete_flag, created_at, updated_at)
+VALUES
+    ('M', 'Masculino', FALSE, NOW (), NOW ()),
+    ('F', 'Femenino', FALSE, NOW (), NOW ()),
+    ('O', 'Otro', FALSE, NOW (), NOW ()),
+    ('ND', 'No definido', FALSE, NOW (), NOW ()) ON CONFLICT (code) DO NOTHING;
+
+-- Insertar datos iniciales en la tabla status
 INSERT INTO
     status (code, name, category)
 VALUES
@@ -76,7 +87,6 @@ VALUES
     (1, 3), -- Admin puede eliminar estudiante
     (1, 4);
 
--- Admin puede ver estudiante
 -- Generar datos para escuelas
 INSERT INTO
     schools (
@@ -87,7 +97,6 @@ INSERT INTO
         email,
         website,
         logo_url,
-        principal_name,
         delete_flag
     )
 VALUES
@@ -99,7 +108,6 @@ VALUES
         'escuela1@example.com',
         'https://www.escuela1.com',
         'logo.png',
-        'Juan Pérez',
         FALSE
     );
 
