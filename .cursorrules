@@ -1,0 +1,10 @@
+- Los iconos que se usan en todo el proyecto son de font-awesome 
+- Utiliza siempre el componente IconFA para crear iconos:
+  - Importa el componente: import IconFA from '@/components/ui/IconFA';
+  - Uso básico: <IconFA icon="nombre-del-icono" />
+  - Con estilo: <IconFA icon="nombre-del-icono" style="duotone|solid|regular|light|brands" />
+  - Con tamaño: <IconFA icon="nombre-del-icono" size="xs|sm|lg|xl|2xl" />
+  - Con clase personalizada: <IconFA icon="nombre-del-icono" className="text-green-500" />
+  - No uses el prefijo "fa-" al especificar el nombre del icono
+- Evita usar elementos <i> directamente con clases de Font Awesome
+- Los nombres de iconos están en kebab-case (usando guiones): "user-graduate", "chart-line", "people-group" 
