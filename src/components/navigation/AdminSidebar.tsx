@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 
 // Icons
 import { ChevronDownIcon, HorizontaLDots } from '@/icons';
+import IconFA from '@/components/ui/IconFA';
 
 type NavItem = {
     name: string;
@@ -18,24 +19,24 @@ type NavItem = {
 
 const navItems: NavItem[] = [
     {
-        icon: <i className="fa-duotone fa-solid fa-school-flag fa-xl"></i>,
+        icon: <IconFA icon="school-flag" style="duotone" size="xl" />,
         name: 'Inicio',
         path: '/admin-dashboard/dashboard',
     },
     {
-        icon: <i className="fa-duotone fa-solid fa-calendar-clock fa-xl"></i>,
+        icon: <IconFA icon="calendar-clock" style="duotone" size="xl" />,
         name: 'Ciclos escolares',
         path: '/admin-dashboard/admin-school-year',
     },
     {
         name: 'Profesores',
-        icon: <i className="fa-duotone fa-solid fa-person-chalkboard fa-xl"></i>,
+        icon: <IconFA icon="person-chalkboard" style="duotone" size="xl" />,
         subItems: [
             {
                 name: 'Mis profesores',
                 path: '/admin-dashboard/admin-teachers/',
                 pro: false,
-                icon: 'fa-solid fa-chalkboard-teacher',
+                icon: 'chalkboard-teacher',
             },
         ],
     },
@@ -228,15 +229,15 @@ const AdminSidebar: React.FC = () => {
                         <button
                             onClick={() => handleSubmenuToggle(index, menuType)}
                             className={`menu-item group ${openSubmenu?.type === menuType && openSubmenu?.index === index
-                                    ? 'menu-item-active'
-                                    : 'menu-item-inactive'
+                                ? 'menu-item-active'
+                                : 'menu-item-inactive'
                                 } cursor-pointer ${!isExpanded && !isHovered ? 'lg:justify-center' : 'lg:justify-start'
                                 }`}
                         >
                             <span
                                 className={` ${openSubmenu?.type === menuType && openSubmenu?.index === index
-                                        ? 'menu-item-icon-active'
-                                        : 'menu-item-icon-inactive'
+                                    ? 'menu-item-icon-active'
+                                    : 'menu-item-icon-inactive'
                                     }`}
                             >
                                 {nav.icon}
@@ -247,9 +248,9 @@ const AdminSidebar: React.FC = () => {
                             {(isExpanded || isHovered || isMobileOpen) && (
                                 <ChevronDownIcon
                                     className={`ml-auto h-5 w-5 transition-transform duration-200 ${openSubmenu?.type === menuType &&
-                                            openSubmenu?.index === index
-                                            ? 'rotate-180 text-brand-500'
-                                            : ''
+                                        openSubmenu?.index === index
+                                        ? 'rotate-180 text-brand-500'
+                                        : ''
                                         }`}
                                 />
                             )}
@@ -263,8 +264,8 @@ const AdminSidebar: React.FC = () => {
                             >
                                 <span
                                     className={`${isActive(nav.path)
-                                            ? 'menu-item-icon-active'
-                                            : 'menu-item-icon-inactive'
+                                        ? 'menu-item-icon-active'
+                                        : 'menu-item-icon-inactive'
                                         }`}
                                 >
                                     {nav.icon}
@@ -301,7 +302,7 @@ const AdminSidebar: React.FC = () => {
                                                 : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50',
                                         )}
                                     >
-                                        <i className={cn(subItem.icon, 'h-4 w-4')}></i>
+                                        <IconFA icon={subItem.icon} className="h-4 w-4" />
                                         {subItem.name}
                                         {subItem.pro && (
                                             <span className="ml-auto rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-0.5 text-xs font-medium text-white">
@@ -361,8 +362,8 @@ const AdminSidebar: React.FC = () => {
                         <div>
                             <h2
                                 className={`mb-4 flex text-xs uppercase leading-[20px] text-gray-400 ${!isExpanded && !isHovered
-                                        ? 'lg:justify-center'
-                                        : 'justify-start'
+                                    ? 'lg:justify-center'
+                                    : 'justify-start'
                                     }`}
                             >
                                 {isExpanded || isHovered || isMobileOpen ? (
@@ -377,8 +378,8 @@ const AdminSidebar: React.FC = () => {
                         <div className="">
                             <h2
                                 className={`mb-4 flex text-xs uppercase leading-[20px] text-gray-400 ${!isExpanded && !isHovered
-                                        ? 'lg:justify-center'
-                                        : 'justify-start'
+                                    ? 'lg:justify-center'
+                                    : 'justify-start'
                                     }`}
                             >
                                 {isExpanded || isHovered || isMobileOpen ? (
