@@ -1,19 +1,19 @@
 'use client';
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, {useEffect, useRef, useState, useCallback} from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { useSidebar } from '@/context/SidebarContext';
-import { cn } from '@/lib/utils';
+import {usePathname} from 'next/navigation';
+import {useSidebar} from '@/context/SidebarContext';
+import {cn} from '@/lib/utils';
 
 // Icons
-import { ChevronDownIcon, HorizontaLDots } from '@/icons';
+import {ChevronDownIcon, HorizontaLDots} from '@/icons';
 
 type NavItem = {
     name: string;
     icon: React.ReactNode;
     path?: string;
-    subItems?: { name: string; path: string; pro?: boolean; new?: boolean; icon: string }[];
+    subItems?: {name: string; path: string; pro?: boolean; new?: boolean; icon: string}[];
 };
 
 const navItems: NavItem[] = [
@@ -35,7 +35,7 @@ const navItems: NavItem[] = [
                 name: 'Mis profesores',
                 path: '/admin-dashboard/admin-teachers/',
                 pro: false,
-                icon: 'fa-solid fa-chalkboard-teacher'
+                icon: 'fa-solid fa-chalkboard-teacher',
             },
         ],
     },
@@ -47,8 +47,8 @@ const navItems: NavItem[] = [
                 name: 'Mis alumnos',
                 path: '/admin-dashboard/admin-students',
                 pro: false,
-                icon: 'fa-solid fa-list'
-            }
+                icon: 'fa-solid fa-list',
+            },
         ],
     },
     {
@@ -59,19 +59,19 @@ const navItems: NavItem[] = [
                 name: 'Mis grupos',
                 path: '/admin-dashboard/admin-groups',
                 pro: false,
-                icon: 'fa-solid fa-users'
+                icon: 'fa-solid fa-users',
             },
             {
                 name: 'Administración de grupos y materias',
                 path: '/admin-dashboard/admin-groups/admin-group-subjects',
                 pro: false,
-                icon: 'fa-solid fa-book'
+                icon: 'fa-solid fa-book',
             },
             {
                 name: 'Gestión de grupos y alumnos',
                 path: '/admin-dashboard/admin-groups/admin-group-students',
                 pro: false,
-                icon: 'fa-solid fa-user-graduate'
+                icon: 'fa-solid fa-user-graduate',
             },
         ],
     },
@@ -83,13 +83,25 @@ const navItems: NavItem[] = [
                 name: 'Mis materias',
                 path: '/admin-dashboard/admin-subjects',
                 pro: false,
-                icon: 'fa-solid fa-book'
+                icon: 'fa-solid fa-book',
             },
             {
                 name: 'Gestión de materias',
                 path: '/admin-dashboard/admin-subjects/manage',
                 pro: false,
-                icon: 'fa-solid fa-gear'
+                icon: 'fa-solid fa-gear',
+            },
+        ],
+    },
+    {
+        name: 'Usuarios',
+        icon: <i className="fa-duotone fa-solid fa-users-viewfinder fa-xl"></i>,
+        subItems: [
+            {
+                name: 'Administración de usuarios',
+                path: '/admin-dashboard/admin-users',
+                pro: false,
+                icon: 'fa-solid fa-user-gear',
             },
         ],
     },
@@ -104,13 +116,13 @@ const othersItems: NavItem[] = [
                 name: 'Blank Page',
                 path: '/blank',
                 pro: false,
-                icon: 'fa-solid fa-file'
+                icon: 'fa-solid fa-file',
             },
             {
                 name: '404 Error',
                 path: '/error-404',
                 pro: false,
-                icon: 'fa-solid fa-triangle-exclamation'
+                icon: 'fa-solid fa-triangle-exclamation',
             },
         ],
     },
@@ -128,7 +140,7 @@ const othersItems: NavItem[] = [
 
 const AdminSidebar: React.FC = () => {
     // Hooks
-    const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+    const {isExpanded, isMobileOpen, isHovered, setIsHovered} = useSidebar();
     const pathname = usePathname();
 
     // States
@@ -204,7 +216,7 @@ const AdminSidebar: React.FC = () => {
             ) {
                 return null;
             }
-            return { type: menuType, index };
+            return {type: menuType, index};
         });
     };
 
@@ -221,17 +233,20 @@ const AdminSidebar: React.FC = () => {
                     {nav.subItems ? (
                         <button
                             onClick={() => handleSubmenuToggle(index, menuType)}
-                            className={`menu-item group ${openSubmenu?.type === menuType && openSubmenu?.index === index
-                                ? 'menu-item-active'
-                                : 'menu-item-inactive'
-                                } cursor-pointer ${!isExpanded && !isHovered ? 'lg:justify-center' : 'lg:justify-start'
-                                }`}
+                            className={`menu-item group ${
+                                openSubmenu?.type === menuType && openSubmenu?.index === index
+                                    ? 'menu-item-active'
+                                    : 'menu-item-inactive'
+                            } cursor-pointer ${
+                                !isExpanded && !isHovered ? 'lg:justify-center' : 'lg:justify-start'
+                            }`}
                         >
                             <span
-                                className={` ${openSubmenu?.type === menuType && openSubmenu?.index === index
-                                    ? 'menu-item-icon-active'
-                                    : 'menu-item-icon-inactive'
-                                    }`}
+                                className={` ${
+                                    openSubmenu?.type === menuType && openSubmenu?.index === index
+                                        ? 'menu-item-icon-active'
+                                        : 'menu-item-icon-inactive'
+                                }`}
                             >
                                 {nav.icon}
                             </span>
@@ -240,11 +255,12 @@ const AdminSidebar: React.FC = () => {
                             )}
                             {(isExpanded || isHovered || isMobileOpen) && (
                                 <ChevronDownIcon
-                                    className={`ml-auto h-5 w-5 transition-transform duration-200 ${openSubmenu?.type === menuType &&
+                                    className={`ml-auto h-5 w-5 transition-transform duration-200 ${
+                                        openSubmenu?.type === menuType &&
                                         openSubmenu?.index === index
-                                        ? 'rotate-180 text-brand-500'
-                                        : ''
-                                        }`}
+                                            ? 'rotate-180 text-brand-500'
+                                            : ''
+                                    }`}
                                 />
                             )}
                         </button>
@@ -252,14 +268,16 @@ const AdminSidebar: React.FC = () => {
                         nav.path && (
                             <Link
                                 href={nav.path}
-                                className={`menu-item group ${isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
-                                    }`}
+                                className={`menu-item group ${
+                                    isActive(nav.path) ? 'menu-item-active' : 'menu-item-inactive'
+                                }`}
                             >
                                 <span
-                                    className={`${isActive(nav.path)
-                                        ? 'menu-item-icon-active'
-                                        : 'menu-item-icon-inactive'
-                                        }`}
+                                    className={`${
+                                        isActive(nav.path)
+                                            ? 'menu-item-icon-active'
+                                            : 'menu-item-icon-inactive'
+                                    }`}
                                 >
                                     {nav.icon}
                                 </span>
@@ -284,18 +302,18 @@ const AdminSidebar: React.FC = () => {
                             }}
                         >
                             <div className="ml-4 space-y-1">
-                                {nav.subItems.map((subItem) => (
+                                {nav.subItems.map(subItem => (
                                     <Link
                                         key={subItem.path}
                                         href={subItem.path}
                                         className={cn(
-                                            "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                                            'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                                             pathname === subItem.path
-                                                ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50"
-                                                : "text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50"
+                                                ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50'
+                                                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50',
                                         )}
                                     >
-                                        <i className={cn(subItem.icon, "w-4 h-4")}></i>
+                                        <i className={cn(subItem.icon, 'h-4 w-4')}></i>
                                         {subItem.name}
                                         {subItem.pro && (
                                             <span className="ml-auto rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-0.5 text-xs font-medium text-white">
@@ -323,8 +341,9 @@ const AdminSidebar: React.FC = () => {
             onMouseLeave={() => setIsHovered(false)}
         >
             <div
-                className={`flex py-8 ${!isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
-                    }`}
+                className={`flex py-8 ${
+                    !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
+                }`}
             >
                 <Link href="/">
                     {isExpanded || isHovered || isMobileOpen ? (
@@ -354,10 +373,11 @@ const AdminSidebar: React.FC = () => {
                     <div className="flex flex-col gap-4">
                         <div>
                             <h2
-                                className={`mb-4 flex text-xs uppercase leading-[20px] text-gray-400 ${!isExpanded && !isHovered
-                                    ? 'lg:justify-center'
-                                    : 'justify-start'
-                                    }`}
+                                className={`mb-4 flex text-xs uppercase leading-[20px] text-gray-400 ${
+                                    !isExpanded && !isHovered
+                                        ? 'lg:justify-center'
+                                        : 'justify-start'
+                                }`}
                             >
                                 {isExpanded || isHovered || isMobileOpen ? (
                                     'Menu'
@@ -370,10 +390,11 @@ const AdminSidebar: React.FC = () => {
 
                         <div className="">
                             <h2
-                                className={`mb-4 flex text-xs uppercase leading-[20px] text-gray-400 ${!isExpanded && !isHovered
-                                    ? 'lg:justify-center'
-                                    : 'justify-start'
-                                    }`}
+                                className={`mb-4 flex text-xs uppercase leading-[20px] text-gray-400 ${
+                                    !isExpanded && !isHovered
+                                        ? 'lg:justify-center'
+                                        : 'justify-start'
+                                }`}
                             >
                                 {isExpanded || isHovered || isMobileOpen ? (
                                     'Otros'
