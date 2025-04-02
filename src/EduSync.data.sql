@@ -1,4 +1,54 @@
 /************ Generar datos para las tablas ************/
+-- Insertar estados iniciales
+INSERT INTO
+    status (code, name, category)
+VALUES
+    -- Estados para ciclos escolares
+    ('SCHOOL_YEAR_ACTIVE', 'Activo', 'school_year'),
+    ('SCHOOL_YEAR_INACTIVE', 'Inactivo', 'school_year'),
+    (
+        'SCHOOL_YEAR_COMPLETED',
+        'Completado',
+        'school_year'
+    ),
+    -- Estados para grupos
+    ('GROUP_ACTIVE', 'Activo', 'group'),
+    ('GROUP_INACTIVE', 'Inactivo', 'group'),
+    ('GROUP_COMPLETED', 'Completado', 'group'),
+    -- Estados para estudiantes en grupos
+    ('STUDENT_GROUP_ACTIVE', 'Activo', 'student_group'),
+    (
+        'STUDENT_GROUP_INACTIVE',
+        'Inactivo',
+        'student_group'
+    ),
+    (
+        'STUDENT_GROUP_GRADUATED',
+        'Graduado',
+        'student_group'
+    ),
+    (
+        'STUDENT_GROUP_TRANSFERRED',
+        'Transferido',
+        'student_group'
+    ),
+    -- Estados para periodos de evaluación
+    (
+        'EVALUATION_PERIOD_ACTIVE',
+        'Activo',
+        'evaluation_period'
+    ),
+    (
+        'EVALUATION_PERIOD_INACTIVE',
+        'Inactivo',
+        'evaluation_period'
+    ),
+    (
+        'EVALUATION_PERIOD_COMPLETED',
+        'Completado',
+        'evaluation_period'
+    );
+
 -- Generar datos para los roles y permisos
 INSERT INTO
     roles (name, description)
