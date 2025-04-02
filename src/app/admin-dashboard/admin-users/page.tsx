@@ -82,7 +82,7 @@ export default function AdminUsersDashboard() {
                 email: user.email,
                 first_name: user.first_name,
                 last_name: user.last_name,
-                roles: (user.user_roles as UserRole[]).map(ur => ur.roles.name),
+                roles: (user.user_roles as unknown as UserRole[]).map(ur => ur.roles.name),
             }));
 
             setUsers(formattedUsers);
@@ -322,7 +322,7 @@ export default function AdminUsersDashboard() {
                                 Cancelar
                             </Button>
                             <Button
-                                onClick={handleSubmit}
+                                type="submit"
                                 className="bg-primary hover:bg-primary/90 text-white"
                                 disabled={isLoading}
                             >
