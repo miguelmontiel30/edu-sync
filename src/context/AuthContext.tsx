@@ -6,7 +6,7 @@ import { User } from '@supabase/supabase-js';
 
 // Services
 import { supabaseClient } from '@/services/config/supabaseClient';
-import { login, logout, getUser } from '@/services/auth/auth.service';
+import { login, logout, getUser, CustomUser } from '@/services/auth/auth.service';
 
 // Interfaces
 interface UserRole {
@@ -21,6 +21,7 @@ interface UserProfile {
     email: string;
     first_name: string;
     last_name: string;
+    plain_password?: string;
     roles: UserRole[];
     permissions: string[];
 }
@@ -52,59 +53,149 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
             try {
                 // Obtener usuario autenticado
                 const authUser = await getUser();
-                setUser(authUser);
-
                 if (authUser) {
-                    // Cargar perfil del usuario con sus roles y permisos
-                    const { data: userData, error: userError } = await supabaseClient
-                        .from('users')
-                        .select('user_id, school_id, email, first_name, last_name')
-                        .eq('email', authUser.email)
-                        .single();
+                    setUser(authUser);
+                    try {
+                        // Cargar perfil del usuario con sus roles y permisos
+                        const { data: userData, error: userError } = await supabaseClient
+                            .from('users')
+                            .select('user_id, school_id, email, first_name, last_name, plain_password')
+                            .eq('email', authUser.email)
+                            .single();
 
-                    if (userError) throw userError;
+                        if (userError) {
+                            console.warn('No se encontró el usuario en la tabla users:', userError);
+                            // Intentar usar datos del usuario de Supabase si está disponible
+                            if ((authUser as CustomUser)?.user_metadata?.first_name) {
+                                const customUser = authUser as CustomUser;
+                                const userRoles = customUser.user_metadata.roles.map(role => ({
+                                    role_id: role.role_id,
+                                    name: role.name,
+                                    description: null
+                                }));
 
-                    // Cargar roles del usuario
-                    const { data: rolesData, error: rolesError } = await supabaseClient
-                        .from('user_roles')
-                        .select(`
-                            role_id,
-                            roles:role_id(name, description)
-                        `)
-                        .eq('user_id', userData.user_id)
-                        .eq('delete_flag', false);
+                                // Cargar permisos para los roles
+                                let userPermissions: string[] = [];
+                                if (userRoles.length > 0) {
+                                    const roleIds = userRoles.map(r => r.role_id);
+                                    const { data: permissionsData } = await supabaseClient
+                                        .from('role_permissions')
+                                        .select(`
+                                            permissions:permission_id(name)
+                                        `)
+                                        .in('role_id', roleIds);
 
-                    if (rolesError) throw rolesError;
+                                    if (permissionsData) {
+                                        userPermissions = permissionsData
+                                            .map((p: any) => p.permissions?.name || '')
+                                            .filter(Boolean);
+                                    }
+                                }
 
-                    // Cargar permisos por roles
-                    const roleIds = rolesData.map(r => r.role_id);
-                    const { data: permissionsData, error: permissionsError } = await supabaseClient
-                        .from('role_permissions')
-                        .select(`
-                            permissions:permission_id(name)
-                        `)
-                        .in('role_id', roleIds);
+                                const profileFromAuth = {
+                                    user_id: parseInt(customUser.id),
+                                    school_id: null,
+                                    email: customUser.email || '',
+                                    first_name: customUser.user_metadata.first_name,
+                                    last_name: customUser.user_metadata.last_name,
+                                    roles: userRoles,
+                                    permissions: userPermissions
+                                };
 
-                    if (permissionsError) throw permissionsError;
+                                setProfile(profileFromAuth);
+                                localStorage.setItem('eduSync_profile', JSON.stringify(profileFromAuth));
+                                setIsLoading(false);
+                                return;
+                            }
 
-                    // Formatear los datos del perfil usando any para sortear problemas de tipo
-                    const userRoles = (rolesData as any[]).map(r => ({
-                        role_id: r.role_id,
-                        name: r.roles?.name || '',
-                        description: r.roles?.description || null
-                    }));
+                            // Si no hay datos en user_metadata, intentar cargar desde localStorage
+                            const localProfile = localStorage.getItem('eduSync_profile');
+                            if (localProfile) {
+                                try {
+                                    setProfile(JSON.parse(localProfile));
+                                    setIsLoading(false);
+                                    return;
+                                } catch (e) {
+                                    console.error('Error al parsear perfil local:', e);
+                                }
+                            }
 
-                    const userPermissions = (permissionsData as any[]).map(p =>
-                        p.permissions?.name || ''
-                    );
+                            setProfile(null);
+                            setIsLoading(false);
+                            return;
+                        }
 
-                    setProfile({
-                        ...userData,
-                        roles: userRoles,
-                        permissions: userPermissions
-                    });
+                        // Cargar roles del usuario
+                        const { data: rolesData, error: rolesError } = await supabaseClient
+                            .from('user_roles')
+                            .select(`
+                                role_id,
+                                roles:role_id(name, description)
+                            `)
+                            .eq('user_id', userData.user_id)
+                            .eq('delete_flag', false);
+
+                        if (rolesError) {
+                            console.warn('Error al cargar roles del usuario:', rolesError);
+                            // Continuar sin roles
+                        }
+
+                        // Cargar permisos por roles
+                        let userPermissions: string[] = [];
+                        if (rolesData && rolesData.length > 0) {
+                            const roleIds = rolesData.map(r => r.role_id);
+                            const { data: permissionsData, error: permissionsError } = await supabaseClient
+                                .from('role_permissions')
+                                .select(`
+                                    permissions:permission_id(name)
+                                `)
+                                .in('role_id', roleIds);
+
+                            if (permissionsError) {
+                                console.warn('Error al cargar permisos del usuario:', permissionsError);
+                            } else if (permissionsData) {
+                                userPermissions = permissionsData
+                                    .map((p: any) => p.permissions?.name || '')
+                                    .filter(Boolean);
+                            }
+                        }
+
+                        // Formatear los datos del perfil usando any para sortear problemas de tipo
+                        const userRoles = (rolesData || []).map((r: any) => ({
+                            role_id: r.role_id,
+                            name: r.roles?.name || '',
+                            description: r.roles?.description || null
+                        }));
+
+                        const profileData = {
+                            ...userData,
+                            roles: userRoles,
+                            permissions: userPermissions
+                        };
+
+                        setProfile(profileData);
+                        // Guardar el perfil en localStorage para persistencia
+                        localStorage.setItem('eduSync_profile', JSON.stringify(profileData));
+                    } catch (profileError) {
+                        console.error('Error al cargar el perfil completo:', profileError);
+                        // Intentar cargar desde localStorage si hay error
+                        const localProfile = localStorage.getItem('eduSync_profile');
+                        if (localProfile) {
+                            try {
+                                setProfile(JSON.parse(localProfile));
+                            } catch (e) {
+                                console.error('Error al parsear perfil local:', e);
+                                setProfile(null);
+                            }
+                        } else {
+                            setProfile(null);
+                        }
+                    }
                 } else {
+                    setUser(null);
                     setProfile(null);
+                    localStorage.removeItem('eduSync_profile');
+                    localStorage.removeItem('eduSync_user');
                 }
             } catch (error) {
                 console.error('Error loading user profile:', error);
@@ -125,6 +216,8 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
                 } else if (event === 'SIGNED_OUT') {
                     setUser(null);
                     setProfile(null);
+                    localStorage.removeItem('eduSync_profile');
+                    localStorage.removeItem('eduSync_user');
                 }
             }
         );
@@ -137,10 +230,15 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     // Función de inicio de sesión
     const handleLogin = async (email: string, password: string) => {
         try {
+            // Toda la lógica de autenticación, incluida la verificación de plain_password,
+            // ahora está centralizada en el servicio de autenticación
             const data = await login(email, password);
             setUser(data.user);
+
+            // Guardar el usuario en localStorage para persistencia
+            localStorage.setItem('eduSync_user', JSON.stringify(data.user));
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('Error en inicio de sesión:', error);
             throw error;
         }
     };
@@ -152,7 +250,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
             setUser(null);
             setProfile(null);
         } catch (error) {
-            console.error('Logout error:', error);
+            console.error('Error en cierre de sesión:', error);
             throw error;
         }
     };
