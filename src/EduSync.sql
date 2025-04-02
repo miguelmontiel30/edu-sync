@@ -19,6 +19,19 @@ DELETE ON TABLES TO public;
 -- ---------------------------
 -- Nuevas definiciones de la DB
 -- ---------------------------
+-- Tabla de estados (debe ir primero ya que otras tablas la referencian)
+CREATE TABLE
+    IF NOT EXISTS status (
+        status_id SERIAL PRIMARY KEY,
+        code VARCHAR(20) NOT NULL UNIQUE,
+        name VARCHAR(50) NOT NULL,
+        category VARCHAR(50) NOT NULL,
+        delete_flag BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW (),
+        updated_at TIMESTAMPTZ DEFAULT NOW (),
+        deleted_at TIMESTAMPTZ
+    );
+
 -- Tabla de escuelas
 CREATE TABLE
     IF NOT EXISTS schools (
@@ -106,9 +119,10 @@ CREATE TABLE
         mother_last_name VARCHAR(100),
         birth_date DATE NOT NULL,
         gender VARCHAR(20) NOT NULL,
-        curp VARCHAR(18),
+        curp VARCHAR(18) NOT NULL,
         phone VARCHAR(15),
         email VARCHAR(100),
+        image_url VARCHAR(255),
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
         updated_at TIMESTAMPTZ DEFAULT NOW (),
@@ -127,7 +141,7 @@ CREATE TABLE
         phone VARCHAR(15),
         alternative_phone VARCHAR(15),
         email VARCHAR(100),
-        address TEXT,
+        image_url VARCHAR(255),
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
         updated_at TIMESTAMPTZ DEFAULT NOW (),
@@ -142,20 +156,12 @@ CREATE TABLE
         tutor_id INTEGER REFERENCES tutors (tutor_id) ON DELETE CASCADE,
         is_primary BOOLEAN DEFAULT FALSE,
         can_pickup BOOLEAN DEFAULT TRUE,
-        notes TEXT,
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
         updated_at TIMESTAMPTZ DEFAULT NOW (),
         deleted_at TIMESTAMPTZ,
         UNIQUE (student_id, tutor_id)
     );
-
--- Restricción para asegurar que cada estudiante tenga al menos un tutor primario
-CREATE UNIQUE INDEX IF NOT EXISTS idx_primary_tutor_per_student ON student_tutors (student_id)
-WHERE
-    is_primary = TRUE
-    AND delete_flag = FALSE
-    AND deleted_at IS NULL;
 
 -- Tabla de direcciones
 CREATE TABLE
@@ -202,7 +208,7 @@ CREATE TABLE
         name VARCHAR(100) NOT NULL,
         start_date DATE NOT NULL,
         end_date DATE NOT NULL,
-        status VARCHAR(20) DEFAULT 'inactive' CHECK (status IN ('active', 'inactive', 'completed')),
+        status_id INTEGER REFERENCES status (status_id) NOT NULL,
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
         updated_at TIMESTAMPTZ DEFAULT NOW (),
@@ -215,8 +221,12 @@ CREATE TABLE
         teacher_id SERIAL PRIMARY KEY,
         school_id INTEGER REFERENCES schools (school_id),
         name VARCHAR(255) NOT NULL,
-        role VARCHAR(100) NOT NULL,
-        image VARCHAR(255),
+        father_last_name VARCHAR(100) NOT NULL,
+        mother_last_name VARCHAR(100),
+        birth_date DATE NOT NULL,
+        gender VARCHAR(20) NOT NULL,
+        curp VARCHAR(18) NULL,
+        image_url VARCHAR(255),
         email VARCHAR(100),
         phone VARCHAR(15),
         delete_flag BOOLEAN DEFAULT FALSE,
@@ -230,14 +240,12 @@ CREATE TABLE
     IF NOT EXISTS groups (
         group_id SERIAL PRIMARY KEY,
         school_id INTEGER REFERENCES schools (school_id),
+        school_year_id INTEGER REFERENCES school_years (school_year_id),
+        primary_teacher INTEGER REFERENCES teachers (teacher_id),
         grade INTEGER NOT NULL,
         group_name VARCHAR(10) NOT NULL,
-        school_year_id INTEGER REFERENCES school_years (school_year_id),
-        students_number INTEGER DEFAULT 0,
-        subjects_number INTEGER DEFAULT 0,
-        status VARCHAR(20) CHECK (status IN ('active', 'inactive', 'completed')),
-        general_average NUMERIC(4, 2),
         description TEXT,
+        status_id INTEGER REFERENCES status (status_id) NOT NULL,
         group_image VARCHAR(255),
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
@@ -245,6 +253,25 @@ CREATE TABLE
         deleted_at TIMESTAMPTZ,
         UNIQUE (school_id, school_year_id, grade, group_name)
     );
+
+-- Relación entre estudiantes y grupos (muchos a muchos)
+CREATE TABLE
+    IF NOT EXISTS student_groups (
+        student_group_id SERIAL PRIMARY KEY,
+        student_id INTEGER REFERENCES students (student_id) ON DELETE CASCADE,
+        group_id INTEGER REFERENCES groups (group_id) ON DELETE CASCADE,
+        enrollment_date DATE DEFAULT CURRENT_DATE,
+        status_id INTEGER REFERENCES status (status_id) NOT NULL,
+        delete_flag BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW (),
+        updated_at TIMESTAMPTZ DEFAULT NOW (),
+        deleted_at TIMESTAMPTZ
+    );
+
+-- Crear índice único que solo considere registros activos y el ciclo escolar
+CREATE UNIQUE INDEX student_groups_student_id_school_year_active_key ON student_groups (student_id, group_id)
+WHERE
+    delete_flag = FALSE;
 
 -- Tabla de materias
 CREATE TABLE
@@ -259,39 +286,6 @@ CREATE TABLE
         deleted_at TIMESTAMPTZ
     );
 
--- Relación entre grupos y profesores (muchos a muchos)
-CREATE TABLE
-    IF NOT EXISTS group_teachers (
-        group_teacher_id SERIAL PRIMARY KEY,
-        group_id INTEGER REFERENCES groups (group_id) ON DELETE CASCADE,
-        teacher_id INTEGER REFERENCES teachers (teacher_id) ON DELETE CASCADE,
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ,
-        UNIQUE (group_id, teacher_id)
-    );
-
--- Relación entre estudiantes y grupos (muchos a muchos)
-CREATE TABLE
-    IF NOT EXISTS student_groups (
-        student_group_id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students (student_id) ON DELETE CASCADE,
-        group_id INTEGER REFERENCES groups (group_id) ON DELETE CASCADE,
-        enrollment_date DATE DEFAULT CURRENT_DATE,
-        status VARCHAR(20) DEFAULT 'active' CHECK (
-            status IN ('active', 'inactive', 'graduated', 'transferred')
-        ),
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ
-    );
-
--- Crear índice único que solo considere registros activos y el ciclo escolar
-CREATE UNIQUE INDEX student_groups_student_id_school_year_active_key ON student_groups (student_id, group_id)
-WHERE
-    delete_flag = FALSE;
-
 -- Tabla para materias asignadas a grupos
 CREATE TABLE
     IF NOT EXISTS group_subjects (
@@ -301,6 +295,7 @@ CREATE TABLE
         teacher_id INTEGER REFERENCES teachers (teacher_id),
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
+        updated_at TIMESTAMPTZ DEFAULT NOW (),
         deleted_at TIMESTAMPTZ,
         UNIQUE (group_id, subject_id)
     );
@@ -310,11 +305,7 @@ CREATE TABLE
     IF NOT EXISTS grades (
         grade_id SERIAL PRIMARY KEY,
         student_id INTEGER REFERENCES students (student_id) ON DELETE CASCADE,
-        group_id INTEGER REFERENCES groups (group_id) ON DELETE CASCADE,
-        subject_id INTEGER REFERENCES subjects (subject_id) ON DELETE CASCADE,
-        teacher_id INTEGER REFERENCES teachers (teacher_id),
-        school_year_id INTEGER REFERENCES school_years (school_year_id),
-        period VARCHAR(50) NOT NULL,
+        evaluation_period_id INTEGER REFERENCES evaluation_periods (evaluation_period_id) ON DELETE CASCADE,
         grade NUMERIC(4, 2) NOT NULL,
         comments TEXT,
         delete_flag BOOLEAN DEFAULT FALSE,
@@ -322,6 +313,46 @@ CREATE TABLE
         updated_at TIMESTAMPTZ DEFAULT NOW (),
         deleted_at TIMESTAMPTZ,
         UNIQUE (student_id, subject_id, period, school_year_id)
+    );
+
+--Tabla para definir los periodos de evaluación
+CREATE TABLE
+    IF NOT EXISTS evaluation_periods (
+        evaluation_period_id SERIAL PRIMARY KEY,
+        group_subject_id INTEGER REFERENCES group_subjects (group_subject_id) ON DELETE CASCADE,
+        name VARCHAR(100) NOT NULL,
+        description TEXT,
+        start_date DATE NOT NULL,
+        end_date DATE NOT NULL,
+        status_id INTEGER REFERENCES status (status_id) NOT NULL,
+        delete_flag BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW (),
+        updated_at TIMESTAMPTZ DEFAULT NOW (),
+        deleted_at TIMESTAMPTZ
+    );
+
+-- Tabla de tipos de dirección
+CREATE TABLE
+    address_types (
+        type_id SERIAL PRIMARY KEY,
+        code VARCHAR(20) NOT NULL UNIQUE,
+        name VARCHAR(50) NOT NULL,
+        delete_flag BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW (),
+        updated_at TIMESTAMPTZ DEFAULT NOW (),
+        deleted_at TIMESTAMPTZ
+    );
+
+-- Tabla de géneros
+CREATE TABLE
+    genders (
+        gender_id SERIAL PRIMARY KEY,
+        code VARCHAR(20) NOT NULL UNIQUE,
+        name VARCHAR(50) NOT NULL,
+        delete_flag BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW (),
+        updated_at TIMESTAMPTZ DEFAULT NOW (),
+        deleted_at TIMESTAMPTZ
     );
 
 -- Índices para mejorar rendimiento
@@ -375,6 +406,15 @@ CREATE INDEX IF NOT EXISTS idx_user_email ON users (email);
 
 -- Índice para buscar usuario por email
 CREATE INDEX IF NOT EXISTS idx_user_email ON users (email);
+
+-- Índices para mejorar rendimiento
+CREATE INDEX IF NOT EXISTS idx_school_years_status ON school_years (status_id);
+
+CREATE INDEX IF NOT EXISTS idx_groups_status ON groups (status_id);
+
+CREATE INDEX IF NOT EXISTS idx_student_groups_status ON student_groups (status_id);
+
+CREATE INDEX IF NOT EXISTS idx_evaluation_periods_status ON evaluation_periods (status_id);
 
 -- Habilitar Row Level Security (RLS) en todas las tablas
 ALTER TABLE schools ENABLE ROW LEVEL SECURITY;
@@ -506,6 +546,10 @@ WITH
     CHECK (true);
 
 CREATE POLICY "Acceso total a user_addresses" ON user_addresses FOR ALL USING (true)
+WITH
+    CHECK (true);
+
+CREATE POLICY "Acceso total a estados" ON status FOR ALL USING (true)
 WITH
     CHECK (true);
 
