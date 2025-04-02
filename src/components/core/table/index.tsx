@@ -44,7 +44,7 @@ export interface TableCellProps {
 export const Table: React.FC<TableProps> = ({ children, className = '', maxHeight = '400px', pagination }) => {
   return (
     <div className="relative">
-      <div className={`overflow-auto ${className}`} style={{ maxHeight }}>
+      <div className={`overflow-auto dark-scrollbar ${className}`} style={{ maxHeight }}>
         <table className="w-full">
           {children}
         </table>

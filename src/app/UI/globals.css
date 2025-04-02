@@ -85,8 +85,41 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        @apply rounded-full bg-gray-200 dark:bg-gray-700;
+        @apply rounded-full bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-500;
     }
+
+    /* Firefox compatibility for custom-scrollbar */
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: rgb(156 163 175) transparent; /* bg-gray-400 y transparente */
+    }
+
+    .dark .custom-scrollbar {
+        scrollbar-color: rgb(156 163 175) transparent; /* bg-gray-400 y transparente */
+    }
+
+    .dark-scrollbar::-webkit-scrollbar {
+        @apply size-1.5;
+    }
+
+    .dark-scrollbar::-webkit-scrollbar-track {
+        @apply rounded-full bg-transparent;
+    }
+
+    .dark-scrollbar::-webkit-scrollbar-thumb {
+        @apply rounded-full bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-500;
+    }
+
+    /* Firefox compatibility for dark-scrollbar */
+    .dark-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: rgb(156 163 175) rgba(0, 0, 0, 0.05); /* bg-gray-400 con un fondo ligeramente visible */
+    }
+
+    .dark .dark-scrollbar {
+        scrollbar-color: rgb(156 163 175) rgba(255, 255, 255, 0.05); /* bg-gray-400 con un fondo ligeramente visible para mejor contraste */
+    }
+
     /* For Remove Date Icon */
     input[type='date']::-webkit-inner-spin-button,
     input[type='time']::-webkit-inner-spin-button,
