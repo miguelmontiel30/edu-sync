@@ -1,29 +1,36 @@
 'use client';
 
 // React
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
 // Next
-import {useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 // Store
-import {useAuthStore} from '@/store/useAuthStore';
+import { useAuthStore } from '@/store/useAuthStore';
 
 // Auth Context
-import {useAuth} from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 const LoginPage: React.FC = () => {
+    // States
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    const {login: storeLogin} = useAuthStore();
-    const {login: contextLogin} = useAuth();
+    // Contexts
+    const { login: storeLogin } = useAuthStore();
+    const { login: contextLogin } = useAuth();
+
+    // Router
     const router = useRouter();
 
+    // Handler to submit the form when the user clicks the login button
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        // Resetear errores y estado de carga
         setError('');
         setIsLoading(true);
 
@@ -107,6 +114,7 @@ const LoginPage: React.FC = () => {
                         )}
                     </button>
                 </form>
+
                 <div className="text-center">
                     <a
                         href="/register"

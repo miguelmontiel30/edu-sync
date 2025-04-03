@@ -68,10 +68,17 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
                 // Si no hay usuario autenticado, limpiar todo
                 if (!authUser) {
+                    // Limpiar el usuario
                     setUser(null);
+
+                    // Limpiar el perfil
                     setProfile(null);
+
+                    // Limpiar localStorage
                     localStorage.removeItem('eduSync_profile');
                     localStorage.removeItem('eduSync_user');
+
+                    // Establecer el estado de carga a false
                     setIsLoading(false);
                     return;
                 }
@@ -210,13 +217,19 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     // Función de inicio de sesión
     const handleLogin = async (email: string, password: string) => {
         try {
+            // Establecer el estado de carga a true
             setIsLoading(true);
+
             // La autenticación ahora está centralizada y optimizada
             const data = await login(email, password);
+
+            // Establecer el usuario
             setUser(data.user);
 
             // Cargar el perfil desde localStorage, que fue guardado durante login
             const storedProfile = localStorage.getItem('eduSync_profile');
+
+            // Si hay un perfil en localStorage, establecerlo
             if (storedProfile) {
                 try {
                     setProfile(JSON.parse(storedProfile));
@@ -225,9 +238,13 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
                 }
             }
 
+            // Establecer el estado de carga a false
             setIsLoading(false);
         } catch (error) {
+            // Establecer el estado de carga a false
             setIsLoading(false);
+
+            // Lanzar el error
             console.error('Error en inicio de sesión:', error);
             throw error;
         }
@@ -236,13 +253,25 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     // Función de cierre de sesión
     const handleLogout = async () => {
         try {
+            // Establecer el estado de carga a true
             setIsLoading(true);
+
+            // Cerrar la sesión
             await logout();
+
+            // Limpiar el usuario
             setUser(null);
+
+            // Limpiar el perfil
             setProfile(null);
+
+            // Establecer el estado de carga a false
             setIsLoading(false);
         } catch (error) {
+            // Establecer el estado de carga a false
             setIsLoading(false);
+
+            // Lanzar el error
             console.error('Error en cierre de sesión:', error);
             throw error;
         }
