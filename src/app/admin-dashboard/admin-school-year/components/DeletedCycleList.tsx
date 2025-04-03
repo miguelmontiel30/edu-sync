@@ -1,128 +1,157 @@
-import { useState } from 'react';
-import { SchoolCycle } from './types';
-import { getStatusColor } from './utils';
+// React
+import { useState, useEffect } from 'react';
+
+// Componentes
+import IconFA from '@/components/ui/IconFA';
 import Badge from '@/components/core/badge/Badge';
 import Button from '@/components/core/button/Button';
-import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/core/table';
-import IconFA from '@/components/ui/IconFA';
+import { DataTable, Column } from '@/components/core/table';
+import ComponentCard from '@/components/common/ComponentCard';
+
+// Utils
+import { SchoolCycle } from './types';
+import { getStatusColor } from './utils';
 
 interface DeletedCycleListProps {
-    cycles: SchoolCycle[];
-    isLoading: boolean;
-    onRestore: (id: number) => void;
+    readonly cycles: SchoolCycle[];
+    readonly isLoading: boolean;
+    readonly onRestore: (id: number) => void;
 }
 
 export default function DeletedCycleList({ cycles, isLoading, onRestore }: DeletedCycleListProps) {
     const [showDeleted, setShowDeleted] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Definir las columnas de la tabla
+    const columns: Column<SchoolCycle>[] = [
+        {
+            key: 'name',
+            header: 'Nombre',
+            sortable: true,
+            render: (cycle) => (
+                <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                    {cycle.name}
+                </span>
+            )
+        },
+        {
+            key: 'startDate',
+            header: 'Fecha de Inicio',
+            sortable: true,
+            render: (cycle) => (
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    {new Date(cycle.startDate).toLocaleDateString()}
+                </span>
+            )
+        },
+        {
+            key: 'endDate',
+            header: 'Fecha de Fin',
+            sortable: true,
+            render: (cycle) => (
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    {new Date(cycle.endDate).toLocaleDateString()}
+                </span>
+            )
+        },
+        {
+            key: 'groupsCount',
+            header: 'Grupos',
+            render: (cycle) => (
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    {cycle.groupsCount}
+                </span>
+            )
+        },
+        {
+            key: 'studentsCount',
+            header: 'Alumnos',
+            render: (cycle) => (
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    {cycle.studentsCount}
+                </span>
+            )
+        },
+        {
+            key: 'averageGrade',
+            header: 'Promedio',
+            render: (cycle) => (
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    {cycle.averageGrade.toFixed(2)}
+                </span>
+            )
+        },
+        {
+            key: 'status',
+            header: 'Estado',
+            sortable: true,
+            render: (cycle) => (
+                <Badge
+                    size="sm"
+                    color={getStatusColor(cycle.status)}
+                >
+                    <span className="font-outfit">
+                        {cycle.statusName}
+                    </span>
+                </Badge>
+            )
+        },
+        {
+            key: 'actions',
+            header: 'Acciones',
+            render: (cycle) => (
+                <Button
+                    variant="outline"
+                    size="sm"
+                    startIcon={<IconFA icon="rotate-left" style="duotone" />}
+                    onClick={() => onRestore(cycle.id)}
+                >
+                    <span className="font-outfit">Restaurar</span>
+                </Button>
+            )
+        }
+    ];
+
+    // Filtrar registros cuando se busca
+    const handleSearch = (term: string) => {
+        setSearchTerm(term);
+    };
 
     return (
-        <div className="mt-6">
-            <button
-                onClick={() => setShowDeleted(!showDeleted)}
-                className="flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white p-4 text-left dark:border-gray-800 dark:bg-white/[0.03]"
-            >
-                <div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
-                        Ciclos Eliminados
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                        {cycles.length} ciclos en la papelera
-                    </p>
-                </div>
-                <IconFA icon={showDeleted ? 'chevron-up' : 'chevron-down'} style="solid" className={`text-${showDeleted ? 'primary' : 'gray-400'}`} />
-            </button>
+        <ComponentCard
+            title="Ciclos Escolares Eliminados"
+            desc="Historial de ciclos escolares que han sido eliminados del sistema."
+            className="mt-6"
+        >
+            <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowDeleted(!showDeleted)}
+                    className="flex items-center gap-1"
+                >
+                    <IconFA icon={showDeleted ? 'eye-slash' : 'eye'} style="solid" className="text-gray-500" />
+                    <span className="font-outfit">{showDeleted ? 'Ocultar' : 'Mostrar'} Eliminados</span>
+                </Button>
+            </div>
 
             {showDeleted && (
-                <div className="mt-4">
-                    <div className="overflow-x-auto">
-                        {isLoading ? (
-                            <div className="flex items-center justify-center h-[200px]">
-                                <IconFA icon="spinner" spin className="text-gray-400" />
-                            </div>
-                        ) : (
-                            <Table className="min-w-full">
-                                <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                                    <TableRow>
-                                        <TableCell isHeader>Nombre</TableCell>
-                                        <TableCell isHeader>Fecha de Inicio</TableCell>
-                                        <TableCell isHeader>Fecha de Fin</TableCell>
-                                        <TableCell isHeader>Grupos</TableCell>
-                                        <TableCell isHeader>Alumnos</TableCell>
-                                        <TableCell isHeader>Promedio</TableCell>
-                                        <TableCell isHeader>Estado</TableCell>
-                                        <TableCell isHeader>Acciones</TableCell>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                                    {cycles.map(cycle => (
-                                        <TableRow key={cycle.id}>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
-                                                    {cycle.name}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                    {new Date(cycle.startDate).toLocaleDateString()}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                    {new Date(cycle.endDate).toLocaleDateString()}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                    {cycle.groupsCount}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                    {cycle.studentsCount}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                                                    {cycle.averageGrade.toFixed(2)}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <Badge
-                                                    size="sm"
-                                                    color={getStatusColor(cycle.status)}
-                                                >
-                                                    <span className="font-outfit">
-                                                        {cycle.statusName}
-                                                    </span>
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    startIcon={<IconFA icon="rotate-left" style="duotone" />}
-                                                    onClick={() => onRestore(cycle.id)}
-                                                >
-                                                    <span className="font-outfit">Restaurar</span>
-                                                </Button>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    {cycles.length === 0 && (
-                                        <TableRow>
-                                            <TableCell colSpan={8} className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                                    No hay ciclos eliminados
-                                                </span>
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        )}
-                    </div>
-                </div>
+                <DataTable
+                    data={cycles}
+                    columns={columns}
+                    keyExtractor={(cycle) => cycle.id}
+                    searchable={true}
+                    searchPlaceholder="Buscar ciclos eliminados..."
+                    defaultSortField="name"
+                    defaultSortDirection="asc"
+                    isLoading={isLoading}
+                    noDataMessage="No hay ciclos escolares eliminados"
+                    searchNoResultsMessage="No se encontraron ciclos escolares que coincidan con la búsqueda"
+                    itemsPerPage={5}
+                    maxHeight="400px"
+                    onSearch={handleSearch}
+                />
             )}
-        </div>
+        </ComponentCard>
     );
 } 
