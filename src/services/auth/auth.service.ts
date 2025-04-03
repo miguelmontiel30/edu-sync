@@ -24,10 +24,10 @@ export interface CustomUser extends Partial<User> {
  */
 export async function login(email: string, password: string) {
     try {
-        // Buscar el usuario directamente en la tabla users
+        // Primero buscar el usuario sin relación con roles
         const {data: userData, error: userError} = await supabaseClient
             .from('users')
-            .select('user_id, email, first_name, last_name, plain_password')
+            .select('user_id, email, first_name, last_name, plain_password, school_id')
             .eq('email', email)
             .single();
 
@@ -52,89 +52,124 @@ export async function login(email: string, password: string) {
             );
         }
 
-        // Verificar si el usuario tiene roles asignados
-        const {data: userRolesData, error: rolesError} = await supabaseClient
+        // Obtener roles del usuario
+        const {data: userRoles, error: rolesError} = await supabaseClient
             .from('user_roles')
-            .select('role_id, roles:role_id(name)')
+            .select(
+                `
+                role_id, 
+                roles:role_id(
+                    name
+                )
+            `,
+            )
             .eq('user_id', userData.user_id)
             .eq('delete_flag', false);
 
         if (rolesError) {
-            console.error('Error al verificar roles del usuario:', rolesError);
-            throw new Error(
-                'No se pudieron verificar los permisos del usuario. Por favor, contacte al administrador.',
-            );
+            console.error('Error al obtener roles del usuario:', rolesError);
+            throw new Error('Error al verificar roles. Por favor, intente más tarde.');
         }
 
         // Si el usuario no tiene roles asignados
-        if (!userRolesData || userRolesData.length === 0) {
+        if (!userRoles || userRoles.length === 0) {
             throw new Error(
                 'Tu cuenta no tiene permisos asignados para acceder al sistema. Por favor, contacte al administrador.',
             );
         }
 
-        // Intentar iniciar sesión con Supabase Auth para mantener la sesión
-        try {
-            const {data, error} = await supabaseClient.auth.signInWithPassword({
-                email,
-                password,
-            });
+        // Obtener permisos en una sola consulta adicional
+        const roleIds = userRoles.map((role: any) => role.role_id);
+        let userPermissions: string[] = [];
 
-            if (error) {
-                console.warn(
-                    'No se pudo crear sesión en Supabase Auth, continuando con sesión personalizada',
-                );
+        if (roleIds.length > 0) {
+            const {data: permissionsData, error: permissionsError} = await supabaseClient
+                .from('role_permissions')
+                .select(
+                    `
+                    permissions:permission_id(name)
+                `,
+                )
+                .in('role_id', roleIds);
 
-                // Crear una "sesión personalizada" con los datos del usuario
-                // Nota: Esto no crea una sesión real en Supabase Auth
-                const customUser: CustomUser = {
-                    id: userData.user_id.toString(),
-                    email: userData.email,
-                    user_metadata: {
-                        first_name: userData.first_name,
-                        last_name: userData.last_name,
-                        roles: userRolesData.map((role: any) => ({
-                            role_id: role.role_id,
-                            name: role.roles?.name || '',
-                        })),
-                    },
-                    app_metadata: {},
-                    aud: 'authenticated',
-                    created_at: new Date().toISOString(),
-                };
-
-                return {
-                    session: null,
-                    user: customUser as User,
-                };
+            if (!permissionsError && permissionsData) {
+                userPermissions = permissionsData
+                    .map((p: any) => p.permissions?.name || '')
+                    .filter(Boolean);
             }
-
-            return data;
-        } catch (authError) {
-            console.error('Error en la autenticación con Supabase:', authError);
-
-            // Devolver una sesión personalizada con los datos del usuario
-            const customUser: CustomUser = {
-                id: userData.user_id.toString(),
-                email: userData.email,
-                user_metadata: {
-                    first_name: userData.first_name,
-                    last_name: userData.last_name,
-                    roles: userRolesData.map((role: any) => ({
-                        role_id: role.role_id,
-                        name: role.roles?.name || '',
-                    })),
-                },
-                app_metadata: {},
-                aud: 'authenticated',
-                created_at: new Date().toISOString(),
-            };
-
-            return {
-                session: null,
-                user: customUser as User,
-            };
         }
+
+        // Formatear los roles
+        const formattedRoles = userRoles.map((r: any) => ({
+            role_id: r.role_id,
+            name: r.roles?.name || '',
+        }));
+
+        // Crear un usuario personalizado
+        const customUser: CustomUser = {
+            id: userData.user_id.toString(),
+            email: userData.email,
+            user_metadata: {
+                first_name: userData.first_name,
+                last_name: userData.last_name,
+                roles: formattedRoles,
+            },
+            app_metadata: {
+                permissions: userPermissions,
+            },
+            aud: 'authenticated',
+            created_at: new Date().toISOString(),
+        };
+
+        // Guardar los datos en localStorage
+        localStorage.setItem('eduSync_user', JSON.stringify(customUser));
+
+        // Crear el perfil completo con permisos
+        const profileData = {
+            user_id: userData.user_id,
+            school_id: userData.school_id || null,
+            email: userData.email,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            roles: formattedRoles.map(role => ({
+                ...role,
+                description: null,
+            })),
+            permissions: userPermissions,
+        };
+
+        localStorage.setItem('eduSync_profile', JSON.stringify(profileData));
+
+        // Solo intentar la autenticación de Supabase si hay un motivo específico para ello
+        // Por ejemplo, si se necesita un token JWT para acceder a funciones protegidas
+        // De lo contrario, omitimos esta llamada ya que nuestra autenticación personalizada es suficiente
+        const skipSupabaseAuth = true; // Cambiar a false si se necesita autenticación con Supabase
+
+        if (!skipSupabaseAuth) {
+            try {
+                const {data, error} = await supabaseClient.auth.signInWithPassword({
+                    email,
+                    password,
+                });
+
+                if (!error) {
+                    return {
+                        session: data.session,
+                        user: customUser as User,
+                    };
+                }
+            } catch (authError) {
+                console.warn(
+                    'No se pudo autenticar con Supabase, usando autenticación personalizada',
+                );
+            }
+        }
+
+        // Devolver una sesión personalizada
+        return {
+            session: null,
+            user: customUser as User,
+        };
     } catch (error) {
         console.error('Error en autenticación:', error);
         throw error;
@@ -142,27 +177,40 @@ export async function login(email: string, password: string) {
 }
 
 export async function logout() {
-    await supabaseClient.auth.signOut();
+    // Limpiar el localStorage primero
     localStorage.removeItem('eduSync_user');
     localStorage.removeItem('eduSync_profile');
+
+    // Luego hacer logout en Supabase solo si es necesario
+    try {
+        await supabaseClient.auth.signOut();
+    } catch (error) {
+        console.warn('Error al cerrar sesión en Supabase:', error);
+        // No propagar el error ya que el cierre de sesión local es suficiente
+    }
 }
 
 export async function getUser() {
-    const {data, error} = await supabaseClient.auth.getUser();
-
-    if (error) {
-        // Intentar obtener el usuario desde localStorage si existe algún dato guardado
-        const localUser = localStorage.getItem('eduSync_user');
-        if (localUser) {
-            try {
-                return JSON.parse(localUser) as User;
-            } catch (e) {
-                console.error('Error al parsear el usuario local:', e);
-                return null;
-            }
+    // Intentar primero obtener el usuario desde localStorage
+    const localUser = localStorage.getItem('eduSync_user');
+    if (localUser) {
+        try {
+            return JSON.parse(localUser) as User;
+        } catch (e) {
+            console.error('Error al parsear el usuario local:', e);
+            // Continuar para intentar obtener desde Supabase
         }
-        return null;
     }
 
-    return data.user;
+    // Solo si no está en localStorage, intentar obtener desde Supabase
+    try {
+        const {data, error} = await supabaseClient.auth.getUser();
+        if (!error) {
+            return data.user;
+        }
+    } catch (e) {
+        console.warn('Error al obtener usuario de Supabase:', e);
+    }
+
+    return null;
 }
