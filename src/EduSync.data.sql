@@ -87,6 +87,19 @@ VALUES
     (1, 3), -- Admin puede eliminar estudiante
     (1, 4);
 
+-- Asignar rol de administrador al usuario de prueba
+INSERT INTO
+    user_roles (user_id, role_id)
+SELECT
+    user_id,
+    role_id
+FROM
+    users,
+    roles
+WHERE
+    email = 'test@email.com'
+    AND name = 'admin';
+
 -- Generar datos para escuelas
 INSERT INTO
     schools (
@@ -111,30 +124,6 @@ VALUES
         FALSE
     );
 
--- Insertar usuario de prueba
-INSERT INTO
-    users (email, password_hash, first_name, last_name)
-VALUES
-    (
-        'test@email.com',
-        crypt ('1234', gen_salt ('bf')),
-        'Usuario',
-        'Prueba'
-    );
-
--- Asignar rol de administrador al usuario de prueba
-INSERT INTO
-    user_roles (user_id, role_id)
-SELECT
-    user_id,
-    role_id
-FROM
-    users,
-    roles
-WHERE
-    email = 'test@email.com'
-    AND name = 'admin';
-
 -- Insertar ciclos escolares
 INSERT INTO
     "school_years" (
@@ -143,7 +132,7 @@ INSERT INTO
         "name",
         "start_date",
         "end_date",
-        "status",
+        "status_id",
         "delete_flag",
         "created_at",
         "updated_at",
@@ -156,7 +145,14 @@ VALUES
         'Ciclo 2025-2026',
         '2025-07-18',
         '2026-07-30',
-        'inactive',
+        (
+            SELECT
+                status_id
+            FROM
+                status
+            WHERE
+                code = 'SCHOOL_YEAR_INACTIVE'
+        ),
         'false',
         '2025-03-27 00:35:22.175036+00',
         '2025-03-27 05:45:28.114+00',
@@ -168,7 +164,14 @@ VALUES
         'Ciclo 2023-2024',
         '2023-07-13',
         '2024-07-30',
-        'completed',
+        (
+            SELECT
+                status_id
+            FROM
+                status
+            WHERE
+                code = 'SCHOOL_YEAR_COMPLETED'
+        ),
         'false',
         '2025-03-27 00:35:37.835517+00',
         '2025-03-27 07:53:50.918+00',
@@ -180,7 +183,14 @@ VALUES
         'test 3',
         '2025-03-02',
         '2025-03-30',
-        'inactive',
+        (
+            SELECT
+                status_id
+            FROM
+                status
+            WHERE
+                code = 'SCHOOL_YEAR_INACTIVE'
+        ),
         'true',
         '2025-03-27 00:35:55.20988+00',
         '2025-03-27 00:48:34.986+00',
@@ -192,7 +202,14 @@ VALUES
         'Ciclo 2024-2025',
         '2024-07-27',
         '2025-07-13',
-        'active',
+        (
+            SELECT
+                status_id
+            FROM
+                status
+            WHERE
+                code = 'SCHOOL_YEAR_ACTIVE'
+        ),
         'false',
         '2025-03-27 01:35:10.229855+00',
         '2025-03-27 07:37:12.599+00',
