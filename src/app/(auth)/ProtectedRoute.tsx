@@ -1,6 +1,7 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import IconFA from '@/components/ui/IconFA';
 
 interface ProtectedRouteProps {
     readonly children: ReactNode;
@@ -15,38 +16,55 @@ export default function ProtectedRoute({
 }: ProtectedRouteProps) {
     // Obtener el usuario autenticado y sus datos
     const { user, profile, isLoading, isAdmin, hasPermission } = useAuth();
+    const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
     // Obtener la ruta actual
     const router = useRouter();
 
-    // Si está cargando, mostrar un estado de carga
-    if (isLoading) {
-        return <div className="flex h-screen items-center justify-center">Cargando...</div>;
+    // Usar useEffect para manejar la redirección
+    useEffect(() => {
+        // Solo verificar cuando isLoading es false
+        if (!isLoading) {
+            // Verificar si hay usuario autenticado
+            if (!user || !profile) {
+                router.push('/login');
+                return;
+            }
+
+            // Verificar si se requiere ser administrador
+            if (adminOnly && !isAdmin) {
+                router.push('/unauthorized');
+                return;
+            }
+
+            // Verificar permisos requeridos
+            const hasAllPermissions = requiredPermissions.every(permission =>
+                hasPermission(permission)
+            );
+
+            // Si no tiene los permisos requeridos
+            if (requiredPermissions.length > 0 && !hasAllPermissions) {
+                router.push('/unauthorized');
+                return;
+            }
+
+            // Si pasa todas las verificaciones
+            setIsAuthorized(true);
+        }
+    }, [user, profile, isLoading, isAdmin, adminOnly, requiredPermissions, hasPermission, router]);
+
+    // Mientras carga o verifica autorización, mostrar estado de carga
+    if (isLoading || isAuthorized === null) {
+        return (
+            <div className="flex h-screen w-full flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
+                <div className="mb-4 text-indigo-600 dark:text-indigo-400">
+                    <IconFA icon="spinner" spin size="2xl" />
+                </div>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Verificando acceso...</p>
+            </div>
+        );
     }
 
-    // Si no hay usuario autenticado, redirigir al login
-    if (!user || !profile) {
-        router.push('/login');
-        return null;
-    }
-
-    // Verificar si se requiere ser administrador
-    if (adminOnly && !isAdmin) {
-        router.push('/unauthorized');
-        return null;
-    }
-
-    // Verificar permisos requeridos
-    const hasAllPermissions = requiredPermissions.every(permission =>
-        hasPermission(permission)
-    );
-
-    // Si no hay permisos requeridos, redirigir al usuario a la página de no autorizado
-    if (requiredPermissions.length > 0 && !hasAllPermissions) {
-        router.push('/unauthorized');
-        return null;
-    }
-
-    // Si pasa todas las verificaciones, renderizar los componentes hijos
+    // Si está autorizado, renderizar los hijos
     return <>{children}</>;
 }
