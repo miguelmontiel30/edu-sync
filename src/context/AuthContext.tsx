@@ -51,151 +51,131 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
         const loadUserAndProfile = async () => {
             setIsLoading(true);
             try {
+                // Intentar cargar desde localStorage primero
+                let localProfile: UserProfile | null = null;
+                const storedProfile = localStorage.getItem('eduSync_profile');
+
+                if (storedProfile) {
+                    try {
+                        localProfile = JSON.parse(storedProfile);
+                    } catch (e) {
+                        console.error('Error al parsear perfil local:', e);
+                    }
+                }
+
                 // Obtener usuario autenticado
                 const authUser = await getUser();
-                if (authUser) {
-                    setUser(authUser);
-                    try {
-                        // Cargar perfil del usuario con sus roles y permisos
-                        const { data: userData, error: userError } = await supabaseClient
-                            .from('users')
-                            .select('user_id, school_id, email, first_name, last_name, plain_password')
-                            .eq('email', authUser.email)
-                            .single();
 
-                        if (userError) {
-                            console.warn('No se encontró el usuario en la tabla users:', userError);
-                            // Intentar usar datos del usuario de Supabase si está disponible
-                            if ((authUser as CustomUser)?.user_metadata?.first_name) {
-                                const customUser = authUser as CustomUser;
-                                const userRoles = customUser.user_metadata.roles.map(role => ({
-                                    role_id: role.role_id,
-                                    name: role.name,
-                                    description: null
-                                }));
-
-                                // Cargar permisos para los roles
-                                let userPermissions: string[] = [];
-                                if (userRoles.length > 0) {
-                                    const roleIds = userRoles.map(r => r.role_id);
-                                    const { data: permissionsData } = await supabaseClient
-                                        .from('role_permissions')
-                                        .select(`
-                                            permissions:permission_id(name)
-                                        `)
-                                        .in('role_id', roleIds);
-
-                                    if (permissionsData) {
-                                        userPermissions = permissionsData
-                                            .map((p: any) => p.permissions?.name || '')
-                                            .filter(Boolean);
-                                    }
-                                }
-
-                                const profileFromAuth = {
-                                    user_id: parseInt(customUser.id),
-                                    school_id: null,
-                                    email: customUser.email || '',
-                                    first_name: customUser.user_metadata.first_name,
-                                    last_name: customUser.user_metadata.last_name,
-                                    roles: userRoles,
-                                    permissions: userPermissions
-                                };
-
-                                setProfile(profileFromAuth);
-                                localStorage.setItem('eduSync_profile', JSON.stringify(profileFromAuth));
-                                setIsLoading(false);
-                                return;
-                            }
-
-                            // Si no hay datos en user_metadata, intentar cargar desde localStorage
-                            const localProfile = localStorage.getItem('eduSync_profile');
-                            if (localProfile) {
-                                try {
-                                    setProfile(JSON.parse(localProfile));
-                                    setIsLoading(false);
-                                    return;
-                                } catch (e) {
-                                    console.error('Error al parsear perfil local:', e);
-                                }
-                            }
-
-                            setProfile(null);
-                            setIsLoading(false);
-                            return;
-                        }
-
-                        // Cargar roles del usuario
-                        const { data: rolesData, error: rolesError } = await supabaseClient
-                            .from('user_roles')
-                            .select(`
-                                role_id,
-                                roles:role_id(name, description)
-                            `)
-                            .eq('user_id', userData.user_id)
-                            .eq('delete_flag', false);
-
-                        if (rolesError) {
-                            console.warn('Error al cargar roles del usuario:', rolesError);
-                            // Continuar sin roles
-                        }
-
-                        // Cargar permisos por roles
-                        let userPermissions: string[] = [];
-                        if (rolesData && rolesData.length > 0) {
-                            const roleIds = rolesData.map(r => r.role_id);
-                            const { data: permissionsData, error: permissionsError } = await supabaseClient
-                                .from('role_permissions')
-                                .select(`
-                                    permissions:permission_id(name)
-                                `)
-                                .in('role_id', roleIds);
-
-                            if (permissionsError) {
-                                console.warn('Error al cargar permisos del usuario:', permissionsError);
-                            } else if (permissionsData) {
-                                userPermissions = permissionsData
-                                    .map((p: any) => p.permissions?.name || '')
-                                    .filter(Boolean);
-                            }
-                        }
-
-                        // Formatear los datos del perfil usando any para sortear problemas de tipo
-                        const userRoles = (rolesData || []).map((r: any) => ({
-                            role_id: r.role_id,
-                            name: r.roles?.name || '',
-                            description: r.roles?.description || null
-                        }));
-
-                        const profileData = {
-                            ...userData,
-                            roles: userRoles,
-                            permissions: userPermissions
-                        };
-
-                        setProfile(profileData);
-                        // Guardar el perfil en localStorage para persistencia
-                        localStorage.setItem('eduSync_profile', JSON.stringify(profileData));
-                    } catch (profileError) {
-                        console.error('Error al cargar el perfil completo:', profileError);
-                        // Intentar cargar desde localStorage si hay error
-                        const localProfile = localStorage.getItem('eduSync_profile');
-                        if (localProfile) {
-                            try {
-                                setProfile(JSON.parse(localProfile));
-                            } catch (e) {
-                                console.error('Error al parsear perfil local:', e);
-                                setProfile(null);
-                            }
-                        } else {
-                            setProfile(null);
-                        }
-                    }
-                } else {
+                // Si no hay usuario autenticado, limpiar todo
+                if (!authUser) {
                     setUser(null);
                     setProfile(null);
                     localStorage.removeItem('eduSync_profile');
                     localStorage.removeItem('eduSync_user');
+                    setIsLoading(false);
+                    return;
+                }
+
+                setUser(authUser);
+
+                // Si tenemos el perfil en localStorage y corresponde al usuario actual, usarlo
+                if (localProfile && localProfile.email === authUser.email) {
+                    setProfile(localProfile);
+                    setIsLoading(false);
+                    return;
+                }
+
+                // Si es un usuario personalizado (CustomUser), usar sus metadatos
+                if ((authUser as CustomUser)?.user_metadata?.first_name) {
+                    const customUser = authUser as CustomUser;
+                    const app_metadata = customUser.app_metadata || {};
+
+                    // Crear el perfil a partir de los metadatos del usuario
+                    const profileFromAuth: UserProfile = {
+                        user_id: parseInt(customUser.id),
+                        school_id: null,
+                        email: customUser.email || '',
+                        first_name: customUser.user_metadata.first_name,
+                        last_name: customUser.user_metadata.last_name,
+                        roles: customUser.user_metadata.roles.map(role => ({
+                            role_id: role.role_id,
+                            name: role.name,
+                            description: null
+                        })),
+                        permissions: Array.isArray(app_metadata.permissions) ? app_metadata.permissions : []
+                    };
+
+                    setProfile(profileFromAuth);
+                    localStorage.setItem('eduSync_profile', JSON.stringify(profileFromAuth));
+                    setIsLoading(false);
+                    return;
+                }
+
+                // Solo como último recurso, consultar la base de datos
+                try {
+                    const { data: userData, error: userError } = await supabaseClient
+                        .from('users')
+                        .select(`
+                            user_id, 
+                            school_id, 
+                            email, 
+                            first_name, 
+                            last_name, 
+                            plain_password,
+                            user_roles:user_id(
+                                role_id, 
+                                roles:role_id(name, description)
+                            )
+                        `)
+                        .eq('email', authUser.email)
+                        .eq('user_roles.delete_flag', false)
+                        .single();
+
+                    if (userError) {
+                        console.warn('Error al cargar perfil del usuario desde DB:', userError);
+                        setProfile(null);
+                        setIsLoading(false);
+                        return;
+                    }
+
+                    // Formatear roles
+                    const userRoles = (userData.user_roles || []).map((r: any) => ({
+                        role_id: r.role_id,
+                        name: r.roles?.name || '',
+                        description: r.roles?.description || null
+                    }));
+
+                    // Cargar permisos en una sola consulta adicional
+                    let userPermissions: string[] = [];
+                    if (userRoles.length > 0) {
+                        const roleIds = userRoles.map(r => r.role_id);
+                        const { data: permissionsData } = await supabaseClient
+                            .from('role_permissions')
+                            .select(`
+                                permissions:permission_id(name)
+                            `)
+                            .in('role_id', roleIds);
+
+                        if (permissionsData) {
+                            userPermissions = permissionsData
+                                .map((p: any) => p.permissions?.name || '')
+                                .filter(Boolean);
+                        }
+                    }
+
+                    // Crear perfil completo
+                    const profileData = {
+                        ...userData,
+                        user_roles: undefined, // Eliminar propiedad anidada que no necesitamos
+                        roles: userRoles,
+                        permissions: userPermissions
+                    };
+
+                    setProfile(profileData);
+                    localStorage.setItem('eduSync_profile', JSON.stringify(profileData));
+                } catch (dbError) {
+                    console.error('Error al cargar datos del usuario desde DB:', dbError);
+                    setProfile(null);
                 }
             } catch (error) {
                 console.error('Error loading user profile:', error);
@@ -208,7 +188,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
         loadUserAndProfile();
 
-        // Suscribirse a cambios de autenticación
+        // Suscribirse a cambios de autenticación solo si es necesario
         const { data: authListener } = supabaseClient.auth.onAuthStateChange(
             async (event, session) => {
                 if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
@@ -230,14 +210,24 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     // Función de inicio de sesión
     const handleLogin = async (email: string, password: string) => {
         try {
-            // Toda la lógica de autenticación, incluida la verificación de plain_password,
-            // ahora está centralizada en el servicio de autenticación
+            setIsLoading(true);
+            // La autenticación ahora está centralizada y optimizada
             const data = await login(email, password);
             setUser(data.user);
 
-            // Guardar el usuario en localStorage para persistencia
-            localStorage.setItem('eduSync_user', JSON.stringify(data.user));
+            // Cargar el perfil desde localStorage, que fue guardado durante login
+            const storedProfile = localStorage.getItem('eduSync_profile');
+            if (storedProfile) {
+                try {
+                    setProfile(JSON.parse(storedProfile));
+                } catch (e) {
+                    console.error('Error al parsear perfil después del login:', e);
+                }
+            }
+
+            setIsLoading(false);
         } catch (error) {
+            setIsLoading(false);
             console.error('Error en inicio de sesión:', error);
             throw error;
         }
@@ -246,10 +236,13 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     // Función de cierre de sesión
     const handleLogout = async () => {
         try {
+            setIsLoading(true);
             await logout();
             setUser(null);
             setProfile(null);
+            setIsLoading(false);
         } catch (error) {
+            setIsLoading(false);
             console.error('Error en cierre de sesión:', error);
             throw error;
         }
