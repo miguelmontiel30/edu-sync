@@ -1,7 +1,7 @@
-import React, { FC } from 'react';
+import React from 'react';
 
 export interface InputProps {
-    type?: string;
+    type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'date' | 'time' | 'datetime-local' | 'search' | 'url';
     placeholder?: string;
     className?: string;
     startIcon?: React.ReactNode;
@@ -20,7 +20,8 @@ const Input: React.FC<InputProps> = ({
     value,
     onChange,
     name,
-    defaultValue
+    defaultValue,
+    id
 }) => {
     return (
         <div className="relative">
@@ -30,6 +31,7 @@ const Input: React.FC<InputProps> = ({
                 </div>
             )}
             <input
+                id={id}
                 type={type}
                 placeholder={placeholder}
                 className={`w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 outline-none focus:border-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:focus:border-primary ${startIcon ? 'pl-10' : ''} ${className}`}
