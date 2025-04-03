@@ -1,0 +1,166 @@
+import { useState, useEffect } from 'react';
+import { SchoolCycle } from './types';
+import { Modal } from '@/components/ui/modal';
+import Label from '@/components/form/Label';
+import Input from '@/components/form/input/InputField';
+import Select from '@/components/form/Select';
+import Button from '@/components/core/button/Button';
+import IconFA from '@/components/ui/IconFA';
+
+interface CycleFormModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (cycleData: { name: string; startDate: string; endDate: string; status: string }) => Promise<void>;
+    selectedCycle: SchoolCycle | null;
+    isSaving: boolean;
+}
+
+export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving }: CycleFormModalProps) {
+    const [cycleForm, setCycleForm] = useState({
+        name: '',
+        startDate: '',
+        endDate: '',
+        status: ''
+    });
+
+    useEffect(() => {
+        if (selectedCycle) {
+            setCycleForm({
+                name: selectedCycle.name,
+                startDate: selectedCycle.startDate,
+                endDate: selectedCycle.endDate,
+                status: selectedCycle.status
+            });
+        } else {
+            setCycleForm({
+                name: '',
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+                status: '1' // Activo por defecto
+            });
+        }
+    }, [selectedCycle, isOpen]);
+
+    function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+        const { name, value } = e.target;
+        setCycleForm(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    }
+
+    function handleSelectChange(value: string) {
+        setCycleForm(prev => ({
+            ...prev,
+            status: value
+        }));
+    }
+
+    async function handleSaveCycle() {
+        await onSave(cycleForm);
+    }
+
+    return (
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            className="max-w-[700px] p-6 lg:p-10"
+        >
+            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+                <div>
+                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
+                        {selectedCycle ? "Editar ciclo escolar" : "Define un nuevo ciclo escolar"}
+                    </h5>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                        El conjunto de fechas clave que delimitan el periodo académico, en el que se asignan grupos, materias y alumnos para organizar eficazmente el año escolar.
+                    </p>
+                </div>
+                <div className="mt-8">
+                    <div>
+                        <div>
+                            <Label htmlFor="cycle-name" className="font-outfit">
+                                Nombre del ciclo escolar
+                            </Label>
+                            <Input
+                                id="cycle-name"
+                                type="text"
+                                placeholder={`Ej. Ciclo ${new Date().getFullYear()}-${new Date().getFullYear() + 1}`}
+                                onChange={(e) => handleInputChange(e)}
+                                name="name"
+                                defaultValue={cycleForm.name}
+                            />
+                        </div>
+                    </div>
+                    <div className="mt-6">
+                        <Label className="font-outfit">
+                            Estado del Ciclo
+                        </Label>
+                        <Select
+                            options={[
+                                { value: '1', label: 'Activo' },
+                                { value: '2', label: 'Inactivo' },
+                                { value: '3', label: 'Finalizado' }
+                            ]}
+                            placeholder="Seleccione un estado"
+                            onChange={(value) => handleSelectChange(value)}
+                            defaultValue={cycleForm.status}
+                        />
+                    </div>
+
+                    <div className="mt-6">
+                        <Label htmlFor="cycle-start-date" className="font-outfit">
+                            Ingrese la fecha de inicio
+                        </Label>
+                        <Input
+                            id="cycle-start-date"
+                            type="date"
+                            name="startDate"
+                            placeholder="Fecha de inicio"
+                            onChange={(e) => handleInputChange(e)}
+                            defaultValue={cycleForm.startDate}
+                        />
+                    </div>
+
+                    <div className="mt-6">
+                        <Label htmlFor="cycle-end-date" className="font-outfit">
+                            Ingrese la fecha de fin
+                        </Label>
+                        <Input
+                            id="cycle-end-date"
+                            type="date"
+                            name="endDate"
+                            placeholder="Fecha de fin"
+                            onChange={(e) => handleInputChange(e)}
+                            defaultValue={cycleForm.endDate}
+                        />
+                    </div>
+                </div>
+                <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+                    <Button
+                        onClick={onClose}
+                        variant="outline"
+                        className="sm:w-auto"
+                        disabled={isSaving}
+                    >
+                        <span className="font-outfit">Cancelar</span>
+                    </Button>
+                    <Button
+                        onClick={handleSaveCycle}
+                        variant="primary"
+                        className="sm:w-auto"
+                        disabled={isSaving}
+                    >
+                        {isSaving ? (
+                            <>
+                                <IconFA icon="spinner" spin className="mr-2" />
+                                <span className="font-outfit">Guardando...</span>
+                            </>
+                        ) : (
+                            <span className="font-outfit">{selectedCycle ? "Actualizar Ciclo" : "Crear Ciclo"}</span>
+                        )}
+                    </Button>
+                </div>
+            </div>
+        </Modal>
+    );
+} 
