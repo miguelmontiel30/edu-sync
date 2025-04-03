@@ -1,18 +1,25 @@
+// React
 import { useState, useEffect } from 'react';
+
+// Types
 import { SchoolCycle } from './types';
+
+// Componentes UI
 import { Modal } from '@/components/ui/modal';
-import Label from '@/components/form/Label';
-import Input from '@/components/form/input/InputField';
-import Select from '@/components/form/Select';
 import Button from '@/components/core/button/Button';
 import IconFA from '@/components/ui/IconFA';
 
+// Componentes de formulario
+import Label from '@/components/form/Label';
+import Input from '@/components/form/input/InputField';
+import Select from '@/components/form/Select';
+
 interface CycleFormModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSave: (cycleData: { name: string; startDate: string; endDate: string; status: string }) => Promise<void>;
-    selectedCycle: SchoolCycle | null;
-    isSaving: boolean;
+    readonly isOpen: boolean;
+    readonly onClose: () => void;
+    readonly onSave: (cycleData: { name: string; startDate: string; endDate: string; status: string }) => Promise<void>;
+    readonly selectedCycle: SchoolCycle | null;
+    readonly isSaving: boolean;
 }
 
 export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving }: CycleFormModalProps) {
@@ -24,22 +31,35 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
     });
 
     useEffect(() => {
-        if (selectedCycle) {
-            setCycleForm({
-                name: selectedCycle.name,
-                startDate: selectedCycle.startDate,
-                endDate: selectedCycle.endDate,
-                status: selectedCycle.status
-            });
+        if (isOpen) {
+            if (selectedCycle) {
+                setCycleForm({
+                    name: selectedCycle.name || '',
+                    startDate: selectedCycle.startDate || '',
+                    endDate: selectedCycle.endDate || '',
+                    status: selectedCycle.status || ''
+                });
+            } else {
+                setCycleForm({
+                    name: '',
+                    startDate: new Date().toISOString().split('T')[0],
+                    endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+                    status: '1' // Activo por defecto
+                });
+            }
         } else {
-            setCycleForm({
-                name: '',
-                startDate: new Date().toISOString().split('T')[0],
-                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-                status: '1' // Activo por defecto
-            });
+            resetForm();
         }
     }, [selectedCycle, isOpen]);
+
+    function resetForm() {
+        setCycleForm({
+            name: '',
+            startDate: '',
+            endDate: '',
+            status: ''
+        });
+    }
 
     function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const { name, value } = e.target;
@@ -57,6 +77,22 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
     }
 
     async function handleSaveCycle() {
+        // Validar que los campos requeridos estén completos
+        if (!cycleForm.name || !cycleForm.startDate || !cycleForm.endDate || !cycleForm.status) {
+            alert('Por favor, complete todos los campos requeridos.');
+            return;
+        }
+
+        // Validar que la fecha de inicio sea anterior a la fecha de fin
+        if (new Date(cycleForm.startDate) >= new Date(cycleForm.endDate)) {
+            alert('La fecha de inicio debe ser anterior a la fecha de fin.');
+            return;
+        }
+
+        // Limpiar los campos
+        resetForm();
+
+        // Guardar el ciclo
         await onSave(cycleForm);
     }
 
@@ -87,7 +123,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                                 placeholder={`Ej. Ciclo ${new Date().getFullYear()}-${new Date().getFullYear() + 1}`}
                                 onChange={(e) => handleInputChange(e)}
                                 name="name"
-                                defaultValue={cycleForm.name}
+                                value={cycleForm.name}
                             />
                         </div>
                     </div>
@@ -96,6 +132,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                             Estado del Ciclo
                         </Label>
                         <Select
+                            key={`status-select-${cycleForm.status}-${isOpen}-${selectedCycle?.id || 'new'}`}
                             options={[
                                 { value: '1', label: 'Activo' },
                                 { value: '2', label: 'Inactivo' },
@@ -117,7 +154,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                             name="startDate"
                             placeholder="Fecha de inicio"
                             onChange={(e) => handleInputChange(e)}
-                            defaultValue={cycleForm.startDate}
+                            value={cycleForm.startDate}
                         />
                     </div>
 
@@ -131,7 +168,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                             name="endDate"
                             placeholder="Fecha de fin"
                             onChange={(e) => handleInputChange(e)}
-                            defaultValue={cycleForm.endDate}
+                            value={cycleForm.endDate}
                         />
                     </div>
                 </div>

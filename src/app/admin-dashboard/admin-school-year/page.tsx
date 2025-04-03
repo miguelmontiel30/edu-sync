@@ -80,13 +80,22 @@ export default function SchoolYearDashboard() {
     // Manejar la eliminación de un ciclo
     async function handleDelete(id: number) {
         if (!confirm('¿Estás seguro de que deseas eliminar este ciclo escolar?')) return;
+
         setIsSaving(true);
+
         try {
+            // Eliminar el ciclo
             await deleteCycle(id);
+
+            // Actualizar la lista de ciclos
             setCycles(prev => prev.filter(cycle => cycle.id !== id));
+
+            // Actualizar la lista de ciclos eliminados
             await fetchDeletedCycles();
         } catch (error) {
             console.error('Error al eliminar el ciclo escolar:', error);
+
+            // Mostrar mensaje de error
             alert('Error al eliminar el ciclo escolar. Por favor intenta nuevamente.');
         } finally {
             setIsSaving(false);
@@ -102,6 +111,9 @@ export default function SchoolYearDashboard() {
     // Cerrar modal
     function closeModal() {
         setIsModalOpen(false);
+
+        // Limpiar los campos
+        setSelectedCycle(null);
     }
 
     // Guardar ciclo escolar (crear o actualizar)
@@ -131,10 +143,18 @@ export default function SchoolYearDashboard() {
     // Restaurar ciclo eliminado
     async function handleRestore(id: number) {
         try {
+            // Primero restauramos el ciclo
             await restoreCycle(id);
-            // Actualizar estados
-            await fetchSchoolYears();
-            await fetchDeletedCycles();
+
+            // Actualizamos los datos
+            const [activeCycles] = await Promise.all([
+                loadSchoolYears(),
+                loadDeletedCycles()
+            ]);
+
+            // Actualizamos el estado
+            setCycles(activeCycles);
+            setDeletedCycles(prevDeleted => prevDeleted.filter(cycle => cycle.id !== id));
         } catch (error) {
             console.error('Error al restaurar el ciclo:', error);
             alert('Error al restaurar el ciclo. Por favor intenta nuevamente.');
