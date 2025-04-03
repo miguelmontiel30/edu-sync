@@ -7,7 +7,6 @@ import { useSidebar } from '@/context/SidebarContext';
 import { cn } from '@/lib/utils';
 
 // Icons
-import { ChevronDownIcon, HorizontaLDots } from '@/icons';
 import IconFA from '@/components/ui/IconFA';
 
 type NavItem = {
@@ -42,61 +41,61 @@ const navItems: NavItem[] = [
     },
     {
         name: 'Alumnos',
-        icon: <i className="fa-duotone fa-solid fa-user-graduate fa-xl"></i>,
+        icon: <IconFA icon="user-graduate" style="duotone" size="xl" />,
         subItems: [
             {
                 name: 'Mis alumnos',
                 path: '/admin-dashboard/admin-students',
                 pro: false,
-                icon: 'fa-solid fa-list',
+                icon: 'list',
             },
         ],
     },
     {
         name: 'Grupos',
-        icon: <i className="fa-duotone fa-solid fa-people-group fa-xl"></i>,
+        icon: <IconFA icon="people-group" style="duotone" size="xl" />,
         subItems: [
             {
                 name: 'Mis grupos',
                 path: '/admin-dashboard/admin-groups',
                 pro: false,
-                icon: 'fa-solid fa-users',
+                icon: 'users',
             },
             {
                 name: 'Administración de grupos',
                 path: '/admin-dashboard/admin-groups/admin-groups-gestion',
                 pro: false,
-                icon: 'fa-solid fa-user-graduate',
+                icon: 'user-graduate',
             },
         ],
     },
     {
         name: 'Materias',
-        icon: <i className="fa-duotone fa-solid fa-books fa-xl"></i>,
+        icon: <IconFA icon="books" style="duotone" size="xl" />,
         subItems: [
             {
                 name: 'Mis materias',
                 path: '/admin-dashboard/admin-subjects',
                 pro: false,
-                icon: 'fa-solid fa-book',
+                icon: 'book',
             },
             {
                 name: 'Gestión de materias',
                 path: '/admin-dashboard/admin-subjects/manage',
                 pro: false,
-                icon: 'fa-solid fa-gear',
+                icon: 'gear',
             },
         ],
     },
     {
         name: 'Usuarios',
-        icon: <i className="fa-duotone fa-solid fa-users-viewfinder fa-xl"></i>,
+        icon: <IconFA icon="users-viewfinder" style="duotone" size="xl" />,
         subItems: [
             {
                 name: 'Administración de usuarios',
                 path: '/admin-dashboard/admin-users',
                 pro: false,
-                icon: 'fa-solid fa-user-gear',
+                icon: 'user-gear',
             },
         ],
     },
@@ -105,29 +104,29 @@ const navItems: NavItem[] = [
 const othersItems: NavItem[] = [
     {
         name: 'Finanzas y pagos',
-        icon: <i className="fa-duotone fa-solid fa-chart-mixed-up-circle-dollar fa-xl"></i>,
+        icon: <IconFA icon="chart-mixed-up-circle-dollar" style="duotone" size="xl" />,
         subItems: [
             {
                 name: 'Blank Page',
                 path: '/blank',
                 pro: false,
-                icon: 'fa-solid fa-file',
+                icon: 'file',
             },
             {
                 name: '404 Error',
                 path: '/error-404',
                 pro: false,
-                icon: 'fa-solid fa-triangle-exclamation',
+                icon: 'triangle-exclamation',
             },
         ],
     },
     {
-        icon: <i className="fa-duotone fa-solid fa-calendar fa-xl"></i>,
+        icon: <IconFA icon="calendar" style="duotone" size="xl" />,
         name: 'Calendario',
         path: '/calendar',
     },
     {
-        icon: <i className="fa-duotone fa-solid fa-id-card fa-xl"></i>,
+        icon: <IconFA icon="id-card" style="duotone" size="xl" />,
         name: 'Mi Perfil',
         path: '/profile',
     },
@@ -246,7 +245,8 @@ const AdminSidebar: React.FC = () => {
                                 <span className={`menu-item-text`}>{nav.name}</span>
                             )}
                             {(isExpanded || isHovered || isMobileOpen) && (
-                                <ChevronDownIcon
+                                <IconFA
+                                    icon="chevron-down"
                                     className={`ml-auto h-5 w-5 transition-transform duration-200 ${openSubmenu?.type === menuType &&
                                         openSubmenu?.index === index
                                         ? 'rotate-180 text-brand-500'
@@ -335,24 +335,20 @@ const AdminSidebar: React.FC = () => {
             >
                 <Link href="/">
                     {isExpanded || isHovered || isMobileOpen ? (
-                        <>
-                            <Image
-                                className="dark:hidden"
-                                src="/images/EduSync-logo.png"
-                                alt="Logo"
-                                width={150}
-                                height={40}
+                        <div className="flex items-center">
+                            <IconFA
+                                icon="graduation-cap"
+                                size="xl"
+                                className="text-indigo-600 dark:text-indigo-400"
                             />
-                            <Image
-                                className="hidden dark:block"
-                                src="/images/EduSync-logo.png"
-                                alt="Logo"
-                                width={150}
-                                height={40}
-                            />
-                        </>
+                            <h1 className="ml-2 text-xl font-semibold text-gray-800 dark:text-white">EduSync</h1>
+                        </div>
                     ) : (
-                        <Image src="/images/EduSync-logo.png" alt="Logo" width={32} height={32} />
+                        <IconFA
+                            icon="graduation-cap"
+                            size="xl"
+                            className="text-indigo-600 dark:text-indigo-400"
+                        />
                     )}
                 </Link>
             </div>
@@ -369,7 +365,7 @@ const AdminSidebar: React.FC = () => {
                                 {isExpanded || isHovered || isMobileOpen ? (
                                     'Menu'
                                 ) : (
-                                    <HorizontaLDots size={16} />
+                                    <IconFA icon="ellipsis-h" />
                                 )}
                             </h2>
                             {renderMenuItems(navItems, 'main')}
@@ -385,7 +381,7 @@ const AdminSidebar: React.FC = () => {
                                 {isExpanded || isHovered || isMobileOpen ? (
                                     'Otros'
                                 ) : (
-                                    <HorizontaLDots size={16} />
+                                    <IconFA icon="ellipsis-h" />
                                 )}
                             </h2>
                             {renderMenuItems(othersItems, 'others')}

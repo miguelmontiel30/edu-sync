@@ -19,9 +19,7 @@ import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import Select from '@/components/form/Select';
 import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/core/table';
-
-// Icons
-import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, MoreDotIcon } from '@/icons';
+import IconFA from '@/components/ui/IconFA';
 
 // Supabase
 import { supabaseClient } from '@/services/config/supabaseClient';

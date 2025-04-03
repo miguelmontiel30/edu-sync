@@ -6,6 +6,7 @@ import UserDropdown from '@/components/header/UserDropdown';
 import { useSidebar } from '../../context/SidebarContext';
 import Image from 'next/image';
 import Link from 'next/link';
+import IconFA from '@/components/ui/IconFA';
 
 // Renombramos el componente a AdminNavbar
 const AdminNavbar: React.FC = () => {
@@ -89,20 +90,14 @@ const AdminNavbar: React.FC = () => {
 
                     {/* Logo en mobile */}
                     <Link href="/" className="lg:hidden">
-                        <Image
-                            width={50}
-                            height={50}
-                            className="dark:hidden w-[50px] h-[50px]"
-                            src="/images/EduSync-logo.png"
-                            alt="Logo"
-                        />
-                        <Image
-                            width={50}
-                            height={50}
-                            className="hidden dark:block w-[50px] h-[50px]"
-                            src="/images/EduSync-logo.png"
-                            alt="Logo"
-                        />
+                        <div className="flex items-center">
+                            <IconFA
+                                icon="graduation-cap"
+                                size="xl"
+                                className="text-indigo-600 dark:text-indigo-400"
+                            />
+                            <h1 className="ml-2 text-xl font-semibold text-gray-800 dark:text-white">EduSync</h1>
+                        </div>
                     </Link>
 
                     {/* Botón para abrir el menú de aplicaciones en mobile */}
