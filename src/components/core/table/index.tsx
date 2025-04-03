@@ -1,4 +1,7 @@
 import React, { ReactNode } from "react";
+import DataTable, { Column, SortDirection, DataTableProps } from './DataTable';
+
+export { DataTable, type Column, type SortDirection, type DataTableProps };
 
 // Props for Table
 interface TableProps {

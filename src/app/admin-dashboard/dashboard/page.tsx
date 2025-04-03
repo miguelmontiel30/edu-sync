@@ -7,13 +7,13 @@ import Button from '@/components/core/button/Button';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/core/table';
 import { Dropdown } from '@/components/ui/dropdown/Dropdown';
 import { DropdownItem } from '@/components/ui/dropdown/DropdownItem';
-import { ArrowDownIcon, ArrowUpIcon, BoxIconLine, MoreDotIcon } from '@/icons';
 import { useAuthStore } from '@/store/useAuthStore';
 import { ApexOptions } from 'apexcharts';
 import { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { supabaseClient } from '@/services/config/supabaseClient';
 import Link from 'next/link';
+import IconFA from '@/components/ui/IconFA';
 
 export default function AdminMainContent() {
     const { user } = useAuthStore();
@@ -489,7 +489,7 @@ export default function AdminMainContent() {
                                 </h4>
                             </div>
                             <Badge color="success">
-                                <ArrowUpIcon />
+                                <IconFA icon="arrow-up" className="text-success-500" />
                                 {stats.recentStudents} nuevos
                             </Badge>
                         </div>
@@ -497,7 +497,7 @@ export default function AdminMainContent() {
 
                     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
-                            <BoxIconLine className="text-gray-800 dark:text-white/90" />
+                            <IconFA icon="box" className="text-gray-800 dark:text-white/90" />
                         </div>
                         <div className="mt-5 flex items-end justify-between">
                             <div>
@@ -510,7 +510,7 @@ export default function AdminMainContent() {
                             </div>
 
                             <Badge color="success">
-                                <ArrowUpIcon className="text-success-500" />
+                                <IconFA icon="arrow-up" className="text-success-500" />
                                 {((monthlyAttendance[monthlyAttendance.length - 1] - monthlyAttendance[monthlyAttendance.length - 2]) / monthlyAttendance[monthlyAttendance.length - 2] * 100).toFixed(1)}%
                             </Badge>
                         </div>
