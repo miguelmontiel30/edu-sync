@@ -8,11 +8,10 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
-// Store
-import { useAuthStore } from '@/store/useAuthStore';
-
-// Auth Context
-import { useAuth } from '@/context/AuthContext';
+// Servicios de autenticación
+import { login } from '@/services/auth/authService';
+import { useSessionContext } from '@/context/SessionContext';
+import { checkSupabaseConnection } from '@/services/config/supabaseClient';
 
 // Componentes Core
 import Input from '@/components/form/input/InputField';
@@ -35,11 +34,47 @@ const LoginPage: React.FC = () => {
     const totalSlides = 3;
 
     // Contexts
-    const { login: storeLogin } = useAuthStore();
-    const { login: contextLogin } = useAuth();
+    const { refreshSession, isAuthenticated } = useSessionContext();
 
     // Router
     const router = useRouter();
+
+    // Verificar si ya hay sesión activa
+    useEffect(() => {
+        const checkSessionAndRedirect = async () => {
+            if (isAuthenticated && !isLoading) {
+                try {
+                    // Intentar refrescar la sesión para asegurar que tenemos la información correcta
+                    const updatedSession = await refreshSession();
+
+                    if (!updatedSession) {
+                        console.log('No se pudo obtener la sesión actualizada');
+                        return;
+                    }
+
+                    console.log('Sesión activa en login, verificando rol:', updatedSession.role);
+
+                    // Determinar a qué dashboard redireccionar según el rol
+                    let targetPath = '/login';
+
+                    if (updatedSession.role === 'admin') {
+                        targetPath = '/admin-dashboard/dashboard';
+                    } else if (updatedSession.role === 'teacher') {
+                        targetPath = '/teacher-dashboard/dashboard';
+                    } else if (updatedSession.role === 'student') {
+                        targetPath = '/student-dashboard/dashboard';
+                    }
+
+                    console.log('Redirigiendo desde login a:', targetPath);
+                    router.push(targetPath);
+                } catch (error) {
+                    console.error('Error verificando sesión en login:', error);
+                }
+            }
+        };
+
+        checkSessionAndRedirect();
+    }, [isAuthenticated, isLoading, refreshSession, router]);
 
     // Cambiar automáticamente las diapositivas cada 5 segundos
     useEffect(() => {
@@ -72,29 +107,70 @@ const LoginPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        // Validar campos
+        if (!username.trim()) {
+            setError('Por favor ingresa tu correo electrónico');
+            return;
+        }
+
+        if (!password) {
+            setError('Por favor ingresa tu contraseña');
+            return;
+        }
+
         // Resetear errores y estado de carga
         setError('');
         setIsLoading(true);
 
         try {
-            // Primero autenticamos con Supabase a través del Context
-            await contextLogin(username, password);
+            console.log('Iniciando proceso de login con:', username);
 
-            // Luego actualizamos el estado global de Zustand
-            await storeLogin(username, password);
+            // Usar nuestro servicio de autenticación con caché
+            const session = await login(username, password);
 
-            // Redirigimos al dashboard según el tipo de usuario
-            if (selectedUserType === 'admin') {
+            console.log('Login exitoso, refrescando sesión');
+
+            // Refrescar la sesión en el contexto
+            await refreshSession();
+
+            console.log('Sesión refrescada, redirigiendo según rol:', session.role);
+
+            // Redirigimos al dashboard según el rol real del usuario en la base de datos
+            if (session.role === 'admin') {
                 router.push('/admin-dashboard/dashboard');
-            } else if (selectedUserType === 'teacher') {
+            } else if (session.role === 'teacher') {
                 router.push('/teacher-dashboard/dashboard');
-            } else {
+            } else if (session.role === 'student') {
                 router.push('/student-dashboard/dashboard');
+            } else {
+                // Por defecto usar selección del tipo de usuario
+                if (selectedUserType === 'admin') {
+                    router.push('/admin-dashboard/dashboard');
+                } else if (selectedUserType === 'teacher') {
+                    router.push('/teacher-dashboard/dashboard');
+                } else {
+                    router.push('/student-dashboard/dashboard');
+                }
             }
         } catch (error: any) {
             console.error('Login failed:', error);
-            // Mostrar el mensaje de error específico si existe
-            setError(error?.message || 'Error de autenticación. Verifica tus credenciales.');
+
+            // Manejar mensajes de error específicos
+            let errorMessage = 'Error de autenticación. Verifica tus credenciales.';
+
+            if (error?.message) {
+                if (error.message.includes('Contraseña incorrecta')) {
+                    errorMessage = 'La contraseña ingresada es incorrecta';
+                } else if (error.message.includes('no registrado')) {
+                    errorMessage = 'El correo electrónico no está registrado en el sistema';
+                } else if (error.message.includes('Error al obtener datos del usuario')) {
+                    errorMessage = 'Tu usuario existe pero no se pudieron obtener tus datos. Contacta al administrador.';
+                } else {
+                    errorMessage = error.message;
+                }
+            }
+
+            setError(errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -113,6 +189,19 @@ const LoginPage: React.FC = () => {
                 return '';
         }
     };
+
+    // Verificar conexión a Supabase al cargar
+    useEffect(() => {
+        const verifyConnection = async () => {
+            const isConnected = await checkSupabaseConnection();
+            if (!isConnected) {
+                console.error('No se pudo establecer conexión con Supabase');
+                setError('Error de conexión al servidor. Por favor intenta más tarde.');
+            }
+        };
+
+        verifyConnection();
+    }, []);
 
     // Renderizar la selección de tipo de usuario
     const renderUserTypeSelection = () => (

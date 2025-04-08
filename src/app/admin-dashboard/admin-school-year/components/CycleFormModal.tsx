@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 // Types
 import { SchoolCycle } from './types';
 
+// Hooks personalizados
+import { useStatusOptions } from '@/hooks/useStatusData';
+
 // Componentes UI
 import { Modal } from '@/components/ui/modal';
 import Button from '@/components/core/button/Button';
@@ -23,6 +26,9 @@ interface CycleFormModalProps {
 }
 
 export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving }: CycleFormModalProps) {
+    // Obtener estados de ciclo escolar usando nuestro hook
+    const { options: statusOptions, isLoading: isLoadingStatus } = useStatusOptions('school_year');
+
     const [cycleForm, setCycleForm] = useState({
         name: '',
         startDate: '',
@@ -40,17 +46,20 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                     status: selectedCycle.status || ''
                 });
             } else {
+                // Buscar el status SCHOOL_YEAR_ACTIVE
+                const activeStatusOption = statusOptions.find(option => option.value === 'SCHOOL_YEAR_ACTIVE');
+
                 setCycleForm({
                     name: '',
                     startDate: new Date().toISOString().split('T')[0],
                     endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-                    status: '1' // Activo por defecto
+                    status: activeStatusOption ? activeStatusOption.value : ''
                 });
             }
         } else {
             resetForm();
         }
-    }, [selectedCycle, isOpen]);
+    }, [selectedCycle, isOpen, statusOptions]);
 
     function resetForm() {
         setCycleForm({
@@ -131,17 +140,19 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                         <Label className="font-outfit">
                             Estado del Ciclo
                         </Label>
-                        <Select
-                            key={`status-select-${cycleForm.status}-${isOpen}-${selectedCycle?.id || 'new'}`}
-                            options={[
-                                { value: '1', label: 'Activo' },
-                                { value: '2', label: 'Inactivo' },
-                                { value: '3', label: 'Finalizado' }
-                            ]}
-                            placeholder="Seleccione un estado"
-                            onChange={(value) => handleSelectChange(value)}
-                            defaultValue={cycleForm.status}
-                        />
+                        {isLoadingStatus ? (
+                            <div className="flex items-center justify-center h-[38px] bg-gray-50 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
+                                <IconFA icon="spinner" spin className="text-gray-400" />
+                            </div>
+                        ) : (
+                            <Select
+                                key={`status-select-${cycleForm.status}-${isOpen}-${selectedCycle?.id || 'new'}`}
+                                options={statusOptions}
+                                placeholder="Seleccione un estado"
+                                onChange={(value) => handleSelectChange(value)}
+                                defaultValue={cycleForm.status}
+                            />
+                        )}
                     </div>
 
                     <div className="mt-6">

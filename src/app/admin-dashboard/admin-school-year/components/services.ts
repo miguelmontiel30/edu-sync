@@ -1,14 +1,11 @@
 import {supabaseClient} from '@/services/config/supabaseClient';
 import {SchoolCycle} from './types';
+import statusService from '@/services/status/statusService';
 
 export async function loadSchoolYears(): Promise<SchoolCycle[]> {
     try {
-        const {data: statusData, error: statusError} = await supabaseClient
-            .from('status')
-            .select('*')
-            .eq('category', 'school_year');
-
-        if (statusError) throw statusError;
+        // Usar nuestro servicio de caché para obtener los estados
+        const statusData = await statusService.getSchoolYearStatuses();
 
         // Primero obtenemos los ciclos escolares con sus grupos
         const {data, error} = await supabaseClient
@@ -116,12 +113,8 @@ export async function loadSchoolYears(): Promise<SchoolCycle[]> {
 
 export async function loadDeletedCycles(): Promise<SchoolCycle[]> {
     try {
-        const {data: statusData, error: statusError} = await supabaseClient
-            .from('status')
-            .select('*')
-            .eq('category', 'school_year');
-
-        if (statusError) throw statusError;
+        // Usar nuestro servicio de caché para obtener los estados
+        await statusService.getSchoolYearStatuses();
 
         const {data, error} = await supabaseClient
             .from('school_years')
