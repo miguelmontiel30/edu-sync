@@ -521,6 +521,32 @@ COMMENT ON COLUMN student_tutors.is_primary IS 'Indica si es el tutor principal'
 COMMENT ON COLUMN student_tutors.can_pickup IS 'Indica si puede recoger al estudiante';
 
 -- =============================================
+-- Tablas de Configuración
+-- =============================================
+-- Tabla de configuración general del sistema
+CREATE TABLE
+    IF NOT EXISTS school_settings (
+        setting_id SERIAL PRIMARY KEY,
+        school_id INTEGER REFERENCES schools (school_id) NOT NULL,
+        key VARCHAR(100) NOT NULL,
+        value JSONB NOT NULL DEFAULT '{}',
+        description TEXT,
+        is_system BOOLEAN DEFAULT FALSE,
+        delete_flag BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW (),
+        updated_at TIMESTAMPTZ DEFAULT NOW (),
+        UNIQUE (school_id, key)
+    );
+
+COMMENT ON TABLE school_settings IS 'Almacena configuraciones por escuela del sistema';
+
+COMMENT ON COLUMN school_settings.key IS 'Nombre de la clave de configuración (ej: theme.colors, notifications.email)';
+
+COMMENT ON COLUMN school_settings.value IS 'Valor de la configuración en formato JSON';
+
+COMMENT ON COLUMN school_settings.is_system IS 'Indica si es una configuración de sistema que no debe modificarse';
+
+-- =============================================
 -- Índices
 -- =============================================
 -- Índices para búsqueda por nombre

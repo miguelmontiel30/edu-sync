@@ -1524,3 +1524,102 @@ VALUES
         '2025-04-02 01:10:37.664771+00',
         null
     );
+
+-- =============================================
+-- Configuración de tema para la escuela por defecto
+-- =============================================
+-- Insertar configuración de tema para la escuela con ID 1
+INSERT INTO
+    school_settings (
+        school_id,
+        key,
+        value,
+        description,
+        is_system,
+        created_at,
+        updated_at
+    )
+VALUES
+    (
+        1,
+        'theme.settings',
+        json_build_object (
+            'primary_color',
+            '#465FFF',
+            'custom_color',
+            '',
+            'use_custom_color',
+            false,
+            'palette',
+            json_build_object (
+                '25',
+                '#F2F7FF',
+                '50',
+                '#ECF3FF',
+                '100',
+                '#DDE9FF',
+                '200',
+                '#C2D6FF',
+                '300',
+                '#9CB9FF',
+                '400',
+                '#7592FF',
+                '500',
+                '#465FFF',
+                '600',
+                '#3641F5',
+                '700',
+                '#2A31D8',
+                '800',
+                '#252DAE',
+                '900',
+                '#262E89',
+                '950',
+                '#161950'
+            )
+        ),
+        'Configuración del tema principal del sistema',
+        TRUE,
+        NOW (),
+        NOW ()
+    ) ON CONFLICT (school_id, key) DO
+UPDATE
+SET
+    value = EXCLUDED.value,
+    updated_at = NOW ();
+
+-- Insertar configuraciones adicionales para los colores predefinidos
+INSERT INTO
+    school_settings (
+        school_id,
+        key,
+        value,
+        description,
+        is_system,
+        created_at,
+        updated_at
+    )
+VALUES
+    (
+        1,
+        'theme.predefined_colors',
+        json_build_array (
+            json_build_object ('name', 'Azul (Default)', 'value', '#465FFF'),
+            json_build_object ('name', 'Verde', 'value', '#10B981'),
+            json_build_object ('name', 'Rojo', 'value', '#EF4444'),
+            json_build_object ('name', 'Morado', 'value', '#8B5CF6'),
+            json_build_object ('name', 'Naranja', 'value', '#F97316'),
+            json_build_object ('name', 'Rosa', 'value', '#EC4899'),
+            json_build_object ('name', 'Amarillo', 'value', '#F59E0B'),
+            json_build_object ('name', 'Celeste', 'value', '#0EA5E9'),
+            json_build_object ('name', 'Esmeralda', 'value', '#059669')
+        ),
+        'Colores predefinidos disponibles para personalización del tema',
+        TRUE,
+        NOW (),
+        NOW ()
+    ) ON CONFLICT (school_id, key) DO
+UPDATE
+SET
+    value = EXCLUDED.value,
+    updated_at = NOW ();
