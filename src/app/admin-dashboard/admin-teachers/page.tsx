@@ -5,11 +5,10 @@ import { useState, useEffect } from 'react';
 
 // Components
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import Metrics from './components/Metrics';
-import Charts from './components/Charts';
 import TeacherList from './components/TeacherList';
 import DeletedTeacherList from './components/DeletedTeacherList';
 import TeacherFormModal from './components/TeacherFormModal';
+import MetricsAndChartsWrapper from './components/MetricsAndChartsWrapper';
 
 // Types and Services
 import { Teacher, TeacherForm } from './components/types';
@@ -152,14 +151,8 @@ export default function TeachersDashboard() {
             {/* Breadcrumb */}
             <PageBreadcrumb pageTitle="Gestión de profesores" />
 
-            {/* Metrics */}
-            <Metrics
-                teachers={teachers}
-                isLoading={isLoadingMetrics}
-            />
-
-            {/* Charts */}
-            <Charts
+            {/* Metrics and Charts Wrapper */}
+            <MetricsAndChartsWrapper
                 teachers={teachers}
                 isLoading={isLoadingMetrics}
             />
