@@ -1,6 +1,8 @@
 'use client';
+
 // Context
 import { useSidebar } from '@/context/SidebarContext';
+import { useSessionContext } from '@/context/SessionContext';
 
 // Components
 import AdminSidebar from '@/components/navigation/AdminSidebar';
@@ -8,10 +10,34 @@ import AdminNavbar from '@/components/navigation/AdminNavbar';
 
 // Routes
 import ProtectedRoute from '@/app/(auth)/ProtectedRoute';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     // Sidebar state
     const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+    const { session, hasRole, isLoading } = useSessionContext();
+    const router = useRouter();
+
+    // Verificación adicional de roles para evitar redirecciones innecesarias
+    useEffect(() => {
+        const verifyAdminAccess = async () => {
+            // Solo ejecutar cuando no está cargando y hay datos de sesión
+            if (!isLoading && session) {
+                const isAdmin = hasRole('admin');
+                console.log('Verificando acceso admin en AdminLayout:',
+                    session.role, 'isAdmin:', isAdmin);
+
+                // Si el usuario no es admin, redirigir a unauthorized
+                if (!isAdmin) {
+                    console.log('Usuario no es admin, redirigiendo a unauthorized');
+                    router.push('/unauthorized');
+                }
+            }
+        };
+
+        verifyAdminAccess();
+    }, [session, hasRole, isLoading, router]);
 
     // Dynamic class for main content margin based on sidebar state
     let mainContentMargin = 'lg:ml-[90px]';

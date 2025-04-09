@@ -1,523 +1,64 @@
-BEGIN;
+/************ Generar datos para las tablas ************/
+-- =============================================
+-- Datos iniciales para la tabla genders
+-- =============================================
+INSERT INTO
+    genders (code, name, delete_flag, created_at, updated_at)
+VALUES
+    ('M', 'Masculino', FALSE, NOW (), NOW ()),
+    ('F', 'Femenino', FALSE, NOW (), NOW ()),
+    ('O', 'Otro', FALSE, NOW (), NOW ()),
+    ('ND', 'No definido', FALSE, NOW (), NOW ()) ON CONFLICT (code) DO NOTHING;
 
--- Elimina todo lo que haya en el schema public
-DROP SCHEMA public CASCADE;
-
--- Recrea el schema public
-CREATE SCHEMA public;
-
--- Permite que el usuario public tenga acceso a todo el schema public
-GRANT ALL ON SCHEMA public TO public;
-
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT
-SELECT
-,
-    INSERT,
-UPDATE,
-DELETE ON TABLES TO public;
-
--- ---------------------------
--- Nuevas definiciones de la DB
--- ---------------------------
--- Tabla de escuelas
-CREATE TABLE
-    IF NOT EXISTS schools (
-        school_id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        code VARCHAR(50) UNIQUE,
-        address TEXT,
-        phone VARCHAR(15),
-        email VARCHAR(100),
-        website VARCHAR(255),
-        logo_url VARCHAR(255),
-        principal_name VARCHAR(100),
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ
+-- Insertar datos iniciales en la tabla status
+INSERT INTO
+    status (code, name, category)
+VALUES
+    -- Estados para ciclos escolares
+    ('SCHOOL_YEAR_ACTIVE', 'Activo', 'school_year'),
+    ('SCHOOL_YEAR_INACTIVE', 'Inactivo', 'school_year'),
+    (
+        'SCHOOL_YEAR_COMPLETED',
+        'Completado',
+        'school_year'
+    ),
+    -- Estados para grupos
+    ('GROUP_ACTIVE', 'Activo', 'group'),
+    ('GROUP_INACTIVE', 'Inactivo', 'group'),
+    ('GROUP_COMPLETED', 'Completado', 'group'),
+    -- Estados para estudiantes en grupos
+    ('STUDENT_GROUP_ACTIVE', 'Activo', 'student_group'),
+    (
+        'STUDENT_GROUP_INACTIVE',
+        'Inactivo',
+        'student_group'
+    ),
+    (
+        'STUDENT_GROUP_GRADUATED',
+        'Graduado',
+        'student_group'
+    ),
+    (
+        'STUDENT_GROUP_TRANSFERRED',
+        'Transferido',
+        'student_group'
+    ),
+    -- Estados para periodos de evaluación
+    (
+        'EVALUATION_PERIOD_ACTIVE',
+        'Activo',
+        'evaluation_period'
+    ),
+    (
+        'EVALUATION_PERIOD_INACTIVE',
+        'Inactivo',
+        'evaluation_period'
+    ),
+    (
+        'EVALUATION_PERIOD_COMPLETED',
+        'Completado',
+        'evaluation_period'
     );
-
--- Tabla de roles: define los diferentes perfiles del sistema
-CREATE TABLE
-    IF NOT EXISTS roles (
-        role_id SERIAL PRIMARY KEY,
-        name VARCHAR(50) NOT NULL UNIQUE, -- Ejemplo: 'teacher', 'admin', 'student', 'tutor'
-        description TEXT,
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW ()
-    );
-
--- Tabla de permisos: define acciones o recursos a los que se puede acceder
-CREATE TABLE
-    IF NOT EXISTS permissions (
-        permission_id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL UNIQUE, -- Ejemplo: 'create_student', 'edit_grade', etc.
-        description TEXT,
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW ()
-    );
-
--- Tabla intermedia para relacionar roles y permisos (relación muchos a muchos)
-CREATE TABLE
-    IF NOT EXISTS role_permissions (
-        role_id INTEGER REFERENCES roles (role_id) ON DELETE CASCADE,
-        permission_id INTEGER REFERENCES permissions (permission_id) ON DELETE CASCADE,
-        PRIMARY KEY (role_id, permission_id)
-    );
-
--- Tabla de usuarios: aquí se registran las credenciales y datos básicos.
--- Se relaciona opcionalmente a una escuela mediante school_id.
-CREATE TABLE
-    IF NOT EXISTS users (
-        user_id SERIAL PRIMARY KEY,
-        school_id INTEGER REFERENCES schools (school_id), -- Puede ser NULL si el usuario es global (p.ej., admin del sistema)
-        email VARCHAR(100) NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL, -- Contraseña hasheada
-        first_name VARCHAR(100),
-        last_name VARCHAR(100),
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ
-    );
-
--- Tabla intermedia para relacionar usuarios y roles (relación muchos a muchos)
-CREATE TABLE
-    IF NOT EXISTS user_roles (
-        user_id INTEGER REFERENCES users (user_id) ON DELETE CASCADE,
-        role_id INTEGER REFERENCES roles (role_id) ON DELETE CASCADE,
-        delete_flag BOOLEAN DEFAULT FALSE,
-        assigned_at TIMESTAMPTZ DEFAULT NOW (),
-        PRIMARY KEY (user_id, role_id)
-    );
-
--- Tabla principal de estudiantes
-CREATE TABLE
-    IF NOT EXISTS students (
-        student_id SERIAL PRIMARY KEY,
-        school_id INTEGER REFERENCES schools (school_id),
-        first_name VARCHAR(100) NOT NULL,
-        father_last_name VARCHAR(100) NOT NULL,
-        mother_last_name VARCHAR(100),
-        birth_date DATE NOT NULL,
-        gender VARCHAR(20) NOT NULL,
-        curp VARCHAR(18),
-        phone VARCHAR(15),
-        email VARCHAR(100),
-        grade_level VARCHAR(50),
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ,
-        UNIQUE (school_id, curp)
-    );
-
--- Tabla de tutores
-CREATE TABLE
-    IF NOT EXISTS tutors (
-        tutor_id SERIAL PRIMARY KEY,
-        first_name VARCHAR(100) NOT NULL,
-        last_name VARCHAR(100) NOT NULL,
-        relationship VARCHAR(50) NOT NULL,
-        phone VARCHAR(15),
-        alternative_phone VARCHAR(15),
-        email VARCHAR(100),
-        address TEXT,
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ
-    );
-
--- Tabla de relación entre estudiantes y tutores
-CREATE TABLE
-    IF NOT EXISTS student_tutors (
-        student_tutor_id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students (student_id) ON DELETE CASCADE,
-        tutor_id INTEGER REFERENCES tutors (tutor_id) ON DELETE CASCADE,
-        is_primary BOOLEAN DEFAULT FALSE,
-        can_pickup BOOLEAN DEFAULT TRUE,
-        notes TEXT,
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ,
-        UNIQUE (student_id, tutor_id)
-    );
-
--- Restricción para asegurar que cada estudiante tenga al menos un tutor primario
-CREATE UNIQUE INDEX IF NOT EXISTS idx_primary_tutor_per_student ON student_tutors (student_id)
-WHERE
-    is_primary = TRUE
-    AND delete_flag = FALSE
-    AND deleted_at IS NULL;
-
--- Tabla de direcciones
-CREATE TABLE
-    IF NOT EXISTS addresses (
-        address_id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students (student_id) ON DELETE CASCADE,
-        street VARCHAR(255),
-        neighborhood VARCHAR(100),
-        interior_number VARCHAR(20),
-        exterior_number VARCHAR(20),
-        postal_code VARCHAR(10),
-        reference TEXT,
-        is_current BOOLEAN DEFAULT TRUE,
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ
-    );
-
--- Restricción de dirección actual única por estudiante
-CREATE UNIQUE INDEX IF NOT EXISTS idx_current_address_per_student ON addresses (student_id)
-WHERE
-    is_current = TRUE
-    AND delete_flag = FALSE;
-
--- Tabla de ciclos escolares
-CREATE TABLE
-    IF NOT EXISTS school_years (
-        school_year_id SERIAL PRIMARY KEY,
-        school_id INTEGER REFERENCES schools (school_id),
-        name VARCHAR(100) NOT NULL,
-        start_date DATE NOT NULL,
-        end_date DATE NOT NULL,
-        status VARCHAR(20) DEFAULT 'inactive' CHECK (status IN ('active', 'inactive', 'completed')),
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ
-    );
-
--- Tabla de profesores
-CREATE TABLE
-    IF NOT EXISTS teachers (
-        teacher_id SERIAL PRIMARY KEY,
-        school_id INTEGER REFERENCES schools (school_id),
-        name VARCHAR(255) NOT NULL,
-        role VARCHAR(100) NOT NULL,
-        image VARCHAR(255),
-        email VARCHAR(100),
-        phone VARCHAR(15),
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ
-    );
-
--- Tabla de grupos
-CREATE TABLE
-    IF NOT EXISTS groups (
-        group_id SERIAL PRIMARY KEY,
-        school_id INTEGER REFERENCES schools (school_id),
-        grade INTEGER NOT NULL,
-        group_name VARCHAR(10) NOT NULL,
-        school_year_id INTEGER REFERENCES school_years (school_year_id),
-        students_number INTEGER DEFAULT 0,
-        subjects_number INTEGER DEFAULT 0,
-        status VARCHAR(20) CHECK (status IN ('active', 'inactive', 'completed')),
-        general_average NUMERIC(4, 2),
-        description TEXT,
-        group_image VARCHAR(255),
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ,
-        UNIQUE (school_id, school_year_id, grade, group_name)
-    );
-
--- Tabla de materias
-CREATE TABLE
-    IF NOT EXISTS subjects (
-        subject_id SERIAL PRIMARY KEY,
-        school_id INTEGER REFERENCES schools (school_id),
-        name VARCHAR(100) NOT NULL,
-        description TEXT,
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ
-    );
-
--- Relación entre grupos y profesores (muchos a muchos)
-CREATE TABLE
-    IF NOT EXISTS group_teachers (
-        group_teacher_id SERIAL PRIMARY KEY,
-        group_id INTEGER REFERENCES groups (group_id) ON DELETE CASCADE,
-        teacher_id INTEGER REFERENCES teachers (teacher_id) ON DELETE CASCADE,
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ,
-        UNIQUE (group_id, teacher_id)
-    );
-
--- Relación entre estudiantes y grupos (muchos a muchos)
-CREATE TABLE
-    IF NOT EXISTS student_groups (
-        student_group_id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students (student_id) ON DELETE CASCADE,
-        group_id INTEGER REFERENCES groups (group_id) ON DELETE CASCADE,
-        enrollment_date DATE DEFAULT CURRENT_DATE,
-        status VARCHAR(20) DEFAULT 'active' CHECK (
-            status IN ('active', 'inactive', 'graduated', 'transferred')
-        ),
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ
-    );
-
--- Crear índice único que solo considere registros activos y el ciclo escolar
-CREATE UNIQUE INDEX student_groups_student_id_school_year_active_key ON student_groups (student_id, group_id)
-WHERE
-    delete_flag = FALSE;
-
--- Tabla para materias asignadas a grupos
-CREATE TABLE
-    IF NOT EXISTS group_subjects (
-        group_subject_id SERIAL PRIMARY KEY,
-        group_id INTEGER REFERENCES groups (group_id) ON DELETE CASCADE,
-        subject_id INTEGER REFERENCES subjects (subject_id) ON DELETE CASCADE,
-        teacher_id INTEGER REFERENCES teachers (teacher_id),
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ,
-        UNIQUE (group_id, subject_id)
-    );
-
--- Tabla para calificaciones de estudiantes
-CREATE TABLE
-    IF NOT EXISTS grades (
-        grade_id SERIAL PRIMARY KEY,
-        student_id INTEGER REFERENCES students (student_id) ON DELETE CASCADE,
-        group_id INTEGER REFERENCES groups (group_id) ON DELETE CASCADE,
-        subject_id INTEGER REFERENCES subjects (subject_id) ON DELETE CASCADE,
-        teacher_id INTEGER REFERENCES teachers (teacher_id),
-        school_year_id INTEGER REFERENCES school_years (school_year_id),
-        period VARCHAR(50) NOT NULL,
-        grade NUMERIC(4, 2) NOT NULL,
-        comments TEXT,
-        delete_flag BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMPTZ DEFAULT NOW (),
-        updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ,
-        UNIQUE (student_id, subject_id, period, school_year_id)
-    );
-
--- Índices para mejorar rendimiento
-CREATE INDEX IF NOT EXISTS idx_students_names ON students (first_name, father_last_name, mother_last_name);
-
-CREATE INDEX IF NOT EXISTS idx_students_curp ON students (curp);
-
-CREATE INDEX IF NOT EXISTS idx_group_school_year ON groups (school_year_id);
-
-CREATE INDEX IF NOT EXISTS idx_student_groups_group ON student_groups (group_id);
-
-CREATE INDEX IF NOT EXISTS idx_student_groups_student ON student_groups (student_id);
-
-CREATE INDEX IF NOT EXISTS idx_grades_student_subject ON grades (student_id, subject_id);
-
-CREATE INDEX IF NOT EXISTS idx_addresses_student_id ON addresses (student_id);
-
-CREATE INDEX IF NOT EXISTS idx_active_students ON students (delete_flag)
-WHERE
-    delete_flag = FALSE;
-
-CREATE INDEX IF NOT EXISTS idx_active_teachers ON teachers (delete_flag)
-WHERE
-    delete_flag = FALSE;
-
-CREATE INDEX IF NOT EXISTS idx_active_tutors ON tutors (delete_flag)
-WHERE
-    delete_flag = FALSE;
-
-CREATE INDEX IF NOT EXISTS idx_student_tutors_student ON student_tutors (student_id);
-
-CREATE INDEX IF NOT EXISTS idx_student_tutors_tutor ON student_tutors (tutor_id);
-
-CREATE INDEX IF NOT EXISTS idx_students_school ON students (school_id);
-
-CREATE INDEX IF NOT EXISTS idx_teachers_school ON teachers (school_id);
-
-CREATE INDEX IF NOT EXISTS idx_groups_school ON groups (school_id);
-
-CREATE INDEX IF NOT EXISTS idx_subjects_school ON subjects (school_id);
-
-CREATE INDEX IF NOT EXISTS idx_school_years_school ON school_years (school_id);
-
-CREATE INDEX IF NOT EXISTS idx_active_schools ON schools (delete_flag)
-WHERE
-    delete_flag = FALSE;
-
-CREATE INDEX IF NOT EXISTS idx_user_email ON users (email);
-
--- Índice para buscar usuario por email
-CREATE INDEX IF NOT EXISTS idx_user_email ON users (email);
-
--- Habilitar Row Level Security (RLS) en todas las tablas
-ALTER TABLE schools ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE permissions ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE role_permissions ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE students ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE tutors ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE student_tutors ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE addresses ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE school_years ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE teachers ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE groups ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE subjects ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE group_teachers ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE student_groups ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE group_subjects ENABLE ROW LEVEL SECURITY;
-
-ALTER TABLE grades ENABLE ROW LEVEL SECURITY;
-
--- Eliminar políticas existentes para evitar conflictos
-DROP POLICY IF EXISTS "Acceso total a usuarios" ON users;
-
-DROP POLICY IF EXISTS "Acceso total a roles de usuario" ON user_roles;
-
-DROP POLICY IF EXISTS "Permitir acceso a ciclos escolares" ON school_years;
-
-DROP POLICY IF EXISTS "Acceso total a escuelas" ON schools;
-
-DROP POLICY IF EXISTS "Acceso total a roles" ON roles;
-
-DROP POLICY IF EXISTS "Acceso total a permisos" ON permissions;
-
-DROP POLICY IF EXISTS "Acceso total a role_permissions" ON role_permissions;
-
-DROP POLICY IF EXISTS "Acceso total a estudiantes" ON students;
-
-DROP POLICY IF EXISTS "Acceso total a tutores" ON tutors;
-
-DROP POLICY IF EXISTS "Acceso total a student_tutors" ON student_tutors;
-
-DROP POLICY IF EXISTS "Acceso total a direcciones" ON addresses;
-
-DROP POLICY IF EXISTS "Acceso total a profesores" ON teachers;
-
-DROP POLICY IF EXISTS "Acceso total a grupos" ON groups;
-
-DROP POLICY IF EXISTS "Acceso total a materias" ON subjects;
-
-DROP POLICY IF EXISTS "Acceso total a group_teachers" ON group_teachers;
-
-DROP POLICY IF EXISTS "Acceso total a student_groups" ON student_groups;
-
-DROP POLICY IF EXISTS "Acceso total a group_subjects" ON group_subjects;
-
-DROP POLICY IF EXISTS "Acceso total a calificaciones" ON grades;
-
--- Crear políticas para todas las tablas
-CREATE POLICY "Acceso total a escuelas" ON schools FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a roles" ON roles FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a permisos" ON permissions FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a role_permissions" ON role_permissions FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a usuarios" ON users FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a roles de usuario" ON user_roles FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a estudiantes" ON students FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a tutores" ON tutors FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a student_tutors" ON student_tutors FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a direcciones" ON addresses FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a ciclos escolares" ON school_years FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a profesores" ON teachers FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a grupos" ON groups FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a materias" ON subjects FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a group_teachers" ON group_teachers FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a student_groups" ON student_groups FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a group_subjects" ON group_subjects FOR ALL USING (true)
-WITH
-    CHECK (true);
-
-CREATE POLICY "Acceso total a calificaciones" ON grades FOR ALL USING (true)
-WITH
-    CHECK (true);
-
--- Otorgar permisos a todas las secuencias
-GRANT USAGE,
-SELECT
-    ON ALL SEQUENCES IN SCHEMA public TO authenticated;
-
-GRANT USAGE,
-SELECT
-    ON ALL SEQUENCES IN SCHEMA public TO anon;
-
--- Otorgar permisos a todas las tablas
-GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
-
-GRANT ALL ON ALL TABLES IN SCHEMA public TO anon;
 
 -- Generar datos para los roles y permisos
 INSERT INTO
@@ -546,44 +87,6 @@ VALUES
     (1, 3), -- Admin puede eliminar estudiante
     (1, 4);
 
--- Admin puede ver estudiante
--- Generar datos para escuelas
-INSERT INTO
-    schools (
-        name,
-        code,
-        address,
-        phone,
-        email,
-        website,
-        logo_url,
-        principal_name,
-        delete_flag
-    )
-VALUES
-    (
-        'Escuela 1',
-        'ESC123',
-        'Calle Principal 123',
-        '1234567890',
-        'escuela1@example.com',
-        'https://www.escuela1.com',
-        'logo.png',
-        'Juan Pérez',
-        FALSE
-    );
-
--- Insertar usuario de prueba
-INSERT INTO
-    users (email, password_hash, first_name, last_name)
-VALUES
-    (
-        'test@email.com',
-        crypt ('1234', gen_salt ('bf')),
-        'Usuario',
-        'Prueba'
-    );
-
 -- Asignar rol de administrador al usuario de prueba
 INSERT INTO
     user_roles (user_id, role_id)
@@ -597,6 +100,30 @@ WHERE
     email = 'test@email.com'
     AND name = 'admin';
 
+-- Generar datos para escuelas
+INSERT INTO
+    schools (
+        name,
+        code,
+        address,
+        phone,
+        email,
+        website,
+        logo_url,
+        delete_flag
+    )
+VALUES
+    (
+        'Escuela 1',
+        'ESC123',
+        'Calle Principal 123',
+        '1234567890',
+        'escuela1@example.com',
+        'https://www.escuela1.com',
+        'logo.png',
+        FALSE
+    );
+
 -- Insertar ciclos escolares
 INSERT INTO
     "school_years" (
@@ -605,7 +132,7 @@ INSERT INTO
         "name",
         "start_date",
         "end_date",
-        "status",
+        "status_id",
         "delete_flag",
         "created_at",
         "updated_at",
@@ -618,7 +145,14 @@ VALUES
         'Ciclo 2025-2026',
         '2025-07-18',
         '2026-07-30',
-        'inactive',
+        (
+            SELECT
+                status_id
+            FROM
+                status
+            WHERE
+                code = 'SCHOOL_YEAR_INACTIVE'
+        ),
         'false',
         '2025-03-27 00:35:22.175036+00',
         '2025-03-27 05:45:28.114+00',
@@ -630,7 +164,14 @@ VALUES
         'Ciclo 2023-2024',
         '2023-07-13',
         '2024-07-30',
-        'completed',
+        (
+            SELECT
+                status_id
+            FROM
+                status
+            WHERE
+                code = 'SCHOOL_YEAR_COMPLETED'
+        ),
         'false',
         '2025-03-27 00:35:37.835517+00',
         '2025-03-27 07:53:50.918+00',
@@ -642,7 +183,14 @@ VALUES
         'test 3',
         '2025-03-02',
         '2025-03-30',
-        'inactive',
+        (
+            SELECT
+                status_id
+            FROM
+                status
+            WHERE
+                code = 'SCHOOL_YEAR_INACTIVE'
+        ),
         'true',
         '2025-03-27 00:35:55.20988+00',
         '2025-03-27 00:48:34.986+00',
@@ -654,7 +202,14 @@ VALUES
         'Ciclo 2024-2025',
         '2024-07-27',
         '2025-07-13',
-        'active',
+        (
+            SELECT
+                status_id
+            FROM
+                status
+            WHERE
+                code = 'SCHOOL_YEAR_ACTIVE'
+        ),
         'false',
         '2025-03-27 01:35:10.229855+00',
         '2025-03-27 07:37:12.599+00',
@@ -1667,4 +1222,404 @@ VALUES
         null
     );
 
-COMMIT;
+-- Insertar materias
+INSERT INTO
+    subjects (school_id, name, description)
+VALUES
+    (
+        1,
+        'Matemáticas I',
+        'Introducción a operaciones básicas y razonamiento lógico.'
+    ),
+    (
+        1,
+        'Matemáticas II',
+        'Resolución de problemas con suma, resta y conceptos de geometría.'
+    ),
+    (
+        1,
+        'Español I',
+        'Desarrollo de la lectura, escritura y comprensión de textos.'
+    ),
+    (
+        1,
+        'Español II',
+        'Producción de textos y análisis gramatical.'
+    ),
+    (
+        1,
+        'Ciencias Naturales I',
+        'Observación del entorno natural y seres vivos.'
+    ),
+    (
+        1,
+        'Ciencias Naturales II',
+        'Cuerpo humano, energía y ecosistemas.'
+    ),
+    (
+        1,
+        'Geografía I',
+        'Ubicación espacial y características del entorno.'
+    ),
+    (
+        1,
+        'Historia I',
+        'Conocimiento de hechos históricos relevantes en México.'
+    ),
+    (
+        1,
+        'Formación Cívica y Ética I',
+        'Valores, normas y convivencia.'
+    ),
+    (
+        1,
+        'Educación Socioemocional',
+        'Autoconocimiento, empatía y gestión emocional.'
+    ),
+    (
+        1,
+        'Educación Física I',
+        'Desarrollo motor, juegos y actividades físicas.'
+    ),
+    (
+        1,
+        'Educación Física II',
+        'Coordinación, trabajo en equipo y habilidades motrices.'
+    ),
+    (
+        1,
+        'Educación Artística I',
+        'Expresión a través del dibujo, pintura y manualidades.'
+    ),
+    (
+        1,
+        'Educación Artística II',
+        'Teatro, música y creatividad.'
+    ),
+    (
+        1,
+        'Inglés I',
+        'Vocabulario básico y frases comunes en inglés.'
+    ),
+    (
+        1,
+        'Inglés II',
+        'Comprensión oral, lectura y escritura de frases simples.'
+    ),
+    (
+        1,
+        'Computación I',
+        'Uso básico de computadoras y programas educativos.'
+    ),
+    (
+        1,
+        'Computación II',
+        'Procesadores de texto y exploración segura de internet.'
+    ),
+    (
+        1,
+        'Lectura y Redacción',
+        'Fomento a la lectura y escritura de cuentos y relatos.'
+    ),
+    (
+        1,
+        'Valores y Convivencia',
+        'Respeto, tolerancia y solución de conflictos.'
+    ),
+    (
+        1,
+        'Ciencias Sociales',
+        'Relaciones familiares, escolares y comunitarias.'
+    ),
+    (
+        1,
+        'Biología Básica',
+        'Animales, plantas y el cuerpo humano.'
+    ),
+    (
+        1,
+        'Aritmética',
+        'Operaciones numéricas y problemas cotidianos.'
+    ),
+    (
+        1,
+        'Geometría Básica',
+        'Figuras planas, cuerpos geométricos y medidas.'
+    ),
+    (
+        1,
+        'Ortografía',
+        'Reglas básicas de escritura y puntuación.'
+    ),
+    (
+        1,
+        'Música',
+        'Ritmo, instrumentos y apreciación musical.'
+    ),
+    (
+        1,
+        'Teatro',
+        'Expresión escénica, improvisación y dramatización.'
+    ),
+    (
+        1,
+        'Manualidades',
+        'Habilidades creativas con materiales diversos.'
+    ),
+    (
+        1,
+        'Medio Ambiente',
+        'Cuidado del entorno y recursos naturales.'
+    ),
+    (
+        1,
+        'Expresión Corporal',
+        'Comunicación no verbal y movimiento consciente.'
+    );
+
+-- Insertar asignaciones de grupos a materias y profesores
+INSERT INTO
+    "public"."group_subjects" (
+        "group_subject_id",
+        "group_id",
+        "subject_id",
+        "teacher_id",
+        "delete_flag",
+        "created_at",
+        "deleted_at"
+    )
+VALUES
+    (
+        '1',
+        '1',
+        '1',
+        '1',
+        'true',
+        '2025-04-01 16:42:42.539956+00',
+        '2025-04-01 23:11:04.866+00'
+    ),
+    (
+        '2',
+        '2',
+        '2',
+        '3',
+        'false',
+        '2025-04-01 16:43:57.263795+00',
+        null
+    ),
+    (
+        '3',
+        '1',
+        '2',
+        '8',
+        'true',
+        '2025-04-01 22:20:50.771287+00',
+        '2025-04-01 23:10:31.278+00'
+    ),
+    (
+        '4',
+        '1',
+        '3',
+        '1',
+        'false',
+        '2025-04-01 22:53:03.863759+00',
+        null
+    ),
+    (
+        '5',
+        '1',
+        '5',
+        '1',
+        'false',
+        '2025-04-01 22:53:03.863759+00',
+        null
+    ),
+    (
+        '6',
+        '1',
+        '7',
+        '4',
+        'false',
+        '2025-04-01 22:53:03.863759+00',
+        null
+    ),
+    (
+        '7',
+        '1',
+        '9',
+        '2',
+        'false',
+        '2025-04-01 22:53:03.863759+00',
+        null
+    ),
+    (
+        '8',
+        '1',
+        '10',
+        '1',
+        'false',
+        '2025-04-01 22:55:09.461703+00',
+        null
+    ),
+    (
+        '9',
+        '1',
+        '13',
+        '5',
+        'false',
+        '2025-04-01 23:17:22.943794+00',
+        null
+    ),
+    (
+        '10',
+        '1',
+        '15',
+        '5',
+        'false',
+        '2025-04-01 23:17:22.943794+00',
+        null
+    ),
+    (
+        '11',
+        '1',
+        '17',
+        '3',
+        'false',
+        '2025-04-01 23:17:22.943794+00',
+        null
+    ),
+    (
+        '12',
+        '1',
+        '19',
+        '3',
+        'false',
+        '2025-04-01 23:17:22.943794+00',
+        null
+    ),
+    (
+        '13',
+        '1',
+        '31',
+        '1',
+        'false',
+        '2025-04-02 01:10:37.664771+00',
+        null
+    ),
+    (
+        '14',
+        '1',
+        '30',
+        '6',
+        'false',
+        '2025-04-02 01:10:37.664771+00',
+        null
+    ),
+    (
+        '15',
+        '1',
+        '29',
+        '10',
+        'false',
+        '2025-04-02 01:10:37.664771+00',
+        null
+    );
+
+-- =============================================
+-- Configuración de tema para la escuela por defecto
+-- =============================================
+-- Insertar configuración de tema para la escuela con ID 1
+INSERT INTO
+    school_settings (
+        school_id,
+        key,
+        value,
+        description,
+        is_system,
+        created_at,
+        updated_at
+    )
+VALUES
+    (
+        1,
+        'theme.settings',
+        json_build_object (
+            'primary_color',
+            '#465FFF',
+            'custom_color',
+            '',
+            'use_custom_color',
+            false,
+            'palette',
+            json_build_object (
+                '25',
+                '#F2F7FF',
+                '50',
+                '#ECF3FF',
+                '100',
+                '#DDE9FF',
+                '200',
+                '#C2D6FF',
+                '300',
+                '#9CB9FF',
+                '400',
+                '#7592FF',
+                '500',
+                '#465FFF',
+                '600',
+                '#3641F5',
+                '700',
+                '#2A31D8',
+                '800',
+                '#252DAE',
+                '900',
+                '#262E89',
+                '950',
+                '#161950'
+            )
+        ),
+        'Configuración del tema principal del sistema',
+        TRUE,
+        NOW (),
+        NOW ()
+    ) ON CONFLICT (school_id, key) DO
+UPDATE
+SET
+    value = EXCLUDED.value,
+    updated_at = NOW ();
+
+-- Insertar configuraciones adicionales para los colores predefinidos
+INSERT INTO
+    school_settings (
+        school_id,
+        key,
+        value,
+        description,
+        is_system,
+        created_at,
+        updated_at
+    )
+VALUES
+    (
+        1,
+        'theme.predefined_colors',
+        json_build_array (
+            json_build_object ('name', 'Azul (Default)', 'value', '#465FFF'),
+            json_build_object ('name', 'Verde', 'value', '#10B981'),
+            json_build_object ('name', 'Rojo', 'value', '#EF4444'),
+            json_build_object ('name', 'Morado', 'value', '#8B5CF6'),
+            json_build_object ('name', 'Naranja', 'value', '#F97316'),
+            json_build_object ('name', 'Rosa', 'value', '#EC4899'),
+            json_build_object ('name', 'Amarillo', 'value', '#F59E0B'),
+            json_build_object ('name', 'Celeste', 'value', '#0EA5E9'),
+            json_build_object ('name', 'Esmeralda', 'value', '#059669')
+        ),
+        'Colores predefinidos disponibles para personalización del tema',
+        TRUE,
+        NOW (),
+        NOW ()
+    ) ON CONFLICT (school_id, key) DO
+UPDATE
+SET
+    value = EXCLUDED.value,
+    updated_at = NOW ();

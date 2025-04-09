@@ -1,4 +1,7 @@
 import React, { ReactNode } from "react";
+import DataTable, { Column, SortDirection, DataTableProps } from './DataTable';
+
+export { DataTable, type Column, type SortDirection, type DataTableProps };
 
 // Props for Table
 interface TableProps {
@@ -44,7 +47,7 @@ export interface TableCellProps {
 export const Table: React.FC<TableProps> = ({ children, className = '', maxHeight = '400px', pagination }) => {
   return (
     <div className="relative">
-      <div className={`overflow-auto ${className}`} style={{ maxHeight }}>
+      <div className={`overflow-auto dark-scrollbar ${className}`} style={{ maxHeight }}>
         <table className="w-full">
           {children}
         </table>

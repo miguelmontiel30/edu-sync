@@ -838,7 +838,7 @@ export default function GroupDashboard() {
 
                     <div className="flex justify-end">
                         <div className="flex items-center gap-2">
-                            <Label className="font-outfit text-sm">Solo ciclos activos</Label>
+                            <Label className="font-outfit text-sm">Solo grupos activos</Label>
                             <Switch
                                 label=""
                                 defaultChecked={showOnlyActiveCycles}

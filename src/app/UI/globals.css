@@ -1,12 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import './theme-variables.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+    :root {
+        color-scheme: light;
+    }
+
+    .dark {
+        color-scheme: dark;
+    }
+
+    html {
+        @apply transition-colors duration-200;
+    }
+
     body {
-        @apply relative z-1 bg-gray-50 font-outfit text-base font-normal;
+        @apply relative z-1 bg-gray-50 font-outfit text-base font-normal transition-colors duration-200 dark:bg-gray-900;
     }
 }
 
@@ -15,10 +28,10 @@
         @apply relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium;
     }
     .menu-item-active {
-        @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+        @apply bg-brand-50 text-brand-500 dark:bg-brand-500 dark:bg-opacity-10 dark:text-brand-400;
     }
     .menu-item-inactive {
-        @apply text-gray-700 hover:bg-gray-100 group-hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300;
+        @apply text-gray-700 hover:bg-gray-100 group-hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white dark:hover:bg-opacity-5;
     }
     .menu-item-icon {
         @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400;
@@ -44,20 +57,20 @@
         @apply relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-theme-sm font-medium;
     }
     .menu-dropdown-item-active {
-        @apply bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400;
+        @apply bg-brand-50 text-brand-500 dark:bg-brand-500 dark:bg-opacity-10 dark:text-brand-400;
     }
     .menu-dropdown-item-inactive {
-        @apply text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5;
+        @apply text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white dark:hover:bg-opacity-5;
     }
 
     .menu-dropdown-badge {
         @apply block rounded-full px-2.5 py-0.5 text-xs font-medium uppercase text-brand-500 dark:text-brand-400;
     }
     .menu-dropdown-badge-active {
-        @apply bg-brand-100 dark:bg-brand-500/20;
+        @apply bg-brand-100 dark:bg-brand-500 dark:bg-opacity-20;
     }
     .menu-dropdown-badge-inactive {
-        @apply bg-brand-50 group-hover:bg-brand-100 dark:bg-brand-500/15 dark:group-hover:bg-brand-500/20;
+        @apply bg-brand-50 group-hover:bg-brand-100 dark:bg-brand-500 dark:bg-opacity-15 dark:group-hover:bg-brand-500 dark:group-hover:bg-opacity-20;
     }
 }
 
@@ -85,8 +98,41 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        @apply rounded-full bg-gray-200 dark:bg-gray-700;
+        @apply rounded-full bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-500;
     }
+
+    /* Firefox compatibility for custom-scrollbar */
+    .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: rgb(156 163 175) transparent; /* bg-gray-400 y transparente */
+    }
+
+    .dark .custom-scrollbar {
+        scrollbar-color: rgb(156 163 175) transparent; /* bg-gray-400 y transparente */
+    }
+
+    .dark-scrollbar::-webkit-scrollbar {
+        @apply size-1.5;
+    }
+
+    .dark-scrollbar::-webkit-scrollbar-track {
+        @apply rounded-full bg-transparent;
+    }
+
+    .dark-scrollbar::-webkit-scrollbar-thumb {
+        @apply rounded-full bg-gray-400 hover:bg-gray-500 dark:bg-gray-600 dark:hover:bg-gray-500;
+    }
+
+    /* Firefox compatibility for dark-scrollbar */
+    .dark-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: rgb(156 163 175) rgba(0, 0, 0, 0.05); /* bg-gray-400 con un fondo ligeramente visible */
+    }
+
+    .dark .dark-scrollbar {
+        scrollbar-color: rgb(156 163 175) rgba(255, 255, 255, 0.05); /* bg-gray-400 con un fondo ligeramente visible para mejor contraste */
+    }
+
     /* For Remove Date Icon */
     input[type='date']::-webkit-inner-spin-button,
     input[type='time']::-webkit-inner-spin-button,
@@ -123,10 +169,10 @@
     @apply !p-0;
 }
 .apexcharts-tooltip-title {
-    @apply !mb-0 !border-b-0 !bg-transparent !p-0 !text-[10px] !leading-4 !text-gray-800 dark:!text-white/90;
+    @apply !mb-0 !border-b-0 !bg-transparent !p-0 !text-[10px] !leading-4 !text-gray-800 dark:!text-white dark:!text-opacity-90;
 }
 .apexcharts-tooltip-text {
-    @apply !text-theme-xs !text-gray-700 dark:!text-white/90;
+    @apply !text-theme-xs !text-gray-700 dark:!text-white dark:!text-opacity-90;
 }
 .apexcharts-tooltip-text-y-value {
     @apply !font-medium;
@@ -180,7 +226,7 @@
     @apply !rounded-lg !border-0 !bg-brand-500 !px-4 !py-2.5 !text-sm !font-medium hover:!bg-brand-600 focus:!shadow-none;
 }
 .fc-toolbar-title {
-    @apply !text-lg !font-medium text-gray-800 dark:text-white/90;
+    @apply !text-lg !font-medium text-gray-800 dark:text-white dark:text-opacity-90;
 }
 .fc-header-toolbar.fc-toolbar .fc-toolbar-chunk:last-child {
     @apply rounded-lg bg-gray-100 p-0.5 dark:bg-gray-900;
@@ -208,7 +254,7 @@
     @apply p-2;
 }
 .fc .fc-daygrid-day.fc-day-today .fc-scrollgrid-sync-inner {
-    @apply rounded bg-gray-100 dark:bg-white/[0.03];
+    @apply rounded bg-gray-100 dark:bg-white dark:bg-opacity-[0.03];
 }
 .fc .fc-daygrid-day-number {
     @apply !p-3 text-sm font-medium text-gray-700 dark:text-gray-400;
@@ -220,7 +266,7 @@
     opacity: 1;
 }
 .fc .fc-day-other .fc-daygrid-day-top .fc-daygrid-day-number {
-    @apply text-gray-400 dark:text-white/30;
+    @apply text-gray-400 dark:text-white dark:text-opacity-30;
 }
 .event-fc-color {
     @apply rounded-lg py-2.5 pl-4 pr-3;
@@ -289,7 +335,7 @@
 
 .stocks-slider-outer .swiper-button-next,
 .stocks-slider-outer .swiper-button-prev {
-    @apply !static mt-0 h-8 w-9 rounded-full border border-gray-200 !text-gray-700 transition hover:bg-gray-100 dark:border-white/[0.03] dark:bg-gray-800 dark:!text-gray-400 dark:hover:bg-white/[0.05] dark:hover:!text-white/90;
+    @apply !static mt-0 h-8 w-9 rounded-full border border-gray-200 !text-gray-700 transition hover:bg-gray-100 dark:border-white dark:border-opacity-[0.03] dark:bg-gray-800 dark:!text-gray-400 dark:hover:bg-white dark:hover:bg-opacity-[0.05] dark:hover:!text-white dark:hover:!text-opacity-90;
 }
 
 .stocks-slider-outer .swiper-button-next.swiper-button-disabled,
@@ -323,7 +369,7 @@
 .carouselTwo .swiper-button-prev,
 .carouselFour .swiper-button-next,
 .carouselFour .swiper-button-prev {
-    @apply h-10 w-10 rounded-full border-[0.5px] border-white/10 bg-white/90 !text-gray-700 shadow-slider-navigation backdrop-blur-[10px];
+    @apply h-10 w-10 rounded-full border-[0.5px] border-white border-opacity-10 bg-white bg-opacity-90 !text-gray-700 shadow-slider-navigation backdrop-blur-[10px];
 }
 
 .carouselTwo .swiper-button-prev,
@@ -338,7 +384,7 @@
 
 .carouselThree .swiper-pagination,
 .carouselFour .swiper-pagination {
-    @apply !bottom-3 !left-1/2 inline-flex !w-auto -translate-x-1/2 items-center gap-1.5 rounded-[40px] border-[0.5px] border-white/10 bg-white/60 px-2 py-1.5 shadow-slider-navigation backdrop-blur-[10px] sm:!bottom-5;
+    @apply !bottom-3 !left-1/2 inline-flex !w-auto -translate-x-1/2 items-center gap-1.5 rounded-[40px] border-[0.5px] border-white border-opacity-10 bg-white bg-opacity-60 px-2 py-1.5 shadow-slider-navigation backdrop-blur-[10px] sm:!bottom-5;
 }
 
 .carouselThree .swiper-pagination-bullet,

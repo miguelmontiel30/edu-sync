@@ -1,14 +1,8 @@
 'use client';
 
-// React
-import { useEffect } from 'react';
-
+import { useEffect, useState } from 'react';
 // Next
-import { useRouter } from 'next/navigation';
 import { Outfit } from 'next/font/google';
-
-// Store
-import { useAuthStore } from '@/store/useAuthStore';
 
 // Global styles
 import './UI/globals.css';
@@ -22,7 +16,10 @@ import '../../public/icons/brands.css';
 // Contexts
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { StatusProvider } from '@/context/StatusContext';
+import { SessionProvider } from '@/context/SessionContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { AuthRedirectWrapper } from '@/components/auth/AuthRedirectWrapper';
 
 const outfit = Outfit({
     variable: '--font-outfit-sans',
@@ -34,29 +31,60 @@ export default function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const { isAuthenticated, fetchUser } = useAuthStore();
-    const router = useRouter();
+    // Estado para detectar si estamos en el cliente
+    const [isClient, setIsClient] = useState(false);
 
+    // Efecto que sólo se ejecuta en el cliente
     useEffect(() => {
-        fetchUser();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        setIsClient(true);
+
+        try {
+            // Inicializar tema predeterminado
+            const defaultPrimaryColor = '#465FFF';
+            document.documentElement.style.setProperty('--primary-color', defaultPrimaryColor);
+
+            // Verificar preferencia de tema oscuro/claro
+            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const savedTheme = localStorage.getItem('eduSync.darkMode');
+            const isDarkMode = savedTheme === 'dark' || (savedTheme === null && prefersDarkMode);
+
+            // Aplicar clase dark si es necesario
+            if (isDarkMode) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        } catch (error) {
+            console.error('Error durante la inicialización del tema:', error);
+            // En caso de error, al menos asegurarnos de que se muestre la interfaz
+            setIsClient(true);
+        }
     }, []);
 
-    useEffect(() => {
-        if (!isAuthenticated) {
-            router.push('/login');
-        }
-    }, [isAuthenticated, router]);
-
     return (
-        <html lang="es">
-            <body className={`${outfit.variable} dark:bg-gray-900`}>
-                <AuthProvider>
-                    <ThemeProvider>
-                        <SidebarProvider>{children}</SidebarProvider>
-                    </ThemeProvider>
-                </AuthProvider>
+        <html lang="es" suppressHydrationWarning>
+            <body className={`${outfit.variable} dark:bg-gray-900`} suppressHydrationWarning>
+                {isClient ? (
+                    <SessionProvider>
+                        <AuthProvider>
+                            <ThemeProvider>
+                                <SidebarProvider>
+                                    <StatusProvider>
+                                        <AuthRedirectWrapper>
+                                            {children}
+                                        </AuthRedirectWrapper>
+                                    </StatusProvider>
+                                </SidebarProvider>
+                            </ThemeProvider>
+                        </AuthProvider>
+                    </SessionProvider>
+                ) : (
+                    <div className="flex h-screen w-full items-center justify-center">
+                        <div className="h-8 w-8 animate-spin rounded-full border-4 border-solid border-brand-500 border-r-transparent align-[-0.125em]" />
+                    </div>
+                )}
             </body>
         </html>
     );
 }
+
