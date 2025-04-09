@@ -8,8 +8,8 @@
  * - createContext, useState, useContext, useEffect: Hooks y herramientas
  *   necesarios para crear y usar un Context en React.
  */
-import type React from 'react';
-import {createContext, useState, useContext, useEffect, useMemo} from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import ThemeInitializer from '@/components/theme/ThemeInitializer';
 
 /**
  * ------------------------------------------------------------
@@ -19,11 +19,14 @@ import {createContext, useState, useContext, useEffect, useMemo} from 'react';
  * - ThemeContextType: describe la forma del contexto que exponemos
  *   (incluye el estado "theme" y la función "toggleTheme").
  */
-type Theme = 'light' | 'dark';
-
-type ThemeContextType = {
-    theme: Theme;
+interface ThemeContextType {
+    isDarkMode: boolean;
     toggleTheme: () => void;
+}
+
+const defaultContext: ThemeContextType = {
+    isDarkMode: false,
+    toggleTheme: () => { },
 };
 
 /**
@@ -33,7 +36,7 @@ type ThemeContextType = {
  * - createContext se inicializa con 'undefined' para forzar un error
  *   si se accede al contexto fuera de su proveedor.
  */
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+const ThemeContext = createContext<ThemeContextType>(defaultContext);
 
 /**
  * ------------------------------------------------------------
@@ -43,10 +46,8 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
  *   la función "toggleTheme" a toda la aplicación.
  * - 'children' son los componentes que se renderizan dentro del Provider.
  */
-export const ThemeProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
-    // States para el tema actual y si ya se cargó desde localStorage
-    const [theme, setTheme] = useState<Theme>('light');
-    const [isInitialized, setIsInitialized] = useState(false);
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     /**
      * ------------------------------------------------------------
@@ -58,10 +59,27 @@ export const ThemeProvider: React.FC<{children: React.ReactNode}> = ({children})
      * - Luego de la carga inicial, establece 'isInitialized' en true.
      */
     useEffect(() => {
-        const savedTheme = localStorage.getItem('theme') as Theme | null;
-        const initialTheme = savedTheme || 'light'; // Por defecto: 'light'
-        setTheme(initialTheme);
-        setIsInitialized(true);
+        // Verificar tema del sistema o preferencia guardada
+        const checkDarkMode = () => {
+            // Primero intentamos obtener la preferencia guardada
+            const savedTheme = localStorage.getItem('eduSync.darkMode');
+            if (savedTheme !== null) {
+                return savedTheme === 'dark';
+            }
+            // Si no hay preferencia guardada, usar preferencia del sistema
+            return window.matchMedia('(prefers-color-scheme: dark)').matches;
+        };
+
+        // Establecer tema inicial
+        const darkModeOn = checkDarkMode();
+        setIsDarkMode(darkModeOn);
+
+        // Aplicar clase al documento
+        if (darkModeOn) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
     }, []);
 
     /**
@@ -74,15 +92,14 @@ export const ThemeProvider: React.FC<{children: React.ReactNode}> = ({children})
      * - También guarda el tema en localStorage para futuras recargas.
      */
     useEffect(() => {
-        if (isInitialized) {
-            localStorage.setItem('theme', theme);
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
+        if (isDarkMode) {
+            localStorage.setItem('eduSync.darkMode', 'dark');
+            document.documentElement.classList.add('dark');
+        } else {
+            localStorage.setItem('eduSync.darkMode', 'light');
+            document.documentElement.classList.remove('dark');
         }
-    }, [theme, isInitialized]);
+    }, [isDarkMode]);
 
     /**
      * ------------------------------------------------------------
@@ -91,7 +108,21 @@ export const ThemeProvider: React.FC<{children: React.ReactNode}> = ({children})
      * - Cambia el estado 'theme' de 'light' a 'dark' o viceversa.
      */
     const toggleTheme = () => {
-        setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+        setIsDarkMode((prev) => {
+            const newValue = !prev;
+
+            // Guardar preferencia
+            localStorage.setItem('eduSync.darkMode', newValue ? 'dark' : 'light');
+
+            // Actualizar clase en el DOM
+            if (newValue) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            return newValue;
+        });
     };
 
     /**
@@ -100,9 +131,14 @@ export const ThemeProvider: React.FC<{children: React.ReactNode}> = ({children})
      * ------------------------------------------------------------
      * - Provee el contexto con el tema actual y la función para cambiarlo.
      * - 'children' representa el árbol de componentes que usará este context.
+     * - Añadimos ThemeInitializer para cargar la configuración personalizada.
      */
-    const value = useMemo(() => ({theme, toggleTheme}), [theme]);
-    return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+    return (
+        <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
+            <ThemeInitializer />
+            {children}
+        </ThemeContext.Provider>
+    );
 };
 
 /**

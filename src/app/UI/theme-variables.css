@@ -1,0 +1,23 @@
+:root {
+    /* Variables de color primario */
+    --primary-color: #465fff;
+
+    /* Variables para la paleta brand completa */
+    --brand-25: #f2f7ff;
+    --brand-50: #ecf3ff;
+    --brand-100: #dde9ff;
+    --brand-200: #c2d6ff;
+    --brand-300: #9cb9ff;
+    --brand-400: #7592ff;
+    --brand-500: #465fff;
+    --brand-600: #3641f5;
+    --brand-700: #2a31d8;
+    --brand-800: #252dae;
+    --brand-900: #262e89;
+    --brand-950: #161950;
+}
+
+/*
+ * Estas variables se pueden modificar dinámicamente
+ * usando JavaScript con el ThemeInitializer o el hook useThemeSettings.
+ */
