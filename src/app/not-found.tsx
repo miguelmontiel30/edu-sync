@@ -75,7 +75,7 @@ const NotFoundPage = () => {
                             <Button
                                 variant="primary"
                                 onClick={() => router.push('/')}
-                                startIcon="home"
+                                startIcon={<IconFA icon="home" />}
                             >
                                 Ir a Inicio
                             </Button>
@@ -83,7 +83,7 @@ const NotFoundPage = () => {
                             <Button
                                 variant="outline"
                                 onClick={() => router.back()}
-                                startIcon="arrow-left"
+                                startIcon={<IconFA icon="arrow-left" />}
                             >
                                 Volver Atrás
                             </Button>
