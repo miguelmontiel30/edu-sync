@@ -69,10 +69,6 @@ export default function Charts({ teachers, isLoading }: ChartsProps) {
                     <div className="flex items-center justify-center h-[180px]">
                         <IconFA icon="spinner" spin className="text-gray-400" />
                     </div>
-                ) : activeGroups.length === 0 ? (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
-                        <span className="text-lg font-semibold text-white font-outfit">Sin datos</span>
-                    </div>
                 ) : (
                     <>
                         <div className="flex items-center justify-between">
@@ -85,16 +81,41 @@ export default function Charts({ teachers, isLoading }: ChartsProps) {
                                 </span>
                             </Badge>
                         </div>
-                        <div className="custom-scrollbar max-w-full overflow-x-auto">
+                        <div className="custom-scrollbar max-w-full overflow-x-auto h-[180px]">
                             <div className="-ml-5 min-w-[650px] pl-2 xl:min-w-full">
-                                <ReactApexChart
-                                    options={groupChartOptions}
-                                    series={groupSeries}
-                                    type="bar"
-                                    height={180}
-                                />
+                                {activeGroups.length === 0 ? (
+                                    <div className="h-full w-full" style={{ opacity: 0.3 }}>
+                                        <ReactApexChart
+                                            options={{
+                                                ...groupChartOptions,
+                                                xaxis: {
+                                                    ...groupChartOptions.xaxis,
+                                                    categories: ['1A', '1B', '2A', '2B', '3A']
+                                                }
+                                            }}
+                                            series={[{
+                                                name: 'Profesores',
+                                                data: [5, 7, 4, 6, 8]
+                                            }]}
+                                            type="bar"
+                                            height={180}
+                                        />
+                                    </div>
+                                ) : (
+                                    <ReactApexChart
+                                        options={groupChartOptions}
+                                        series={groupSeries}
+                                        type="bar"
+                                        height={180}
+                                    />
+                                )}
                             </div>
                         </div>
+                        {activeGroups.length === 0 && (
+                            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
+                                <span className="text-lg font-semibold text-white font-outfit text-center px-4">Registra tus datos para poder ver las métricas</span>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
@@ -104,10 +125,6 @@ export default function Charts({ teachers, isLoading }: ChartsProps) {
                 {isLoading ? (
                     <div className="flex items-center justify-center h-[180px]">
                         <IconFA icon="spinner" spin className="text-gray-400" />
-                    </div>
-                ) : totalCount === 0 ? (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
-                        <span className="text-lg font-semibold text-white font-outfit">Sin datos</span>
                     </div>
                 ) : (
                     <>
@@ -121,14 +138,30 @@ export default function Charts({ teachers, isLoading }: ChartsProps) {
                                 </span>
                             </Badge>
                         </div>
-                        <div className="flex justify-center">
-                            <ReactApexChart
-                                options={genderChartOptions}
-                                series={genderSeries}
-                                type="donut"
-                                height={250}
-                            />
+                        <div className="flex justify-center h-[250px]">
+                            {totalCount === 0 ? (
+                                <div className="h-full w-full flex justify-center" style={{ opacity: 0.3 }}>
+                                    <ReactApexChart
+                                        options={genderChartOptions}
+                                        series={[15, 25]}
+                                        type="donut"
+                                        height={250}
+                                    />
+                                </div>
+                            ) : (
+                                <ReactApexChart
+                                    options={genderChartOptions}
+                                    series={genderSeries}
+                                    type="donut"
+                                    height={250}
+                                />
+                            )}
                         </div>
+                        {totalCount === 0 && (
+                            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
+                                <span className="text-lg font-semibold text-white font-outfit text-center px-4">Registra tus datos para poder ver las métricas</span>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
