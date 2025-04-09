@@ -130,6 +130,28 @@ const othersItems: NavItem[] = [
         name: 'Mi Perfil',
         path: '/profile',
     },
+    {
+        icon: <IconFA icon="gear" style="duotone" size="xl" />,
+        name: 'Configuración',
+        path: '/system-config',
+        subItems: [
+            {
+                name: 'Roles y Permisos',
+                path: '/system-config/roles',
+                icon: 'users-gear'
+            },
+            {
+                name: 'Tema y Colores',
+                path: '/system-config/theme',
+                icon: 'palette'
+            }
+        ]
+    },
+    {
+        icon: <IconFA icon="sign-out" style="duotone" size="xl" />,
+        name: 'Cerrar sesión',
+        path: '/logout',
+    },
 ];
 
 const AdminSidebar: React.FC = () => {
