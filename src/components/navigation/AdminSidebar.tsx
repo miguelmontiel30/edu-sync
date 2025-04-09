@@ -20,7 +20,7 @@ const navItems: NavItem[] = [
     {
         icon: <IconFA icon="school-flag" style="duotone" size="xl" />,
         name: 'Inicio',
-        path: '/admin-dashboard/dashboard',
+        path: '/admin-dashboard',
     },
     {
         icon: <IconFA icon="calendar-clock" style="duotone" size="xl" />,

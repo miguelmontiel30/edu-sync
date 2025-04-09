@@ -49,7 +49,7 @@ const UnauthorizedPage = () => {
 
         switch (role.toLowerCase()) {
             case 'admin':
-                return '/admin-dashboard/dashboard';
+                return '/admin-dashboard';
             case 'teacher':
                 return '/teacher-dashboard/dashboard';
             case 'student':
