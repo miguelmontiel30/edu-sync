@@ -3,11 +3,6 @@ import ChartTab from '@/components/common/ChartTab';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import Badge from '@/components/core/badge/Badge';
-import Button from '@/components/core/button/Button';
-import { Table, TableBody, TableCell, TableHeader, TableRow } from '@/components/core/table';
-import { Dropdown } from '@/components/ui/dropdown/Dropdown';
-import { DropdownItem } from '@/components/ui/dropdown/DropdownItem';
-import { useAuthStore } from '@/store/useAuthStore';
 import { ApexOptions } from 'apexcharts';
 import { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
@@ -16,7 +11,6 @@ import Link from 'next/link';
 import IconFA from '@/components/ui/IconFA';
 
 export default function AdminMainContent() {
-    const { user } = useAuthStore();
     const [stats, setStats] = useState({
         totalStudents: 0,
         totalTeachers: 0,
@@ -103,55 +97,6 @@ export default function AdminMainContent() {
     function closeDropdown() {
         setIsOpen(false);
     }
-
-    const series = [stats.averageGrade * 10];
-    const options: ApexOptions = {
-        colors: ['#28a745'],
-        chart: {
-            fontFamily: 'Outfit, sans-serif',
-            type: 'radialBar',
-            height: 330,
-            sparkline: {
-                enabled: true,
-            },
-        },
-        plotOptions: {
-            radialBar: {
-                startAngle: -85,
-                endAngle: 85,
-                hollow: {
-                    size: '80%',
-                },
-                track: {
-                    background: '#E4E7EC',
-                    strokeWidth: '100%',
-                    margin: 5,
-                },
-                dataLabels: {
-                    name: {
-                        show: false,
-                    },
-                    value: {
-                        fontSize: '36px',
-                        fontWeight: '600',
-                        offsetY: -40,
-                        color: '#1D2939',
-                        formatter: function (val) {
-                            return val + '%';
-                        },
-                    },
-                },
-            },
-        },
-        fill: {
-            type: 'solid',
-            colors: ['#465FFF'],
-        },
-        stroke: {
-            lineCap: 'round',
-        },
-        labels: ['Progress'],
-    };
 
     const barOptions: ApexOptions = {
         colors: ['#465fff'],
