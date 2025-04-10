@@ -31,7 +31,7 @@ export const sortCycles = (
                 comparison = a.statusName.localeCompare(b.statusName);
                 break;
             default:
-                comparison = 0;
+                break;
         }
         return sortDirection === 'asc' ? comparison : -comparison;
     });
@@ -62,5 +62,33 @@ export const getStatusColor = (
             return 'warning';
         default:
             return 'info';
+    }
+};
+
+// Función para mapear ID a código de estado
+export const mapStatusIdToCode = (statusId: string): string => {
+    switch (statusId) {
+        case '1':
+            return 'SCHOOL_YEAR_ACTIVE';
+        case '2':
+            return 'SCHOOL_YEAR_INACTIVE';
+        case '3':
+            return 'SCHOOL_YEAR_COMPLETED';
+        default:
+            return '';
+    }
+};
+
+// Función para mapear código a ID de estado
+export const mapStatusCodeToId = (code: string): string => {
+    switch (code) {
+        case 'SCHOOL_YEAR_ACTIVE':
+            return '1';
+        case 'SCHOOL_YEAR_INACTIVE':
+            return '2';
+        case 'SCHOOL_YEAR_COMPLETED':
+            return '3';
+        default:
+            return '';
     }
 };

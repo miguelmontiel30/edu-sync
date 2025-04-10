@@ -1,5 +1,5 @@
 // React
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 // Componentes
 import IconFA from '@/components/ui/IconFA';
@@ -20,7 +20,6 @@ interface DeletedCycleListProps {
 
 export default function DeletedCycleList({ cycles, isLoading, onRestore }: DeletedCycleListProps) {
     const [showDeleted, setShowDeleted] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
 
     // Definir las columnas de la tabla
     const columns: Column<SchoolCycle>[] = [
@@ -112,11 +111,6 @@ export default function DeletedCycleList({ cycles, isLoading, onRestore }: Delet
         }
     ];
 
-    // Filtrar registros cuando se busca
-    const handleSearch = (term: string) => {
-        setSearchTerm(term);
-    };
-
     return (
         <ComponentCard
             title="Ciclos Escolares Eliminados"
@@ -149,7 +143,6 @@ export default function DeletedCycleList({ cycles, isLoading, onRestore }: Delet
                     searchNoResultsMessage="No se encontraron ciclos escolares que coincidan con la búsqueda"
                     itemsPerPage={5}
                     maxHeight="400px"
-                    onSearch={handleSearch}
                 />
             )}
         </ComponentCard>

@@ -17,23 +17,23 @@ export interface Column<T> {
 }
 
 export interface DataTableProps<T> {
-    data: T[];
-    columns: Column<T>[];
-    keyExtractor: (item: T) => string | number;
-    searchable?: boolean;
-    searchPlaceholder?: string;
-    defaultSortField?: string;
-    defaultSortDirection?: SortDirection;
-    isLoading?: boolean;
-    noDataMessage?: string;
-    searchNoResultsMessage?: string;
-    className?: string;
-    itemsPerPage?: number;
-    maxHeight?: string;
-    emptyStateComponent?: ReactNode;
-    loadingComponent?: ReactNode;
-    onSearch?: (searchTerm: string) => void;
-    onSort?: (field: string, direction: SortDirection) => void;
+    readonly data: T[];
+    readonly columns: Column<T>[];
+    readonly keyExtractor: (item: T) => string | number;
+    readonly searchable?: boolean;
+    readonly searchPlaceholder?: string;
+    readonly defaultSortField?: string;
+    readonly defaultSortDirection?: SortDirection;
+    readonly isLoading?: boolean;
+    readonly noDataMessage?: string;
+    readonly searchNoResultsMessage?: string;
+    readonly className?: string;
+    readonly itemsPerPage?: number;
+    readonly maxHeight?: string;
+    readonly emptyStateComponent?: ReactNode;
+    readonly loadingComponent?: ReactNode;
+    readonly onSearch?: (searchTerm: string) => void;
+    readonly onSort?: (field: string, direction: SortDirection) => void;
 }
 
 export default function DataTable<T>({
@@ -190,7 +190,12 @@ export default function DataTable<T>({
                                     <TableCell
                                         key={column.key.toString()}
                                         isHeader
-                                        className={`px-5 py-3 text-center ${column.sortable ? 'cursor-pointer hover:text-gray-700 dark:hover:text-gray-300' : ''} ${column.className || ''} ${column.width ? `w-[${column.width}]` : ''}`}
+                                        className={[
+                                            'px-5 py-3 text-center',
+                                            column.sortable ? 'cursor-pointer hover:text-gray-700 dark:hover:text-gray-300' : '',
+                                            column.className || '',
+                                            column.width ? `w-[${column.width}]` : ''
+                                        ].filter(Boolean).join(' ')}
                                         onClick={column.sortable ? () => handleSort(column.key.toString()) : undefined}
                                     >
                                         {column.sortable ? (

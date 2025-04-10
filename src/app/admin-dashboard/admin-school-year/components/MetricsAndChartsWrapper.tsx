@@ -13,6 +13,7 @@ export default function MetricsAndChartsWrapper({ cycles, isLoading }: Readonly<
     return (
         <MetricsChartsWrapper title="Estadísticas y Gráficos de Ciclos Escolares">
             <Metrics cycles={cycles} isLoading={isLoading} />
+
             <Charts cycles={cycles} isLoading={isLoading} />
         </MetricsChartsWrapper>
     );

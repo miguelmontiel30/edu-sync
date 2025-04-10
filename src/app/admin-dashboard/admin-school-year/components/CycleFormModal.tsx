@@ -18,6 +18,9 @@ import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import Select from '@/components/form/Select';
 
+// Utils
+import { mapStatusCodeToId, mapStatusIdToCode } from './utils';
+
 interface CycleFormModalProps {
     readonly isOpen: boolean;
     readonly onClose: () => void;
@@ -61,34 +64,6 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
             return () => clearTimeout(timer);
         }
     }, [alertState.show]);
-
-    // Función para mapear ID a código de estado
-    const mapStatusIdToCode = (statusId: string): string => {
-        switch (statusId) {
-            case '1':
-                return 'SCHOOL_YEAR_ACTIVE';
-            case '2':
-                return 'SCHOOL_YEAR_INACTIVE';
-            case '3':
-                return 'SCHOOL_YEAR_COMPLETED';
-            default:
-                return '';
-        }
-    };
-
-    // Función para mapear código a ID de estado
-    const mapStatusCodeToId = (code: string): string => {
-        switch (code) {
-            case 'SCHOOL_YEAR_ACTIVE':
-                return '1';
-            case 'SCHOOL_YEAR_INACTIVE':
-                return '2';
-            case 'SCHOOL_YEAR_COMPLETED':
-                return '3';
-            default:
-                return '';
-        }
-    };
 
     // Función para obtener el valor inicial del estado
     const getInitialStatus = () => {

@@ -8,11 +8,11 @@ import IconFA from '@/components/ui/IconFA';
 import ComponentCard from '@/components/common/ComponentCard';
 
 interface CycleListProps {
-    cycles: SchoolCycle[];
-    isLoading: boolean;
-    onEdit: (id: number) => void;
-    onDelete: (id: number) => void;
-    onAddNew: () => void;
+    readonly cycles: SchoolCycle[];
+    readonly isLoading: boolean;
+    readonly onEdit: (id: number) => void;
+    readonly onDelete: (id: number) => void;
+    readonly onAddNew: () => void;
 }
 
 export default function CycleList({ cycles, isLoading, onEdit, onDelete, onAddNew }: CycleListProps) {
