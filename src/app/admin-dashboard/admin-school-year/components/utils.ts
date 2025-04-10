@@ -59,7 +59,7 @@ export const getStatusColor = (
         case '2': // Inactivo
             return 'light';
         case '3': // Finalizado
-            return 'warning';
+            return 'primary';
         default:
             return 'info';
     }

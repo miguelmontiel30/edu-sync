@@ -117,6 +117,7 @@ export default function CycleList({ cycles, isLoading, onEdit, onDelete, onAddNe
                     >
                         <span className="font-outfit">Editar</span>
                     </Button>
+
                     <Button
                         variant="outline"
                         size="sm"
