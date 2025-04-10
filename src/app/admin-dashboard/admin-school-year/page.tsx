@@ -8,6 +8,7 @@ import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import CycleList from './components/CycleList';
 import DeletedCycleList from './components/DeletedCycleList';
 import CycleFormModal from './components/CycleFormModal';
+import DeleteConfirmModal from './components/DeleteConfirmModal';
 import MetricsAndChartsWrapper from './components/MetricsAndChartsWrapper';
 
 // Types and Services
@@ -25,6 +26,8 @@ export default function SchoolYearDashboard() {
     const [isLoadingDeleted, setIsLoadingDeleted] = useState(true);
     const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [cycleToDelete, setCycleToDelete] = useState<SchoolCycle | null>(null);
 
     // Obtener datos de sesion en cache del usuario
     const { session } = useSession();
@@ -96,20 +99,33 @@ export default function SchoolYearDashboard() {
     };
 
     // Manejar la eliminación de un ciclo
-    async function handleDelete(id: number) {
-        if (!confirm('¿Estás seguro de que deseas eliminar este ciclo?')) return;
+    function handleDelete(id: number) {
+        const cycle = cycles.find(cycle => cycle.id === id);
+        if (cycle) {
+            setCycleToDelete(cycle);
+            setIsDeleteModalOpen(true);
+        }
+    }
+
+    // Confirmar eliminación del ciclo
+    async function confirmDelete() {
+        if (!cycleToDelete) return;
 
         setIsSaving(true);
 
         try {
             // Eliminar el ciclo
-            await deleteCycle(id);
+            await deleteCycle(cycleToDelete.id);
 
             // Actualizar listas
             await loadAllCycles();
+
+            // Cerrar modal
+            setIsDeleteModalOpen(false);
+            setCycleToDelete(null);
         } catch (error) {
             console.error('Error al eliminar el ciclo:', error);
-            alert('Error al eliminar el ciclo. Por favor intenta nuevamente.');
+            // El modal de confirmación mostrará el error
         } finally {
             setIsSaving(false);
         }
@@ -166,7 +182,7 @@ export default function SchoolYearDashboard() {
     }
 
     return (
-        <div className="mx-auto max-w-screen-2xl p-4 md:p-6">
+        <div className="mx-auto max-w-screen-2xl md:p-6">
             {/* Breadcrumb */}
             <PageBreadcrumb pageTitle="Ciclos escolares" />
 
@@ -200,6 +216,19 @@ export default function SchoolYearDashboard() {
                 selectedCycle={selectedCycle}
                 isSaving={isSaving}
                 currentCycles={cycles}
+            />
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => {
+                    setIsDeleteModalOpen(false);
+                    setCycleToDelete(null);
+                }}
+                onConfirm={confirmDelete}
+                itemName={cycleToDelete?.name || ''}
+                isDeleting={isSaving}
+                isActiveCycle={cycleToDelete?.status === '1'}
             />
         </div>
     );
