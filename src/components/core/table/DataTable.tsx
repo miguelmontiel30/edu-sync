@@ -250,27 +250,27 @@ export default function DataTable<T>({
             </div>
 
             {!isLoading && (
-                <div className="flex justify-between items-center mt-4 px-2">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                <div className="flex flex-col items-center md:flex-row md:justify-between md:items-center mt-4 px-2 gap-y-3 md:gap-y-0">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 font-outfit text-center md:text-left">
                         Mostrando {Math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage)} de {filteredData.length} registros
                     </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
+
+                    <div className="flex items-center space-x-2">
+                        <button
                             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
+                            className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white/[0.03] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                         >
-                            <IconFA icon="chevron-left" style="solid" className="text-gray-600" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
+                            Anterior
+                        </button>
+
+                        <button
                             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages || totalPages === 0}
+                            className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white/[0.03] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                         >
-                            <IconFA icon="chevron-right" style="solid" className="text-gray-600" />
-                        </Button>
+                            Siguiente
+                        </button>
                     </div>
                 </div>
             )}
