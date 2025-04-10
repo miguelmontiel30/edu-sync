@@ -132,7 +132,7 @@ export default function CycleList({ cycles, isLoading, onEdit, onDelete, onAddNe
     ];
 
     return (
-        <ComponentCard title="Lista de ciclos escolares" desc='Aquí podrás ver todos los ciclos escolares registrados, su información y gestionarlos. Puedes crear nuevos ciclos, editar los existentes o eliminarlos según sea necesario.' className={`w-100 p-4`}>
+        <ComponentCard title="Lista de ciclos escolares" desc='Aquí podrás ver todos los ciclos escolares registrados, su información y gestionarlos. Puedes crear nuevos ciclos, editar los existentes o eliminarlos según sea necesario.' className={`w-100 p-2`}>
             <div className="mb-4 flex justify-end">
                 <Button
                     variant="primary"

@@ -1,8 +1,12 @@
+// React
 import React, { useState, useEffect, ReactNode } from 'react';
+
+// Table components
 import { Table, TableHeader, TableBody, TableRow, TableCell } from './index';
-import Input from '@/components/form/input/InputField';
-import Button from '@/components/core/button/Button';
+
+// Components
 import IconFA from '@/components/ui/IconFA';
+import Input from '@/components/form/input/InputField';
 
 export type SortDirection = 'asc' | 'desc';
 

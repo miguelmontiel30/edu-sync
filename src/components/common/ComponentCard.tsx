@@ -26,7 +26,7 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
             )}
 
             {/* Card Body */}
-            <div className={`${title || desc ? 'border-t border-gray-100 dark:border-gray-800' : ''} p-4 sm:p-6`}>
+            <div className={`${title || desc ? 'border-t border-gray-100 dark:border-gray-800' : ''} p-2 sm:p-6`}>
                 <div className="space-y-6">{children}</div>
             </div>
         </div>
