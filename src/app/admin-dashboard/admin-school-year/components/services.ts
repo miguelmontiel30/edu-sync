@@ -2,11 +2,8 @@ import {supabaseClient} from '@/services/config/supabaseClient';
 import {SchoolCycle} from './types';
 import statusService from '@/services/status/statusService';
 
-export async function loadSchoolYears(): Promise<SchoolCycle[]> {
+export async function loadSchoolYearsBySchoolId(schoolId: number): Promise<SchoolCycle[]> {
     try {
-        // Usar nuestro servicio de caché para obtener los estados
-        const statusData = await statusService.getSchoolYearStatuses();
-
         // Primero obtenemos los ciclos escolares con sus grupos
         const {data, error} = await supabaseClient
             .from('school_years')
@@ -23,6 +20,7 @@ export async function loadSchoolYears(): Promise<SchoolCycle[]> {
             `,
             )
             .eq('delete_flag', false)
+            .eq('school_id', schoolId)
             .order('created_at', {ascending: false});
 
         if (error) throw error;
@@ -111,7 +109,7 @@ export async function loadSchoolYears(): Promise<SchoolCycle[]> {
     }
 }
 
-export async function loadDeletedCycles(): Promise<SchoolCycle[]> {
+export async function loadDeletedCycles(schoolId: number): Promise<SchoolCycle[]> {
     try {
         // Usar nuestro servicio de caché para obtener los estados
         await statusService.getSchoolYearStatuses();
@@ -131,6 +129,7 @@ export async function loadDeletedCycles(): Promise<SchoolCycle[]> {
             `,
             )
             .eq('delete_flag', true)
+            .eq('school_id', schoolId)
             .order('deleted_at', {ascending: false});
 
         if (error) throw error;
