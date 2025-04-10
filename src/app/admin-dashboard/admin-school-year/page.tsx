@@ -5,18 +5,17 @@ import { useState, useEffect } from 'react';
 
 // Components
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import Metrics from './components/Metrics';
-import Charts from './components/Charts';
 import CycleList from './components/CycleList';
 import DeletedCycleList from './components/DeletedCycleList';
 import CycleFormModal from './components/CycleFormModal';
+import MetricsAndChartsWrapper from './components/MetricsAndChartsWrapper';
 
 // Types and Services
 import { SchoolCycle } from './components/types';
 import { loadSchoolYears, loadDeletedCycles, saveCycle, deleteCycle, restoreCycle } from './components/services';
 
 export default function SchoolYearDashboard() {
-    // States
+    // Estados
     const [cycles, setCycles] = useState<SchoolCycle[]>([]);
     const [deletedCycles, setDeletedCycles] = useState<SchoolCycle[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,7 +38,7 @@ export default function SchoolYearDashboard() {
         ]);
     }
 
-    // Cargar ciclos escolares activos
+    // Cargar ciclos activos
     async function fetchSchoolYears() {
         setIsLoadingCycles(true);
         setIsLoadingMetrics(true);
@@ -71,6 +70,9 @@ export default function SchoolYearDashboard() {
     // Manejar la edición de un ciclo
     const handleEdit = (id: number) => {
         const cycleToEdit = cycles.find(cycle => cycle.id === id);
+
+        console.log('cycleToEdit', cycleToEdit);
+
         if (cycleToEdit) {
             setSelectedCycle(cycleToEdit);
             setIsModalOpen(true);
@@ -79,7 +81,7 @@ export default function SchoolYearDashboard() {
 
     // Manejar la eliminación de un ciclo
     async function handleDelete(id: number) {
-        if (!confirm('¿Estás seguro de que deseas eliminar este ciclo escolar?')) return;
+        if (!confirm('¿Estás seguro de que deseas eliminar este ciclo?')) return;
 
         setIsSaving(true);
 
@@ -87,16 +89,11 @@ export default function SchoolYearDashboard() {
             // Eliminar el ciclo
             await deleteCycle(id);
 
-            // Actualizar la lista de ciclos
-            setCycles(prev => prev.filter(cycle => cycle.id !== id));
-
-            // Actualizar la lista de ciclos eliminados
-            await fetchDeletedCycles();
+            // Actualizar listas
+            await loadAllCycles();
         } catch (error) {
-            console.error('Error al eliminar el ciclo escolar:', error);
-
-            // Mostrar mensaje de error
-            alert('Error al eliminar el ciclo escolar. Por favor intenta nuevamente.');
+            console.error('Error al eliminar el ciclo:', error);
+            alert('Error al eliminar el ciclo. Por favor intenta nuevamente.');
         } finally {
             setIsSaving(false);
         }
@@ -111,18 +108,16 @@ export default function SchoolYearDashboard() {
     // Cerrar modal
     function closeModal() {
         setIsModalOpen(false);
-
-        // Limpiar los campos
         setSelectedCycle(null);
     }
 
-    // Guardar ciclo escolar (crear o actualizar)
+    // Guardar ciclo (crear o actualizar)
     async function handleSaveCycle(cycleData: { name: string; startDate: string; endDate: string; status: string }) {
         setIsSaving(true);
         try {
-            // Validar que todos los campos estén completados
-            if (!cycleData.name || !cycleData.startDate || !cycleData.endDate || !cycleData.status) {
-                alert('Por favor completa todos los campos');
+            // Validar datos básicos
+            if (!cycleData.name || !cycleData.startDate || !cycleData.endDate) {
+                alert('Por favor completa todos los campos requeridos');
                 setIsSaving(false);
                 return;
             }
@@ -133,8 +128,8 @@ export default function SchoolYearDashboard() {
             await fetchSchoolYears();
             closeModal();
         } catch (error) {
-            console.error('Error al guardar el ciclo escolar:', error);
-            alert('Error al guardar el ciclo escolar. Por favor intenta nuevamente.');
+            console.error('Error al guardar el ciclo:', error);
+            alert('Error al guardar el ciclo. Por favor intenta nuevamente.');
         } finally {
             setIsSaving(false);
         }
@@ -143,18 +138,11 @@ export default function SchoolYearDashboard() {
     // Restaurar ciclo eliminado
     async function handleRestore(id: number) {
         try {
-            // Primero restauramos el ciclo
+            // Restauramos el ciclo
             await restoreCycle(id);
 
             // Actualizamos los datos
-            const [activeCycles] = await Promise.all([
-                loadSchoolYears(),
-                loadDeletedCycles()
-            ]);
-
-            // Actualizamos el estado
-            setCycles(activeCycles);
-            setDeletedCycles(prevDeleted => prevDeleted.filter(cycle => cycle.id !== id));
+            await loadAllCycles();
         } catch (error) {
             console.error('Error al restaurar el ciclo:', error);
             alert('Error al restaurar el ciclo. Por favor intenta nuevamente.');
@@ -166,28 +154,20 @@ export default function SchoolYearDashboard() {
             {/* Breadcrumb */}
             <PageBreadcrumb pageTitle="Ciclos escolares" />
 
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-1">
-                {/* Metrics */}
-                <Metrics
-                    cycles={cycles}
-                    isLoading={isLoadingMetrics}
-                />
+            {/* Metrics and Charts Wrapper */}
+            <MetricsAndChartsWrapper
+                cycles={cycles}
+                isLoading={isLoadingMetrics}
+            />
 
-                {/* Charts */}
-                <Charts
-                    cycles={cycles}
-                    isLoading={isLoadingMetrics}
-                />
-
-                {/* Cycle List */}
-                <CycleList
-                    cycles={cycles}
-                    isLoading={isLoadingCycles}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onAddNew={openModal}
-                />
-            </div>
+            {/* Cycle List */}
+            <CycleList
+                cycles={cycles}
+                isLoading={isLoadingCycles}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onAddNew={openModal}
+            />
 
             {/* Deleted Cycles */}
             <DeletedCycleList

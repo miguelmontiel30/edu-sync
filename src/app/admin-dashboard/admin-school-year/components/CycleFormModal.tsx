@@ -36,24 +36,61 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
         status: ''
     });
 
+    // Función para mapear ID a código de estado
+    const mapStatusIdToCode = (statusId: string): string => {
+        switch (statusId) {
+            case '1':
+                return 'SCHOOL_YEAR_ACTIVE';
+            case '2':
+                return 'SCHOOL_YEAR_INACTIVE';
+            case '3':
+                return 'SCHOOL_YEAR_COMPLETED';
+            default:
+                return '';
+        }
+    };
+
+    // Función para mapear código a ID de estado
+    const mapStatusCodeToId = (code: string): string => {
+        switch (code) {
+            case 'SCHOOL_YEAR_ACTIVE':
+                return '1';
+            case 'SCHOOL_YEAR_INACTIVE':
+                return '2';
+            case 'SCHOOL_YEAR_COMPLETED':
+                return '3';
+            default:
+                return '';
+        }
+    };
+
+    // Función para obtener el valor inicial del estado
+    const getInitialStatus = () => {
+        if (selectedCycle) {
+            return mapStatusIdToCode(selectedCycle.status.toString());
+        }
+
+        return statusOptions.find(option => option.value === 'SCHOOL_YEAR_ACTIVE')?.value || '';
+    };
+
+    // Efecto para obtener el valor inicial del estado
     useEffect(() => {
         if (isOpen) {
             if (selectedCycle) {
+                // Cuando hay un ciclo seleccionado (edición)
                 setCycleForm({
-                    name: selectedCycle.name || '',
-                    startDate: selectedCycle.startDate || '',
-                    endDate: selectedCycle.endDate || '',
-                    status: selectedCycle.status || ''
+                    name: selectedCycle.name,
+                    startDate: selectedCycle.startDate,
+                    endDate: selectedCycle.endDate,
+                    status: getInitialStatus()
                 });
-            } else {
-                // Buscar el status SCHOOL_YEAR_ACTIVE
-                const activeStatusOption = statusOptions.find(option => option.value === 'SCHOOL_YEAR_ACTIVE');
-
+            } else if (statusOptions.length > 0) {
+                // Cuando no hay ciclo seleccionado (nuevo ciclo)
                 setCycleForm({
                     name: '',
                     startDate: new Date().toISOString().split('T')[0],
                     endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-                    status: activeStatusOption ? activeStatusOption.value : ''
+                    status: getInitialStatus()
                 });
             }
         } else {
@@ -98,11 +135,17 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
             return;
         }
 
+        // Convertir el código de estado a ID antes de guardar
+        const cycleDataToSave = {
+            ...cycleForm,
+            status: mapStatusCodeToId(cycleForm.status)
+        };
+
         // Limpiar los campos
         resetForm();
 
         // Guardar el ciclo
-        await onSave(cycleForm);
+        await onSave(cycleDataToSave);
     }
 
     return (
@@ -146,7 +189,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                             </div>
                         ) : (
                             <Select
-                                key={`status-select-${cycleForm.status}-${isOpen}-${selectedCycle?.id || 'new'}`}
+                                key={`status-select-${selectedCycle?.id || 'new'}-${cycleForm.status}`}
                                 options={statusOptions}
                                 placeholder="Seleccione un estado"
                                 onChange={(value) => handleSelectChange(value)}
