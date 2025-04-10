@@ -12,7 +12,8 @@ import MetricsAndChartsWrapper from './components/MetricsAndChartsWrapper';
 
 // Types and Services
 import { SchoolCycle } from './components/types';
-import { loadSchoolYears, loadDeletedCycles, saveCycle, deleteCycle, restoreCycle } from './components/services';
+import { loadSchoolYearsBySchoolId, loadDeletedCycles, saveCycle, deleteCycle, restoreCycle, } from './components/services';
+import { useSession } from '@/hooks/useSession';
 
 export default function SchoolYearDashboard() {
     // Estados
@@ -25,10 +26,16 @@ export default function SchoolYearDashboard() {
     const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
+    // Obtener datos de sesion en cache del usuario
+    const { session } = useSession();
+
+
     // Cargar datos al montar el componente
     useEffect(() => {
-        loadAllCycles();
-    }, []);
+        if (session?.school_id) {
+            loadAllCycles();
+        }
+    }, [session]);
 
     // Función para cargar todos los ciclos
     async function loadAllCycles() {
@@ -43,7 +50,14 @@ export default function SchoolYearDashboard() {
         setIsLoadingCycles(true);
         setIsLoadingMetrics(true);
         try {
-            const data = await loadSchoolYears();
+            if (!session?.school_id) {
+                throw new Error('No se encontró el ID de la escuela en la sesión');
+            }
+
+            // Cargar los ciclos activos de la escuela
+            const data = await loadSchoolYearsBySchoolId(session?.school_id ?? 0);
+
+            // Actualizar el estado local con los datos cargados
             setCycles(data);
         } catch (error) {
             console.error('Error al cargar los ciclos escolares:', error);
@@ -58,7 +72,11 @@ export default function SchoolYearDashboard() {
     async function fetchDeletedCycles() {
         setIsLoadingDeleted(true);
         try {
-            const data = await loadDeletedCycles();
+            if (!session?.school_id) {
+                throw new Error('No se encontró el ID de la escuela en la sesión');
+            }
+
+            const data = await loadDeletedCycles(session?.school_id ?? 0);
             setDeletedCycles(data);
         } catch (error) {
             console.error('Error al cargar los ciclos eliminados:', error);
@@ -70,8 +88,6 @@ export default function SchoolYearDashboard() {
     // Manejar la edición de un ciclo
     const handleEdit = (id: number) => {
         const cycleToEdit = cycles.find(cycle => cycle.id === id);
-
-        console.log('cycleToEdit', cycleToEdit);
 
         if (cycleToEdit) {
             setSelectedCycle(cycleToEdit);
@@ -183,6 +199,7 @@ export default function SchoolYearDashboard() {
                 onSave={handleSaveCycle}
                 selectedCycle={selectedCycle}
                 isSaving={isSaving}
+                currentCycles={cycles}
             />
         </div>
     );
