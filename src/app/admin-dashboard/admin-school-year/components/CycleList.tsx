@@ -108,9 +108,8 @@ export default function CycleList({ cycles, isLoading, onEdit, onDelete, onAddNe
             header: 'Acciones',
             sortable: false,
             render: (cycle: SchoolCycle) => (
-                <>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
                     <Button
-                        className="mr-2"
                         variant="outline"
                         size="sm"
                         startIcon={<IconFA icon="calendar-pen" style="duotone" />}
@@ -126,7 +125,7 @@ export default function CycleList({ cycles, isLoading, onEdit, onDelete, onAddNe
                     >
                         <span className="font-outfit">Eliminar</span>
                     </Button>
-                </>
+                </div>
             )
         }
     ];

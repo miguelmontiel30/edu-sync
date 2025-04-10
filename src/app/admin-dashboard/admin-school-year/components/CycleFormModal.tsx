@@ -8,9 +8,10 @@ import { SchoolCycle } from './types';
 import { useStatusOptions } from '@/hooks/useStatusData';
 
 // Componentes UI
-import { Modal } from '@/components/ui/modal';
+import Alert from '@/components/core/alert/Alert';
 import Button from '@/components/core/button/Button';
 import IconFA from '@/components/ui/IconFA';
+import { Modal } from '@/components/ui/modal';
 
 // Componentes de formulario
 import Label from '@/components/form/Label';
@@ -23,9 +24,17 @@ interface CycleFormModalProps {
     readonly onSave: (cycleData: { name: string; startDate: string; endDate: string; status: string }) => Promise<void>;
     readonly selectedCycle: SchoolCycle | null;
     readonly isSaving: boolean;
+    readonly currentCycles: SchoolCycle[];
 }
 
-export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving }: CycleFormModalProps) {
+interface AlertState {
+    show: boolean;
+    variant: 'warning' | 'error' | 'success' | 'info';
+    title: string;
+    message: string;
+}
+
+export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving, currentCycles }: CycleFormModalProps) {
     // Obtener estados de ciclo escolar usando nuestro hook
     const { options: statusOptions, isLoading: isLoadingStatus } = useStatusOptions('school_year');
 
@@ -35,6 +44,23 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
         endDate: '',
         status: ''
     });
+
+    const [alertState, setAlertState] = useState<AlertState>({
+        show: false,
+        variant: 'warning',
+        title: '',
+        message: ''
+    });
+
+    // Efecto para cerrar automáticamente la alerta después de 5 segundos
+    useEffect(() => {
+        if (alertState.show) {
+            const timer = setTimeout(() => {
+                setAlertState(prev => ({ ...prev, show: false }));
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [alertState.show]);
 
     // Función para mapear ID a código de estado
     const mapStatusIdToCode = (statusId: string): string => {
@@ -125,21 +151,55 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
     async function handleSaveCycle() {
         // Validar que los campos requeridos estén completos
         if (!cycleForm.name || !cycleForm.startDate || !cycleForm.endDate || !cycleForm.status) {
-            alert('Por favor, complete todos los campos requeridos.');
+            setAlertState({
+                show: true,
+                variant: 'error',
+                title: 'Error',
+                message: 'Por favor, complete todos los campos requeridos.'
+            });
             return;
         }
 
         // Validar que la fecha de inicio sea anterior a la fecha de fin
         if (new Date(cycleForm.startDate) >= new Date(cycleForm.endDate)) {
-            alert('La fecha de inicio debe ser anterior a la fecha de fin.');
+            setAlertState({
+                show: true,
+                variant: 'error',
+                title: 'Error',
+                message: 'La fecha de inicio debe ser anterior a la fecha de fin.'
+            });
             return;
         }
 
+        // Validar que no se cree un ciclo activo si ya existe uno
+        if (cycleForm.status === 'SCHOOL_YEAR_ACTIVE') {
+            const hasActiveCycle = currentCycles.some(cycle =>
+                cycle.status.toString() === '1' &&
+                (!selectedCycle || cycle.id !== selectedCycle.id)
+            );
+            if (hasActiveCycle) {
+                setAlertState({
+                    show: true,
+                    variant: 'error',
+                    title: 'Error',
+                    message: 'Lo sentimos, pero ya existe un ciclo escolar activo. No es posible tener más de un ciclo activo al mismo tiempo.'
+                });
+                return;
+            }
+        }
+
         // Convertir el código de estado a ID antes de guardar
-        const cycleDataToSave = {
-            ...cycleForm,
+        const cycleDataToSave: { name: string; startDate: string; endDate: string; status: string; id?: number } = {
+            name: cycleForm.name,
+            startDate: cycleForm.startDate,
+            endDate: cycleForm.endDate,
             status: mapStatusCodeToId(cycleForm.status)
         };
+
+        // Si es una edición, incluimos el ID
+        if (selectedCycle) {
+            cycleDataToSave.id = selectedCycle.id;
+        }
 
         // Limpiar los campos
         resetForm();
@@ -155,15 +215,25 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
             className="max-w-[700px] p-6 lg:p-10"
         >
             <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
-                <div>
+                <div className="mb-4">
                     <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
                         {selectedCycle ? "Editar ciclo escolar" : "Define un nuevo ciclo escolar"}
                     </h5>
+
                     <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
                         El conjunto de fechas clave que delimitan el periodo académico, en el que se asignan grupos, materias y alumnos para organizar eficazmente el año escolar.
                     </p>
                 </div>
-                <div className="mt-8">
+
+                {alertState.show && (
+                    <Alert
+                        variant={alertState.variant}
+                        title={alertState.title}
+                        message={alertState.message}
+                    />
+                )}
+
+                <div className="mt-4">
                     <div>
                         <div>
                             <Label htmlFor="cycle-name" className="font-outfit">
@@ -179,6 +249,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                             />
                         </div>
                     </div>
+
                     <div className="mt-6">
                         <Label className="font-outfit">
                             Estado del Ciclo
@@ -226,6 +297,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                         />
                     </div>
                 </div>
+
                 <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
                     <Button
                         onClick={onClose}
