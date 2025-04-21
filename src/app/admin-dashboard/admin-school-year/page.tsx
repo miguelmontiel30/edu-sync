@@ -9,9 +9,9 @@ import CycleList from './components/CycleList';
 import DeletedCycleList from './components/DeletedCycleList';
 import CycleFormModal from './components/CycleFormModal';
 import Charts from './components/Charts';
-import DeleteConfirmModal from './components/DeleteConfirmModal';
-import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
 import MetricsGroup from '../core/Metrics/MetricsGroup';
+import DeleteConfirmModal from '../core/Modals/DeleteConfirmModal';
+import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
 
 // Types and Services
 import { MetricConfig } from '../core/Metrics/types';
@@ -30,7 +30,7 @@ export default function SchoolYearDashboard() {
     const [isLoadingCycles, setIsLoadingCycles] = useState(true);
     const [isLoadingDeleted, setIsLoadingDeleted] = useState(true);
     const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [cycleToDelete, setCycleToDelete] = useState<SchoolCycle | null>(null);
 
@@ -116,7 +116,7 @@ export default function SchoolYearDashboard() {
     async function confirmDelete() {
         if (!cycleToDelete) return;
 
-        setIsSaving(true);
+        setIsProcessing(true);
 
         try {
             // Eliminar el ciclo
@@ -132,7 +132,7 @@ export default function SchoolYearDashboard() {
             console.error('Error al eliminar el ciclo:', error);
             // El modal de confirmación mostrará el error
         } finally {
-            setIsSaving(false);
+            setIsProcessing(false);
         }
     }
 
@@ -150,12 +150,12 @@ export default function SchoolYearDashboard() {
 
     // Guardar ciclo (crear o actualizar)
     async function handleSaveCycle(cycleData: { name: string; startDate: string; endDate: string; status: string }) {
-        setIsSaving(true);
+        setIsProcessing(true);
         try {
             // Validar datos básicos
             if (!cycleData.name || !cycleData.startDate || !cycleData.endDate) {
                 alert('Por favor completa todos los campos requeridos');
-                setIsSaving(false);
+                setIsProcessing(false);
                 return;
             }
 
@@ -168,7 +168,7 @@ export default function SchoolYearDashboard() {
             console.error('Error al guardar el ciclo:', error);
             alert('Error al guardar el ciclo. Por favor intenta nuevamente.');
         } finally {
-            setIsSaving(false);
+            setIsProcessing(false);
         }
     }
 
@@ -243,21 +243,28 @@ export default function SchoolYearDashboard() {
                 onClose={closeModal}
                 onSave={handleSaveCycle}
                 selectedCycle={selectedCycle}
-                isSaving={isSaving}
+                isSaving={isProcessing}
                 currentCycles={cycles}
             />
 
             {/* Delete Confirmation Modal */}
             <DeleteConfirmModal
                 isOpen={isDeleteModalOpen}
-                onClose={() => {
-                    setIsDeleteModalOpen(false);
-                    setCycleToDelete(null);
-                }}
+                onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={confirmDelete}
                 itemName={cycleToDelete?.name || ''}
-                isDeleting={isSaving}
-                isActiveCycle={cycleToDelete?.status === '1'}
+                itemType="ciclo"
+                isDeleting={isProcessing}
+                isActiveItem={cycleToDelete?.status === '1'}
+                customMessages={{
+                    title: '¿Estás seguro?',
+                    confirmation: '¿Estás seguro de que deseas eliminar el ciclo ',
+                    recoveryInfo: 'Esta acción puede ser revertida más adelante desde la sección de ciclos eliminados.',
+                    warningTitle: '¡Atención!',
+                    warningMessage: 'Estás a punto de eliminar un ciclo escolar ACTIVO. Esta acción podría afectar negativamente al funcionamiento del sistema. Por favor, asegúrate de completar el ciclo escolar o activar otro ciclo antes de continuar.',
+                    errorTitle: '¡Error!',
+                    errorMessage: 'Ocurrió un error al intentar eliminar el ciclo escolar. Por favor, intenta nuevamente.',
+                }}
             />
         </div>
     );

@@ -8,13 +8,36 @@ import IconFA from '@/components/ui/IconFA';
 import { Modal } from '@/components/ui/modal';
 
 // Tipos
-interface DeleteConfirmModalProps {
+export interface DeleteConfirmModalProps {
     readonly isOpen: boolean;
     readonly onClose: () => void;
     readonly onConfirm: () => Promise<void>;
     readonly itemName: string;
+    readonly itemType: string;
     readonly isDeleting: boolean;
-    readonly isActiveCycle?: boolean;
+    readonly isActiveItem?: boolean;
+    readonly customMessages?: {
+        title?: string;
+        confirmation?: string;
+        warningTitle?: string;
+        warningMessage?: string;
+        errorTitle?: string;
+        errorMessage?: string;
+        recoveryInfo?: string;
+    };
+    readonly customColors?: {
+        activeItemClass?: string;
+        inactiveItemClass?: string;
+        activeIconColor?: string;
+        inactiveIconColor?: string;
+        buttonClass?: string;
+    };
+    readonly customIcons?: {
+        activeItemIcon?: string;
+        inactiveItemIcon?: string;
+        deleteIcon?: string;
+        loadingIcon?: string;
+    };
 }
 
 interface AlertState {
@@ -24,13 +47,24 @@ interface AlertState {
     message: string;
 }
 
+// Función auxiliar para determinar el artículo correcto según el tipo de ítem
+function getArticle(itemType: string): string {
+    if (itemType === 'ciclo') return 'el';
+    if (itemType === 'alumno') return 'al';
+    return 'la';
+}
+
 export default function DeleteConfirmModal({
     isOpen,
     onClose,
     onConfirm,
     itemName,
+    itemType,
     isDeleting,
-    isActiveCycle = false
+    isActiveItem = false,
+    customMessages,
+    customColors,
+    customIcons
 }: DeleteConfirmModalProps) {
     const [alertState, setAlertState] = useState<AlertState>({
         show: false,
@@ -38,6 +72,32 @@ export default function DeleteConfirmModal({
         title: '',
         message: ''
     });
+
+    // Valores por defecto
+    const title = customMessages?.title || 'Confirmar eliminación';
+    const confirmation = customMessages?.confirmation ||
+        `¿Estás seguro de que deseas eliminar ${getArticle(itemType)} ${itemType} `;
+    const warningTitle = customMessages?.warningTitle || '¡Atención!';
+    const warningMessage = customMessages?.warningMessage ||
+        `Estás a punto de eliminar un ${itemType} ACTIVO. Esta acción podría afectar negativamente al funcionamiento del sistema.`;
+    const errorTitle = customMessages?.errorTitle || 'Error';
+    const errorMessage = customMessages?.errorMessage ||
+        `Ocurrió un error al intentar eliminar ${getArticle(itemType)} ${itemType}. Por favor, intenta nuevamente.`;
+    const recoveryInfo = customMessages?.recoveryInfo ||
+        `Esta acción puede ser revertida más adelante desde la sección de ${itemType}s eliminados.`;
+
+    // Colores y clases
+    const activeItemClass = customColors?.activeItemClass || 'bg-warning-50 dark:bg-warning-500/15';
+    const inactiveItemClass = customColors?.inactiveItemClass || 'bg-error-50 dark:bg-error-500/15';
+    const activeIconColor = customColors?.activeIconColor || 'text-warning-500';
+    const inactiveIconColor = customColors?.inactiveIconColor || 'text-error-500';
+    const buttonClass = customColors?.buttonClass || `${isActiveItem ? 'bg-warning-500 hover:bg-warning-600' : 'bg-error-500 hover:bg-error-600'}`;
+
+    // Iconos
+    const activeItemIcon = customIcons?.activeItemIcon || 'circle-exclamation';
+    const inactiveItemIcon = customIcons?.inactiveItemIcon || 'triangle-exclamation';
+    const deleteIcon = customIcons?.deleteIcon || 'trash';
+    const loadingIcon = customIcons?.loadingIcon || 'spinner';
 
     // Efecto para cerrar automáticamente la alerta después de 5 segundos
     useEffect(() => {
@@ -54,12 +114,12 @@ export default function DeleteConfirmModal({
         try {
             await onConfirm();
         } catch (error) {
-            console.error('Error al eliminar:', error);
+            console.error(`Error al eliminar ${itemType}:`, error);
             setAlertState({
                 show: true,
                 variant: 'error',
-                title: 'Error',
-                message: 'Ocurrió un error al intentar eliminar el ciclo. Por favor, intenta nuevamente.'
+                title: errorTitle,
+                message: errorMessage
             });
         }
     }
@@ -73,30 +133,30 @@ export default function DeleteConfirmModal({
             <div className="flex flex-col px-2">
                 <div className="mb-4 text-center">
                     <div className="flex justify-center mb-4">
-                        <div className={`flex items-center justify-center w-16 h-16 ${isActiveCycle ? 'bg-warning-50 dark:bg-warning-500/15' : 'bg-error-50 dark:bg-error-500/15'} rounded-full`}>
+                        <div className={`flex items-center justify-center w-16 h-16 ${isActiveItem ? activeItemClass : inactiveItemClass} rounded-full`}>
                             <IconFA
-                                icon={isActiveCycle ? "circle-exclamation" : "triangle-exclamation"}
+                                icon={isActiveItem ? activeItemIcon : inactiveItemIcon}
                                 size="2xl"
-                                className={isActiveCycle ? "text-warning-500" : "text-error-500"}
+                                className={isActiveItem ? activeIconColor : inactiveIconColor}
                             />
                         </div>
                     </div>
 
                     <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
-                        Confirmar eliminación
+                        {title}
                     </h5>
 
                     <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                        ¿Estás seguro de que deseas eliminar el ciclo <span className="font-semibold">{itemName}</span>?
-                        Esta acción puede ser revertida más adelante desde la sección de ciclos eliminados.
+                        {confirmation}<span className="font-semibold">{itemName}</span>?
+                        {recoveryInfo && ` ${recoveryInfo}`}
                     </p>
 
-                    {isActiveCycle && (
+                    {isActiveItem && (
                         <div className="mt-4">
                             <Alert
                                 variant="warning"
-                                title="¡Atención!"
-                                message="Estás a punto de eliminar un ciclo escolar ACTIVO. Esta acción podría afectar negativamente al funcionamiento del sistema. Por favor, asegúrate de completar el ciclo escolar o activar otro ciclo antes de continuar."
+                                title={warningTitle}
+                                message={warningMessage}
                             />
                         </div>
                     )}
@@ -119,20 +179,21 @@ export default function DeleteConfirmModal({
                     >
                         <span className="font-outfit">Cancelar</span>
                     </Button>
+
                     <Button
                         onClick={handleConfirmDelete}
                         variant="primary"
-                        className={`sm:w-auto ${isActiveCycle ? 'bg-warning-500 hover:bg-warning-600' : 'bg-error-500 hover:bg-error-600'}`}
+                        className={`sm:w-auto ${buttonClass}`}
                         disabled={isDeleting}
                     >
                         {isDeleting ? (
                             <>
-                                <IconFA icon="spinner" spin className="mr-2" />
+                                <IconFA icon={loadingIcon} spin className="mr-2" />
                                 <span className="font-outfit">Eliminando...</span>
                             </>
                         ) : (
                             <>
-                                <IconFA icon="trash" className="mr-2" />
+                                <IconFA icon={deleteIcon} className="mr-2" />
                                 <span className="font-outfit">Eliminar</span>
                             </>
                         )}
@@ -141,4 +202,4 @@ export default function DeleteConfirmModal({
             </div>
         </Modal>
     );
-} 
+}
