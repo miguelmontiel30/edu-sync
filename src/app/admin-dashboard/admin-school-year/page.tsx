@@ -8,8 +8,8 @@ import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import CycleList from './components/CycleList';
 import DeletedCycleList from './components/DeletedCycleList';
 import CycleFormModal from './components/CycleFormModal';
-import Charts from './components/Charts';
 import MetricsGroup from '../core/Metrics/MetricsGroup';
+import BarChartsGroup from '../core/BarCharts/BarChartsGroup';
 import DeleteConfirmModal from '../core/Modals/DeleteConfirmModal';
 import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
 
@@ -209,6 +209,22 @@ export default function SchoolYearDashboard() {
         },
     ];
 
+    const chartConfigs = [
+        {
+            title: 'Promedio General',
+            dataKey: 'averageGrade',
+            color: '#10B981',
+            yAxisTitle: 'Promedio General',
+        },
+        {
+            title: 'Total de Alumnos',
+            dataKey: 'studentsCount',
+            color: '#465FFF',
+            yAxisTitle: 'Total de Alumnos',
+        },
+
+    ];
+
     return (
         <div className="mx-auto max-w-screen-2xl md:p-6">
             {/* Breadcrumb */}
@@ -218,7 +234,7 @@ export default function SchoolYearDashboard() {
             <MetricsChartsWrapper title="Estadísticas y Gráficos de Ciclos Escolares">
                 <MetricsGroup metricsConfig={metricsConfig} isLoading={isLoadingMetrics} isEmpty={cycles.length === 0} emptyMessage="No hay ciclos activos" />
 
-                <Charts cycles={cycles} isLoading={isLoadingCycles} />
+                <BarChartsGroup data={cycles} isLoading={isLoadingCycles} charts={chartConfigs} />
             </MetricsChartsWrapper>
 
             {/* Cycle List */}

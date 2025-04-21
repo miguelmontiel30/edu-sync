@@ -37,7 +37,10 @@ export default function CycleList({ cycles, isLoading, onEdit, onDelete, onAddNe
 
     // Manejar el ordenamiento desde el DataTable
     const handleSort = (field: string, direction: SortDirection) => {
+        // Ordenar los ciclos según el campo y dirección
         const sorted = sortCycles(filteredCycles, field as SortField, direction);
+
+        // Actualizar el estado de los ciclos filtrados
         setFilteredCycles(sorted);
     };
 
