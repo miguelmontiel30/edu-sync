@@ -8,8 +8,10 @@ import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import CycleList from './components/CycleList';
 import DeletedCycleList from './components/DeletedCycleList';
 import CycleFormModal from './components/CycleFormModal';
+import Charts from './components/Charts';
+import Metrics from './components/Metrics';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
-import MetricsAndChartsWrapper from './components/MetricsAndChartsWrapper';
+import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
 
 // Types and Services
 import { SchoolCycle } from './components/types';
@@ -187,10 +189,11 @@ export default function SchoolYearDashboard() {
             <PageBreadcrumb pageTitle="Ciclos escolares" />
 
             {/* Metrics and Charts Wrapper */}
-            <MetricsAndChartsWrapper
-                cycles={cycles}
-                isLoading={isLoadingMetrics}
-            />
+            <MetricsChartsWrapper title="Estadísticas y Gráficos de Ciclos Escolares">
+                <Metrics cycles={cycles} isLoading={isLoadingMetrics} />
+
+                <Charts cycles={cycles} isLoading={isLoadingCycles} />
+            </MetricsChartsWrapper>
 
             {/* Cycle List */}
             <CycleList
