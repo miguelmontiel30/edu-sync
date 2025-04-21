@@ -9,13 +9,16 @@ import CycleList from './components/CycleList';
 import DeletedCycleList from './components/DeletedCycleList';
 import CycleFormModal from './components/CycleFormModal';
 import Charts from './components/Charts';
-import Metrics from './components/Metrics';
 import DeleteConfirmModal from './components/DeleteConfirmModal';
 import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
+import MetricsGroup from '../core/Metrics/MetricsGroup';
 
 // Types and Services
+import { MetricConfig } from '../core/Metrics/types';
 import { SchoolCycle } from './components/types';
 import { loadSchoolYearsBySchoolId, loadDeletedCycles, saveCycle, deleteCycle, restoreCycle, } from './components/services';
+
+// Hooks
 import { useSession } from '@/hooks/useSession';
 
 export default function SchoolYearDashboard() {
@@ -183,6 +186,29 @@ export default function SchoolYearDashboard() {
         }
     }
 
+    const metricsConfig: MetricConfig[] = [
+        {
+            id: 'total-cycles',
+            icon: 'calendar',
+            title: 'Total de Ciclos',
+            value: cycles.length,
+            badgeColor: 'primary',
+            badgeText: `${cycles.filter(cycle => cycle.status === '').length} ciclos activos`,
+        },
+        {
+            id: 'total-students',
+            icon: 'users',
+            title: 'Total de Alumnos',
+            value: cycles.reduce((acc, cycle) => acc + cycle.studentsCount, 0),
+        },
+        {
+            id: 'average-grade',
+            icon: 'graduation-cap',
+            title: 'Promedio General',
+            value: cycles.reduce((acc, cycle) => acc + cycle.averageGrade, 0) / cycles.length,
+        },
+    ];
+
     return (
         <div className="mx-auto max-w-screen-2xl md:p-6">
             {/* Breadcrumb */}
@@ -190,7 +216,7 @@ export default function SchoolYearDashboard() {
 
             {/* Metrics and Charts Wrapper */}
             <MetricsChartsWrapper title="Estadísticas y Gráficos de Ciclos Escolares">
-                <Metrics cycles={cycles} isLoading={isLoadingMetrics} />
+                <MetricsGroup metricsConfig={metricsConfig} isLoading={isLoadingMetrics} isEmpty={cycles.length === 0} emptyMessage="No hay ciclos activos" />
 
                 <Charts cycles={cycles} isLoading={isLoadingCycles} />
             </MetricsChartsWrapper>
