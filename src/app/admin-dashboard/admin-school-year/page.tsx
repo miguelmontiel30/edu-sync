@@ -9,13 +9,13 @@ import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import CycleList from './components/CycleList';
 import CycleFormModal from './components/CycleFormModal';
 
-
 // Core
 import Badge from '@/components/core/badge/Badge';
 import MetricsGroup from '../core/Metrics/MetricsGroup';
 import BarChartsGroup from '../core/BarCharts/BarChartsGroup';
 import DeleteConfirmModal from '../core/Modals/DeleteConfirmModal';
 import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
+import DeletedItemsList, { DeletedItemsListConfig } from '../core/Tables/DeletedItemsList';
 
 // Types and Services
 import { MetricConfig } from '../core/Metrics/types';
@@ -27,7 +27,6 @@ import { getStatusColor } from './components/utils';
 
 // Hooks
 import { useSession } from '@/hooks/useSession';
-import DeletedItemsList, { DeletedItemsListConfig } from '../core/Tables/DeletedItemsList';
 
 
 export default function SchoolYearDashboard() {
