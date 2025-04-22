@@ -39,6 +39,34 @@ export interface TeacherForm {
     image_url: string;
 }
 
-export type SortField = 'name' | 'email' | 'phone' | 'groupsCount' | 'subjectsCount';
+// Tipos para ordenamiento y filtrado
+export type SortField =
+    // Campos comunes
+    | 'name'
+    | 'groupsCount'
+    // Campos específicos de profesores
+    | 'email'
+    | 'phone'
+    | 'subjectsCount'
+    | 'gender'
+    // Campos específicos de ciclos escolares
+    | 'startDate'
+    | 'endDate'
+    | 'studentsCount'
+    | 'averageGrade'
+    | 'status';
 
 export type SortDirection = 'asc' | 'desc';
+
+// También mantenemos los tipos originales para ciclos escolares para compatibilidad
+export interface SchoolCycle {
+    id: string;
+    name: string;
+    startDate: string;
+    endDate: string;
+    groupsCount: number;
+    studentsCount: number;
+    averageGrade: number;
+    statusId: string;
+    statusName: string;
+}
