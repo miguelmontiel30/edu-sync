@@ -348,9 +348,7 @@ export default function SchoolYearDashboard() {
                 isLoading={isLoadingDeleted}
                 onRestore={handleRestore}
                 config={{
-                    title: 'Ciclos eliminados',
-                    description: 'Lista de ciclos eliminados',
-                    columns: cycleListConfig.columns,
+                    ...cycleListConfig,
                 }}
                 className="mt-6"
             />
