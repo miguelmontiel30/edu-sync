@@ -1,7 +1,7 @@
 import {supabaseClient} from '@/services/config/supabaseClient';
 import {Teacher, TeacherForm} from './types';
 
-export async function loadTeachers(): Promise<Teacher[]> {
+export async function loadTeachers(schoolId: number): Promise<Teacher[]> {
     try {
         // Consultar profesores activos
         const {data, error} = await supabaseClient
@@ -13,6 +13,7 @@ export async function loadTeachers(): Promise<Teacher[]> {
             `,
             )
             .eq('delete_flag', false)
+            .eq('school_id', schoolId)
             .order('created_at', {ascending: false});
 
         if (error) throw error;
@@ -68,7 +69,7 @@ export async function loadTeachers(): Promise<Teacher[]> {
     }
 }
 
-export async function loadDeletedTeachers(): Promise<Teacher[]> {
+export async function loadDeletedTeachers(schoolId: number): Promise<Teacher[]> {
     try {
         // Consultar profesores eliminados
         const {data, error} = await supabaseClient
@@ -80,6 +81,7 @@ export async function loadDeletedTeachers(): Promise<Teacher[]> {
             `,
             )
             .eq('delete_flag', true)
+            .eq('school_id', schoolId)
             .order('deleted_at', {ascending: false});
 
         if (error) throw error;
