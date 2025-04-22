@@ -3,11 +3,15 @@
 // React
 import { useState, useEffect } from 'react';
 
+
 // Components
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import CycleList from './components/CycleList';
-import DeletedCycleList from './components/DeletedCycleList';
 import CycleFormModal from './components/CycleFormModal';
+
+
+// Core
+import Badge from '@/components/core/badge/Badge';
 import MetricsGroup from '../core/Metrics/MetricsGroup';
 import BarChartsGroup from '../core/BarCharts/BarChartsGroup';
 import DeleteConfirmModal from '../core/Modals/DeleteConfirmModal';
@@ -18,8 +22,13 @@ import { MetricConfig } from '../core/Metrics/types';
 import { SchoolCycle } from './components/types';
 import { loadSchoolYearsBySchoolId, loadDeletedCycles, saveCycle, deleteCycle, restoreCycle, } from './components/services';
 
+// Utils
+import { getStatusColor } from './components/utils';
+
 // Hooks
 import { useSession } from '@/hooks/useSession';
+import DeletedItemsList, { DeletedItemsListConfig } from '../core/Tables/DeletedItemsList';
+
 
 export default function SchoolYearDashboard() {
     // Estados
@@ -225,6 +234,94 @@ export default function SchoolYearDashboard() {
 
     ];
 
+    // Configuración de la lista
+    const cycleListConfig: DeletedItemsListConfig<SchoolCycle> = {
+        title: 'Ciclos Escolares Eliminados',
+        description: 'Historial de ciclos escolares que han sido eliminados del sistema.',
+        defaultSortField: 'name',
+        defaultSortDirection: 'asc',
+        searchPlaceholder: 'Buscar ciclos eliminados...',
+        noDataMessage: 'No hay ciclos escolares eliminados',
+        searchNoResultsMessage: 'No se encontraron ciclos escolares que coincidan con la búsqueda',
+        buttonLabel: 'Ciclos Eliminados',
+        itemsPerPage: 5,
+        maxHeight: '400px',
+        columns: [
+            {
+                key: 'name',
+                header: 'Nombre',
+                sortable: true,
+                render: (cycle) => (
+                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                        {cycle.name}
+                    </span>
+                )
+            },
+            {
+                key: 'startDate',
+                header: 'Fecha de Inicio',
+                sortable: true,
+                render: (cycle) => (
+                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                        {new Date(cycle.startDate).toLocaleDateString()}
+                    </span>
+                )
+            },
+            {
+                key: 'endDate',
+                header: 'Fecha de Fin',
+                sortable: true,
+                render: (cycle) => (
+                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                        {new Date(cycle.endDate).toLocaleDateString()}
+                    </span>
+                )
+            },
+            {
+                key: 'groupsCount',
+                header: 'Grupos',
+                render: (cycle) => (
+                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                        {cycle.groupsCount}
+                    </span>
+                )
+            },
+            {
+                key: 'studentsCount',
+                header: 'Alumnos',
+                render: (cycle) => (
+                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                        {cycle.studentsCount}
+                    </span>
+                )
+            },
+            {
+                key: 'averageGrade',
+                header: 'Promedio',
+                render: (cycle) => (
+                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                        {cycle.averageGrade.toFixed(2)}
+                    </span>
+                )
+            },
+            {
+                key: 'status',
+                header: 'Estado',
+                sortable: true,
+                render: (cycle) => (
+                    <Badge
+                        size="sm"
+                        color={getStatusColor(cycle.status)}
+                    >
+                        <span className="font-outfit">
+                            {cycle.statusName}
+                        </span>
+                    </Badge>
+                )
+            }
+        ]
+    };
+
     return (
         <div className="mx-auto max-w-screen-2xl md:p-6">
             {/* Breadcrumb */}
@@ -247,10 +344,16 @@ export default function SchoolYearDashboard() {
             />
 
             {/* Deleted Cycles */}
-            <DeletedCycleList
-                cycles={deletedCycles}
+            <DeletedItemsList
+                items={deletedCycles}
                 isLoading={isLoadingDeleted}
                 onRestore={handleRestore}
+                config={{
+                    title: 'Ciclos eliminados',
+                    description: 'Lista de ciclos eliminados',
+                    columns: cycleListConfig.columns,
+                }}
+                className="mt-6"
             />
 
             {/* Form Modal */}
