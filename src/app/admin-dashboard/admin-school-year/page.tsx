@@ -24,7 +24,7 @@ import ItemsList, { ActionButton, ItemsListConfig } from '../core/Tables/ItemsLi
 // Types and Services
 import { ErrorAlert, SchoolCycle, CYCLE_STATUS } from './module-utils/types';
 import { MetricConfig } from '../core/Metrics/types';
-import { loadSchoolYearsBySchoolId, loadDeletedCycles, saveCycle, deleteCycle, restoreCycle, } from './module-utils/services';
+import { loadAllSchoolYearData, saveCycle, deleteCycle, restoreCycle, } from './module-utils/services';
 
 // Utils
 import { getStatusColor, formatDate, validateCycleData } from './module-utils/utils';
@@ -38,13 +38,17 @@ export default function SchoolYearDashboard() {
     const [deletedCycles, setDeletedCycles] = useState<SchoolCycle[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedCycle, setSelectedCycle] = useState<SchoolCycle | null>(null);
-    const [isLoadingCycles, setIsLoadingCycles] = useState(true);
-    const [isLoadingDeleted, setIsLoadingDeleted] = useState(true);
-    const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
-    const [isProcessing, setIsProcessing] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [cycleToDelete, setCycleToDelete] = useState<SchoolCycle | null>(null);
     const [errorAlert, setErrorAlert] = useState<ErrorAlert | null>(null);
+
+    // Loading states
+    const [loadingState, setLoadingState] = useState({
+        cycles: true,
+        metrics: true,
+        deleted: true,
+        processing: false
+    });
 
     // Obtener datos de sesion en cache del usuario
     const { session } = useSession();
@@ -58,26 +62,26 @@ export default function SchoolYearDashboard() {
 
     // Función para cargar todos los ciclos
     async function loadAllCycles() {
-        await Promise.all([
-            fetchSchoolYears(),
-            fetchDeletedCycles()
-        ]);
-    }
+        // Establecer todos los estados de carga a true
+        setLoadingState(prev => ({
+            ...prev,
+            cycles: true,
+            metrics: true,
+            deleted: true
+        }));
 
-    // Cargar ciclos activos
-    async function fetchSchoolYears() {
-        setIsLoadingCycles(true);
-        setIsLoadingMetrics(true);
         try {
             if (!session?.school_id) {
                 throw new Error('No se encontró el ID de la escuela en la sesión');
             }
 
-            // Cargar los ciclos activos de la escuela
-            const data = await loadSchoolYearsBySchoolId(session.school_id);
+            // Cargar todos los ciclos en una sola llamada
+            const { active, deleted } = await loadAllSchoolYearData(session.school_id);
 
-            // Actualizar el estado local con los datos cargados
-            setCycles(data);
+            // Actualizar los estados
+            setCycles(active);
+            setDeletedCycles(deleted);
+
             // Limpiar errores si la carga es exitosa
             setErrorAlert(null);
         } catch (error) {
@@ -89,31 +93,13 @@ export default function SchoolYearDashboard() {
                 message: 'Por favor recarga la página.'
             });
         } finally {
-            setIsLoadingCycles(false);
-            setIsLoadingMetrics(false);
-        }
-    }
-
-    // Cargar ciclos eliminados
-    async function fetchDeletedCycles() {
-        setIsLoadingDeleted(true);
-        try {
-            if (!session?.school_id) {
-                throw new Error('No se encontró el ID de la escuela en la sesión');
-            }
-
-            const data = await loadDeletedCycles(session.school_id);
-            setDeletedCycles(data);
-        } catch (error) {
-            console.error('Error al cargar los ciclos eliminados:', error);
-
-            // Mostrar alerta de error
-            setErrorAlert({
-                title: 'Error al cargar los ciclos eliminados',
-                message: 'No se pudieron cargar los ciclos eliminados. Por favor recarga la página.'
-            });
-        } finally {
-            setIsLoadingDeleted(false);
+            // Restaurar todos los estados de carga a false
+            setLoadingState(prev => ({
+                ...prev,
+                cycles: false,
+                metrics: false,
+                deleted: false
+            }));
         }
     }
 
@@ -140,7 +126,7 @@ export default function SchoolYearDashboard() {
     async function confirmDelete() {
         if (!cycleToDelete) return;
 
-        setIsProcessing(true);
+        setLoadingState(prev => ({ ...prev, processing: true }));
 
         try {
             // Eliminar el ciclo
@@ -161,7 +147,7 @@ export default function SchoolYearDashboard() {
                 message: 'No se pudo eliminar el ciclo. Por favor intenta nuevamente.'
             });
         } finally {
-            setIsProcessing(false);
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     }
 
@@ -179,7 +165,8 @@ export default function SchoolYearDashboard() {
 
     // Guardar ciclo (crear o actualizar)
     async function handleSaveCycle(cycleData: { name: string; startDate: string; endDate: string; status: string }) {
-        setIsProcessing(true);
+        setLoadingState(prev => ({ ...prev, processing: true }));
+
         try {
             // Validar datos
             const validation = validateCycleData(cycleData, cycles, selectedCycle?.id);
@@ -188,14 +175,14 @@ export default function SchoolYearDashboard() {
                     title: 'Error de validación',
                     message: validation.errorMessage || 'Por favor verifica los datos ingresados.'
                 });
-                setIsProcessing(false);
+                setLoadingState(prev => ({ ...prev, processing: false }));
                 return;
             }
 
             await saveCycle(cycleData, selectedCycle?.id);
 
             // Actualizar estado local
-            await fetchSchoolYears();
+            await loadAllCycles();
             closeModal();
         } catch (error) {
             console.error('Error al guardar el ciclo:', error);
@@ -204,12 +191,14 @@ export default function SchoolYearDashboard() {
                 message: 'No se pudo guardar el ciclo. Por favor intenta nuevamente.'
             });
         } finally {
-            setIsProcessing(false);
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     }
 
     // Restaurar ciclo eliminado
     async function handleRestore(id: number) {
+        setLoadingState(prev => ({ ...prev, processing: true }));
+
         try {
             // Restauramos el ciclo
             await restoreCycle(id);
@@ -222,34 +211,45 @@ export default function SchoolYearDashboard() {
                 title: 'Error al restaurar el ciclo',
                 message: 'No se pudo restaurar el ciclo. Por favor intenta nuevamente.'
             });
+        } finally {
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     }
 
-    // Calcular métricas de manera segura con useMemo
+    // Calcular métricas de manera segura con useMemo y valores atómicos
+    const totalCycles = useMemo(() => cycles.length, [cycles]);
+    const activeCycles = useMemo(() => cycles.filter(cycle => cycle.status === CYCLE_STATUS.ACTIVE).length, [cycles]);
+    const totalStudents = useMemo(() => cycles.reduce((acc, cycle) => acc + cycle.studentsCount, 0), [cycles]);
+    const averageGrade = useMemo(() =>
+        cycles.length > 0
+            ? cycles.reduce((acc, cycle) => acc + cycle.averageGrade, 0) / cycles.length
+            : 0,
+        [cycles]
+    );
+
+    // Configurar métricas con valores memorizados
     const metricsConfig: MetricConfig[] = useMemo(() => [
         {
             id: 'total-cycles',
             icon: 'calendar',
             title: 'Total de Ciclos',
-            value: cycles.length,
+            value: totalCycles,
             badgeColor: 'primary',
-            badgeText: `${cycles.filter(cycle => cycle.status === CYCLE_STATUS.ACTIVE).length} ciclos activos`,
+            badgeText: `${activeCycles} ciclos activos`,
         },
         {
             id: 'total-students',
             icon: 'users',
             title: 'Total de Alumnos',
-            value: cycles.reduce((acc, cycle) => acc + cycle.studentsCount, 0),
+            value: totalStudents,
         },
         {
             id: 'average-grade',
             icon: 'graduation-cap',
             title: 'Promedio General',
-            value: cycles.length > 0
-                ? cycles.reduce((acc, cycle) => acc + cycle.averageGrade, 0) / cycles.length
-                : 0,
+            value: averageGrade,
         },
-    ], [cycles]);
+    ], [totalCycles, activeCycles, totalStudents, averageGrade]);
 
     const chartConfigs = [
         {
@@ -479,16 +479,25 @@ export default function SchoolYearDashboard() {
 
             {/* Metrics and Charts Wrapper */}
             <MetricsChartsWrapper title="Estadísticas y Gráficos de Ciclos Escolares">
-                <MetricsGroup metricsConfig={metricsConfig} isLoading={isLoadingMetrics} isEmpty={cycles.length === 0} emptyMessage="No hay ciclos activos" />
+                <MetricsGroup
+                    metricsConfig={metricsConfig}
+                    isLoading={loadingState.metrics}
+                    isEmpty={cycles.length === 0}
+                    emptyMessage="No hay ciclos activos"
+                />
 
-                <BarChartsGroup data={cycles} isLoading={isLoadingCycles} charts={chartConfigs} />
+                <BarChartsGroup
+                    data={cycles}
+                    isLoading={loadingState.cycles}
+                    charts={chartConfigs}
+                />
             </MetricsChartsWrapper>
 
             {/* Cycle List */}
             <ItemsList
                 items={cycles}
                 columns={cycleColumns}
-                isLoading={isLoadingCycles}
+                isLoading={loadingState.cycles}
                 onAddNew={openModal}
                 config={cycleListConfig}
                 actionButtons={cycleActionButtons}
@@ -499,7 +508,7 @@ export default function SchoolYearDashboard() {
                 className="mt-6"
                 items={deletedCycles}
                 onRestore={handleRestore}
-                isLoading={isLoadingDeleted}
+                isLoading={loadingState.deleted}
                 config={deletedCycleListConfig}
             />
 
@@ -509,7 +518,7 @@ export default function SchoolYearDashboard() {
                 onClose={closeModal}
                 onSave={handleSaveCycle}
                 selectedCycle={selectedCycle}
-                isSaving={isProcessing}
+                isSaving={loadingState.processing}
                 currentCycles={cycles}
             />
 
@@ -520,7 +529,7 @@ export default function SchoolYearDashboard() {
                 onConfirm={confirmDelete}
                 itemName={cycleToDelete?.name || ''}
                 itemType="ciclo"
-                isDeleting={isProcessing}
+                isDeleting={loadingState.processing}
                 isActiveItem={cycleToDelete?.status === CYCLE_STATUS.ACTIVE}
                 customMessages={deleteConfirmModalConfig}
             />

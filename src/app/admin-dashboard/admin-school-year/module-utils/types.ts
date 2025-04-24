@@ -8,6 +8,7 @@ export interface SchoolCycle {
     groupsCount: number;
     studentsCount: number;
     averageGrade: number;
+    deleteFlag?: boolean;
 }
 
 export type SortField =
@@ -49,6 +50,8 @@ export interface DatabaseSchoolYear {
         code: string;
     };
     groups?: DatabaseGroup[];
+    delete_flag?: boolean;
+    deleted_at?: string | null;
 }
 
 export interface DatabaseGroup {
