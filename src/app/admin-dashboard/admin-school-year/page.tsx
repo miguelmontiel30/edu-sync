@@ -5,25 +5,26 @@ import { useState, useEffect } from 'react';
 
 
 // Components
-import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import CycleList from './components/CycleList';
 import CycleFormModal from './components/CycleFormModal';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 
 // Core
+import { Column } from '@/components/core/table/DataTable';
 import Badge from '@/components/core/badge/Badge';
 import MetricsGroup from '../core/Metrics/MetricsGroup';
 import BarChartsGroup from '../core/BarCharts/BarChartsGroup';
 import DeleteConfirmModal from '../core/Modals/DeleteConfirmModal';
 import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
 import DeletedItemsList, { DeletedItemsListConfig } from '../core/Tables/DeletedItemsList';
+import ItemsList, { ActionButton, ItemsListConfig } from '../core/Tables/ItemsList';
 
 // Types and Services
+import { SchoolCycle } from './module-utils/types';
 import { MetricConfig } from '../core/Metrics/types';
-import { SchoolCycle } from './components/types';
-import { loadSchoolYearsBySchoolId, loadDeletedCycles, saveCycle, deleteCycle, restoreCycle, } from './components/services';
+import { loadSchoolYearsBySchoolId, loadDeletedCycles, saveCycle, deleteCycle, restoreCycle, } from './module-utils/services';
 
 // Utils
-import { getStatusColor } from './components/utils';
+import { getStatusColor } from './module-utils/utils';
 
 // Hooks
 import { useSession } from '@/hooks/useSession';
@@ -234,7 +235,7 @@ export default function SchoolYearDashboard() {
     ];
 
     // Configuración de la lista
-    const cycleListConfig: DeletedItemsListConfig<SchoolCycle> = {
+    const deletedCycleListConfig: DeletedItemsListConfig<SchoolCycle> = {
         title: 'Ciclos Escolares Eliminados',
         description: 'Historial de ciclos escolares que han sido eliminados del sistema.',
         defaultSortField: 'name',
@@ -321,6 +322,115 @@ export default function SchoolYearDashboard() {
         ]
     };
 
+    const cycleColumns: Column<SchoolCycle>[] = [
+        {
+            key: 'name',
+            header: 'Nombre',
+            sortable: true,
+            render: (cycle: SchoolCycle) => (
+                <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                    {cycle.name}
+                </span>
+            )
+        },
+        {
+            key: 'startDate',
+            header: 'Fecha de Inicio',
+            sortable: true,
+            render: (cycle: SchoolCycle) => (
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    {new Date(cycle.startDate).toLocaleDateString()}
+                </span>
+            )
+        },
+        {
+            key: 'endDate',
+            header: 'Fecha de Fin',
+            sortable: true,
+            render: (cycle: SchoolCycle) => (
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    {new Date(cycle.endDate).toLocaleDateString()}
+                </span>
+            )
+        },
+        {
+            key: 'groupsCount',
+            header: 'Grupos',
+            sortable: true
+        },
+        {
+            key: 'studentsCount',
+            header: 'Alumnos',
+            sortable: true
+        },
+        {
+            key: 'averageGrade',
+            header: 'Promedio',
+            sortable: true,
+            render: (cycle: SchoolCycle) => (
+                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    {cycle.averageGrade.toFixed(2)}
+                </span>
+            )
+        },
+        {
+            key: 'status',
+            header: 'Estado',
+            sortable: true,
+            render: (cycle: SchoolCycle) => (
+                <Badge
+                    size="sm"
+                    color={getStatusColor(cycle.status)}
+                >
+                    <span className="font-outfit">
+                        {cycle.statusName}
+                    </span>
+                </Badge>
+            )
+        }
+    ];
+
+    const cycleActionButtons: ActionButton[] = [
+        {
+            label: 'Editar',
+            icon: 'calendar-pen',
+            iconStyle: 'duotone',
+            variant: 'outline',
+            onClick: (id) => handleEdit(Number(id))
+        },
+        {
+            label: 'Eliminar',
+            icon: 'calendar-xmark',
+            iconStyle: 'duotone',
+            variant: 'outline',
+            onClick: (id) => handleDelete(Number(id))
+        }
+    ];
+
+    const cycleListConfig: ItemsListConfig<SchoolCycle> = {
+        title: 'Lista de ciclos escolares',
+        description: 'Aquí podrás ver todos los ciclos escolares registrados, su información y gestionarlos. Puedes crear nuevos ciclos, editar los existentes o eliminarlos según sea necesario.',
+        addButtonLabel: 'Nuevo Ciclo Escolar',
+        addButtonIcon: 'calendar-pen',
+        noDataMessage: 'No se encontraron ciclos escolares.',
+        searchPlaceholder: 'Buscar ciclos...',
+        searchNoResultsMessage: 'No se encontraron ciclos que coincidan con la búsqueda.',
+        defaultSortField: 'name',
+        defaultSortDirection: 'asc',
+        itemsPerPage: 10,
+        searchableFields: ['name', 'status', 'statusName']
+    };
+
+    const deleteConfirmModalConfig = {
+        title: '¿Estás seguro?',
+        confirmation: '¿Estás seguro de que deseas eliminar el ciclo ',
+        recoveryInfo: 'Esta acción puede ser revertida más adelante desde la sección de ciclos eliminados.',
+        warningTitle: '¡Atención!',
+        warningMessage: 'Estás a punto de eliminar un ciclo escolar ACTIVO. Esta acción podría afectar negativamente al funcionamiento del sistema. Por favor, asegúrate de completar el ciclo escolar o activar otro ciclo antes de continuar.',
+        errorTitle: '¡Error!',
+        errorMessage: 'Ocurrió un error al intentar eliminar el ciclo escolar. Por favor, intenta nuevamente.',
+    };
+
     return (
         <div className="mx-auto max-w-screen-2xl md:p-6">
             {/* Breadcrumb */}
@@ -334,12 +444,13 @@ export default function SchoolYearDashboard() {
             </MetricsChartsWrapper>
 
             {/* Cycle List */}
-            <CycleList
-                cycles={cycles}
+            <ItemsList
+                items={cycles}
+                columns={cycleColumns}
                 isLoading={isLoadingCycles}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
                 onAddNew={openModal}
+                config={cycleListConfig}
+                actionButtons={cycleActionButtons}
             />
 
             {/* Deleted Cycles */}
@@ -348,7 +459,7 @@ export default function SchoolYearDashboard() {
                 isLoading={isLoadingDeleted}
                 onRestore={handleRestore}
                 config={{
-                    ...cycleListConfig,
+                    ...deletedCycleListConfig,
                 }}
                 className="mt-6"
             />
@@ -372,15 +483,7 @@ export default function SchoolYearDashboard() {
                 itemType="ciclo"
                 isDeleting={isProcessing}
                 isActiveItem={cycleToDelete?.status === '1'}
-                customMessages={{
-                    title: '¿Estás seguro?',
-                    confirmation: '¿Estás seguro de que deseas eliminar el ciclo ',
-                    recoveryInfo: 'Esta acción puede ser revertida más adelante desde la sección de ciclos eliminados.',
-                    warningTitle: '¡Atención!',
-                    warningMessage: 'Estás a punto de eliminar un ciclo escolar ACTIVO. Esta acción podría afectar negativamente al funcionamiento del sistema. Por favor, asegúrate de completar el ciclo escolar o activar otro ciclo antes de continuar.',
-                    errorTitle: '¡Error!',
-                    errorMessage: 'Ocurrió un error al intentar eliminar el ciclo escolar. Por favor, intenta nuevamente.',
-                }}
+                customMessages={deleteConfirmModalConfig}
             />
         </div>
     );

@@ -1,25 +1,23 @@
 // React
 import { useState, useEffect } from 'react';
 
-// Types
-import { SchoolCycle } from './types';
-
-// Hooks personalizados
-import { useStatusOptions } from '@/hooks/useStatusData';
-
 // Componentes UI
-import Alert from '@/components/core/alert/Alert';
-import Button from '@/components/core/button/Button';
 import IconFA from '@/components/ui/IconFA';
 import { Modal } from '@/components/ui/modal';
+import Alert from '@/components/core/alert/Alert';
+import Button from '@/components/core/button/Button';
 
 // Componentes de formulario
 import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import Select from '@/components/form/Select';
 
-// Utils
-import { mapStatusCodeToId, mapStatusIdToCode } from './utils';
+// Types & Utils
+import { SchoolCycle } from '../module-utils/types';
+import { mapStatusCodeToId, mapStatusIdToCode } from '../module-utils/utils';
+
+// Hooks
+import { useStatusOptions } from '@/hooks/useStatusData';
 
 interface CycleFormModalProps {
     readonly isOpen: boolean;
