@@ -1,6 +1,27 @@
+// Services
 import {supabaseClient} from '@/services/config/supabaseClient';
-import {SchoolCycle} from './types';
 import statusService from '@/services/status/statusService';
+
+// Types
+import {CycleData, DatabaseGroup, DatabaseSchoolYear, SchoolCycle} from './types';
+
+// Función auxiliar para extraer ids de grupos y estudiantes
+function extractGroupAndStudentData(groups: DatabaseGroup[]) {
+    const groupIds: number[] = [];
+    const studentIds = new Set<number>();
+
+    groups.forEach(group => {
+        groupIds.push(group.group_id);
+
+        const studentGroups = group.student_groups || [];
+
+        studentGroups.forEach(sg => {
+            studentIds.add(sg.student_id);
+        });
+    });
+
+    return {groupIds, studentIds};
+}
 
 // Función auxiliar para calcular la calificación promedio
 async function calculateAverageGrade(groupIds: number[]): Promise<number> {
@@ -44,25 +65,8 @@ async function calculateAverageGrade(groupIds: number[]): Promise<number> {
     return gradesCount > 0 ? Number((totalGrades / gradesCount).toFixed(2)) : 0;
 }
 
-// Función auxiliar para contar estudiantes y obtener IDs de grupos
-function extractGroupAndStudentData(groups: any[]): {studentIds: Set<number>; groupIds: number[]} {
-    const studentIds = new Set<number>();
-    const groupIds: number[] = [];
-
-    for (const group of groups) {
-        groupIds.push(group.group_id);
-        const studentGroups = group.student_groups || [];
-
-        for (const sg of studentGroups) {
-            if (sg.student_id) studentIds.add(sg.student_id);
-        }
-    }
-
-    return {studentIds, groupIds};
-}
-
 // Función para formatear los datos del ciclo escolar
-async function formatCycleData(cycle: any): Promise<SchoolCycle> {
+async function formatCycleData(cycle: DatabaseSchoolYear): Promise<SchoolCycle> {
     const groups = cycle.groups || [];
     const {studentIds, groupIds} = extractGroupAndStudentData(groups);
     const averageGrade = await calculateAverageGrade(groupIds);
@@ -146,20 +150,28 @@ export async function loadDeletedCycles(schoolId: number): Promise<SchoolCycle[]
     }
 }
 
-export async function saveCycle(
-    cycle: {
-        name: string;
-        startDate: string;
-        endDate: string;
-        status: string;
-    },
-    cycleId?: number,
-): Promise<void> {
+export async function saveCycle(cycle: CycleData, cycleId?: number): Promise<void> {
     try {
-        // Validar que todos los campos estén completados
-        if (!cycle.name || !cycle.startDate || !cycle.endDate || !cycle.status) {
-            throw new Error('Por favor completa todos los campos');
+        // Obtener el usuario de la sesión actual
+        const {data: sessionData} = await supabaseClient.auth.getSession();
+
+        // Validar que existe una sesión con un usuario válido
+        if (!sessionData?.session?.user) {
+            throw new Error('No hay una sesión activa o usuario válido');
         }
+
+        // Obtener el ID de la escuela del usuario
+        const {data: userData, error: userError} = await supabaseClient
+            .from('users')
+            .select('school_id')
+            .eq('user_id', sessionData.session.user.id)
+            .single();
+
+        if (userError || !userData?.school_id) {
+            throw new Error('No se pudo obtener el ID de la escuela del usuario');
+        }
+
+        const schoolId = userData.school_id;
 
         if (cycleId) {
             // Actualizar ciclo existente
@@ -176,9 +188,6 @@ export async function saveCycle(
 
             if (error) throw error;
         } else {
-            // Obtener el school_id del usuario actual (esto debe ser implementado según la lógica de autenticación)
-            const schoolId = 1; // Por defecto usamos 1, pero debe ser dinámico en la implementación real
-
             // Crear nuevo ciclo
             const {error} = await supabaseClient
                 .from('school_years')
@@ -231,7 +240,7 @@ export async function restoreCycle(id: number): Promise<void> {
 
         if (error) throw error;
     } catch (error) {
-        console.error('Error al restaurar el ciclo:', error);
+        console.error('Error al restaurar el ciclo escolar:', error);
         throw error;
     }
 }

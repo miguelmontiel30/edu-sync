@@ -1,4 +1,4 @@
-import {SchoolCycle, SortField, SortDirection} from '../module-utils/types';
+import {SchoolCycle, SortField, SortDirection, CYCLE_STATUS} from '../module-utils/types';
 
 // Función para ordenar los ciclos
 export const sortCycles = (
@@ -91,4 +91,51 @@ export const mapStatusCodeToId = (code: string): string => {
         default:
             return '';
     }
+};
+
+// Funciones utilitarias
+export const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString();
+};
+
+// Función de validación de ciclos
+export const validateCycleData = (
+    cycleData: {name: string; startDate: string; endDate: string; status: string},
+    currentCycles: SchoolCycle[] = [],
+    selectedCycleId?: number,
+): {isValid: boolean; errorMessage?: string} => {
+    // Validar campos requeridos
+    if (!cycleData.name || !cycleData.startDate || !cycleData.endDate || !cycleData.status) {
+        return {
+            isValid: false,
+            errorMessage: 'Por favor, complete todos los campos requeridos.',
+        };
+    }
+
+    // Validar fechas
+    if (new Date(cycleData.startDate) >= new Date(cycleData.endDate)) {
+        return {
+            isValid: false,
+            errorMessage: 'La fecha de inicio debe ser anterior a la fecha de fin.',
+        };
+    }
+
+    // Validar que no haya más de un ciclo activo
+    if (cycleData.status === CYCLE_STATUS.ACTIVE) {
+        const hasActiveCycle = currentCycles.some(
+            cycle =>
+                cycle.status === CYCLE_STATUS.ACTIVE &&
+                (!selectedCycleId || cycle.id !== selectedCycleId),
+        );
+
+        if (hasActiveCycle) {
+            return {
+                isValid: false,
+                errorMessage:
+                    'Lo sentimos, pero ya existe un ciclo escolar activo. No es posible tener más de un ciclo activo al mismo tiempo.',
+            };
+        }
+    }
+
+    return {isValid: true};
 };

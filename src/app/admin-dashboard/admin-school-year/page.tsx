@@ -1,14 +1,17 @@
 'use client';
 
 // React
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
+// Theme
+import { textStyles } from './module-utils/theme';
 
 // Components
 import CycleFormModal from './components/CycleFormModal';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 
 // Core
+import Alert from '@/components/core/alert/Alert';
 import { Column } from '@/components/core/table/DataTable';
 import Badge from '@/components/core/badge/Badge';
 import MetricsGroup from '../core/Metrics/MetricsGroup';
@@ -19,16 +22,15 @@ import DeletedItemsList, { DeletedItemsListConfig } from '../core/Tables/Deleted
 import ItemsList, { ActionButton, ItemsListConfig } from '../core/Tables/ItemsList';
 
 // Types and Services
-import { SchoolCycle } from './module-utils/types';
+import { ErrorAlert, SchoolCycle, CYCLE_STATUS } from './module-utils/types';
 import { MetricConfig } from '../core/Metrics/types';
 import { loadSchoolYearsBySchoolId, loadDeletedCycles, saveCycle, deleteCycle, restoreCycle, } from './module-utils/services';
 
 // Utils
-import { getStatusColor } from './module-utils/utils';
+import { getStatusColor, formatDate, validateCycleData } from './module-utils/utils';
 
 // Hooks
 import { useSession } from '@/hooks/useSession';
-
 
 export default function SchoolYearDashboard() {
     // Estados
@@ -42,10 +44,10 @@ export default function SchoolYearDashboard() {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [cycleToDelete, setCycleToDelete] = useState<SchoolCycle | null>(null);
+    const [errorAlert, setErrorAlert] = useState<ErrorAlert | null>(null);
 
     // Obtener datos de sesion en cache del usuario
     const { session } = useSession();
-
 
     // Cargar datos al montar el componente
     useEffect(() => {
@@ -72,13 +74,20 @@ export default function SchoolYearDashboard() {
             }
 
             // Cargar los ciclos activos de la escuela
-            const data = await loadSchoolYearsBySchoolId(session?.school_id ?? 0);
+            const data = await loadSchoolYearsBySchoolId(session.school_id);
 
             // Actualizar el estado local con los datos cargados
             setCycles(data);
+            // Limpiar errores si la carga es exitosa
+            setErrorAlert(null);
         } catch (error) {
             console.error('Error al cargar los ciclos escolares:', error);
-            alert('Error al cargar los ciclos escolares. Por favor recarga la página.');
+
+            // Mostrar alerta de error
+            setErrorAlert({
+                title: 'Error al cargar los ciclos escolares',
+                message: 'Por favor recarga la página.'
+            });
         } finally {
             setIsLoadingCycles(false);
             setIsLoadingMetrics(false);
@@ -93,10 +102,16 @@ export default function SchoolYearDashboard() {
                 throw new Error('No se encontró el ID de la escuela en la sesión');
             }
 
-            const data = await loadDeletedCycles(session?.school_id ?? 0);
+            const data = await loadDeletedCycles(session.school_id);
             setDeletedCycles(data);
         } catch (error) {
             console.error('Error al cargar los ciclos eliminados:', error);
+
+            // Mostrar alerta de error
+            setErrorAlert({
+                title: 'Error al cargar los ciclos eliminados',
+                message: 'No se pudieron cargar los ciclos eliminados. Por favor recarga la página.'
+            });
         } finally {
             setIsLoadingDeleted(false);
         }
@@ -139,7 +154,12 @@ export default function SchoolYearDashboard() {
             setCycleToDelete(null);
         } catch (error) {
             console.error('Error al eliminar el ciclo:', error);
-            // El modal de confirmación mostrará el error
+
+            // Mostrar mensaje de error
+            setErrorAlert({
+                title: 'Error al eliminar el ciclo',
+                message: 'No se pudo eliminar el ciclo. Por favor intenta nuevamente.'
+            });
         } finally {
             setIsProcessing(false);
         }
@@ -161,9 +181,13 @@ export default function SchoolYearDashboard() {
     async function handleSaveCycle(cycleData: { name: string; startDate: string; endDate: string; status: string }) {
         setIsProcessing(true);
         try {
-            // Validar datos básicos
-            if (!cycleData.name || !cycleData.startDate || !cycleData.endDate) {
-                alert('Por favor completa todos los campos requeridos');
+            // Validar datos
+            const validation = validateCycleData(cycleData, cycles, selectedCycle?.id);
+            if (!validation.isValid) {
+                setErrorAlert({
+                    title: 'Error de validación',
+                    message: validation.errorMessage || 'Por favor verifica los datos ingresados.'
+                });
                 setIsProcessing(false);
                 return;
             }
@@ -175,7 +199,10 @@ export default function SchoolYearDashboard() {
             closeModal();
         } catch (error) {
             console.error('Error al guardar el ciclo:', error);
-            alert('Error al guardar el ciclo. Por favor intenta nuevamente.');
+            setErrorAlert({
+                title: 'Error al guardar el ciclo',
+                message: 'No se pudo guardar el ciclo. Por favor intenta nuevamente.'
+            });
         } finally {
             setIsProcessing(false);
         }
@@ -191,18 +218,22 @@ export default function SchoolYearDashboard() {
             await loadAllCycles();
         } catch (error) {
             console.error('Error al restaurar el ciclo:', error);
-            alert('Error al restaurar el ciclo. Por favor intenta nuevamente.');
+            setErrorAlert({
+                title: 'Error al restaurar el ciclo',
+                message: 'No se pudo restaurar el ciclo. Por favor intenta nuevamente.'
+            });
         }
     }
 
-    const metricsConfig: MetricConfig[] = [
+    // Calcular métricas de manera segura con useMemo
+    const metricsConfig: MetricConfig[] = useMemo(() => [
         {
             id: 'total-cycles',
             icon: 'calendar',
             title: 'Total de Ciclos',
             value: cycles.length,
             badgeColor: 'primary',
-            badgeText: `${cycles.filter(cycle => cycle.status === '').length} ciclos activos`,
+            badgeText: `${cycles.filter(cycle => cycle.status === CYCLE_STATUS.ACTIVE).length} ciclos activos`,
         },
         {
             id: 'total-students',
@@ -214,9 +245,11 @@ export default function SchoolYearDashboard() {
             id: 'average-grade',
             icon: 'graduation-cap',
             title: 'Promedio General',
-            value: cycles.reduce((acc, cycle) => acc + cycle.averageGrade, 0) / cycles.length,
+            value: cycles.length > 0
+                ? cycles.reduce((acc, cycle) => acc + cycle.averageGrade, 0) / cycles.length
+                : 0,
         },
-    ];
+    ], [cycles]);
 
     const chartConfigs = [
         {
@@ -231,7 +264,6 @@ export default function SchoolYearDashboard() {
             color: '#465FFF',
             yAxisTitle: 'Total de Alumnos',
         },
-
     ];
 
     // Configuración de la lista
@@ -252,7 +284,7 @@ export default function SchoolYearDashboard() {
                 header: 'Nombre',
                 sortable: true,
                 render: (cycle) => (
-                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                    <span className={textStyles.title}>
                         {cycle.name}
                     </span>
                 )
@@ -262,8 +294,8 @@ export default function SchoolYearDashboard() {
                 header: 'Fecha de Inicio',
                 sortable: true,
                 render: (cycle) => (
-                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                        {new Date(cycle.startDate).toLocaleDateString()}
+                    <span className={textStyles.normal}>
+                        {formatDate(cycle.startDate)}
                     </span>
                 )
             },
@@ -272,8 +304,8 @@ export default function SchoolYearDashboard() {
                 header: 'Fecha de Fin',
                 sortable: true,
                 render: (cycle) => (
-                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                        {new Date(cycle.endDate).toLocaleDateString()}
+                    <span className={textStyles.normal}>
+                        {formatDate(cycle.endDate)}
                     </span>
                 )
             },
@@ -281,7 +313,7 @@ export default function SchoolYearDashboard() {
                 key: 'groupsCount',
                 header: 'Grupos',
                 render: (cycle) => (
-                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    <span className={textStyles.normal}>
                         {cycle.groupsCount}
                     </span>
                 )
@@ -290,7 +322,7 @@ export default function SchoolYearDashboard() {
                 key: 'studentsCount',
                 header: 'Alumnos',
                 render: (cycle) => (
-                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    <span className={textStyles.normal}>
                         {cycle.studentsCount}
                     </span>
                 )
@@ -299,7 +331,7 @@ export default function SchoolYearDashboard() {
                 key: 'averageGrade',
                 header: 'Promedio',
                 render: (cycle) => (
-                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                    <span className={textStyles.normal}>
                         {cycle.averageGrade.toFixed(2)}
                     </span>
                 )
@@ -313,7 +345,7 @@ export default function SchoolYearDashboard() {
                         size="sm"
                         color={getStatusColor(cycle.status)}
                     >
-                        <span className="font-outfit">
+                        <span className={textStyles.normal}>
                             {cycle.statusName}
                         </span>
                     </Badge>
@@ -328,7 +360,7 @@ export default function SchoolYearDashboard() {
             header: 'Nombre',
             sortable: true,
             render: (cycle: SchoolCycle) => (
-                <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                <span className={textStyles.title}>
                     {cycle.name}
                 </span>
             )
@@ -338,8 +370,8 @@ export default function SchoolYearDashboard() {
             header: 'Fecha de Inicio',
             sortable: true,
             render: (cycle: SchoolCycle) => (
-                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                    {new Date(cycle.startDate).toLocaleDateString()}
+                <span className={textStyles.normal}>
+                    {formatDate(cycle.startDate)}
                 </span>
             )
         },
@@ -348,8 +380,8 @@ export default function SchoolYearDashboard() {
             header: 'Fecha de Fin',
             sortable: true,
             render: (cycle: SchoolCycle) => (
-                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
-                    {new Date(cycle.endDate).toLocaleDateString()}
+                <span className={textStyles.normal}>
+                    {formatDate(cycle.endDate)}
                 </span>
             )
         },
@@ -368,7 +400,7 @@ export default function SchoolYearDashboard() {
             header: 'Promedio',
             sortable: true,
             render: (cycle: SchoolCycle) => (
-                <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                <span className={textStyles.normal}>
                     {cycle.averageGrade.toFixed(2)}
                 </span>
             )
@@ -436,6 +468,15 @@ export default function SchoolYearDashboard() {
             {/* Breadcrumb */}
             <PageBreadcrumb pageTitle="Ciclos escolares" />
 
+            {/* Error Alert */}
+            {errorAlert && (
+                <Alert
+                    title={errorAlert.title}
+                    message={errorAlert.message}
+                    variant="error"
+                />
+            )}
+
             {/* Metrics and Charts Wrapper */}
             <MetricsChartsWrapper title="Estadísticas y Gráficos de Ciclos Escolares">
                 <MetricsGroup metricsConfig={metricsConfig} isLoading={isLoadingMetrics} isEmpty={cycles.length === 0} emptyMessage="No hay ciclos activos" />
@@ -455,13 +496,11 @@ export default function SchoolYearDashboard() {
 
             {/* Deleted Cycles */}
             <DeletedItemsList
-                items={deletedCycles}
-                isLoading={isLoadingDeleted}
-                onRestore={handleRestore}
-                config={{
-                    ...deletedCycleListConfig,
-                }}
                 className="mt-6"
+                items={deletedCycles}
+                onRestore={handleRestore}
+                isLoading={isLoadingDeleted}
+                config={deletedCycleListConfig}
             />
 
             {/* Form Modal */}
@@ -482,7 +521,7 @@ export default function SchoolYearDashboard() {
                 itemName={cycleToDelete?.name || ''}
                 itemType="ciclo"
                 isDeleting={isProcessing}
-                isActiveItem={cycleToDelete?.status === '1'}
+                isActiveItem={cycleToDelete?.status === CYCLE_STATUS.ACTIVE}
                 customMessages={deleteConfirmModalConfig}
             />
         </div>
