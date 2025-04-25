@@ -62,3 +62,49 @@ export interface DatabaseGroup {
 }
 
 export type SortDirection = 'asc' | 'desc';
+
+// Types for the School Year Dashboard
+export interface LoadingState {
+    cycles: boolean;
+    metrics: boolean;
+    deleted: boolean;
+    processing: boolean;
+}
+
+export interface CycleManagementHook {
+    // Data
+    cycles: SchoolCycle[];
+    deletedCycles: SchoolCycle[];
+
+    // UI States
+    isModalOpen: boolean;
+    isDeleteModalOpen: boolean;
+    selectedCycle: SchoolCycle | null;
+    cycleToDelete: SchoolCycle | null;
+    errorAlert: ErrorAlert | null;
+    loadingState: LoadingState;
+
+    // Metrics
+    metricsData: {
+        totalCycles: number;
+        activeCycles: number;
+        totalStudents: number;
+        averageGrade: number;
+    };
+
+    // Actions
+    handleEdit: (id: number) => void;
+    handleDelete: (id: number) => void;
+    confirmDelete: () => Promise<void>;
+    openModal: () => void;
+    closeModal: () => void;
+    setIsDeleteModalOpen: (isOpen: boolean) => void;
+    handleSaveCycle: (cycleData: {
+        name: string;
+        startDate: string;
+        endDate: string;
+        status: string;
+    }) => Promise<void>;
+    handleRestore: (id: number) => Promise<void>;
+    loadAllCycles: () => Promise<void>;
+}

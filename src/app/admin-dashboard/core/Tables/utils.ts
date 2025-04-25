@@ -1,6 +1,38 @@
-import {BaseItem} from '../../../../components/common/lists/DeletedItemsList';
+import {Column} from '@/components/core/table/DataTable';
+
+// Definición básica de BaseItem que todos los elementos en listas deben tener
+export interface BaseItem {
+    id: number | string;
+    [key: string]: any;
+}
 
 export type SortDirection = 'asc' | 'desc';
+
+// Extender la interfaz Column para incluir sortFunction
+export interface ExtendedColumn<T> extends Column<T> {
+    sortFunction?: (a: T, b: T) => number;
+}
+
+/**
+ * Crea una función comparadora basada en un mapa de prioridades para ordenar elementos
+ * @param priorityMap Mapa que define la prioridad de cada valor (números menores = mayor prioridad)
+ * @param field Campo a comparar para ordenar
+ * @returns Función comparadora para usar en sort()
+ */
+export function createPriorityComparator<T>(
+    priorityMap: Record<string, number>,
+    field: keyof T,
+): (a: T, b: T) => number {
+    return (a: T, b: T): number => {
+        const valueA = String(a[field] || '');
+        const valueB = String(b[field] || '');
+
+        const priorityA = priorityMap[valueA] ?? 999;
+        const priorityB = priorityMap[valueB] ?? 999;
+
+        return priorityA - priorityB;
+    };
+}
 
 /**
  * Ordena una lista de elementos genericamente por campo
@@ -9,7 +41,23 @@ export function sortItems<T extends BaseItem>(
     items: T[],
     sortField: keyof T | string,
     sortDirection: SortDirection,
+    columns?: ExtendedColumn<T>[] | Column<T>[],
 ): T[] {
+    // Intentar encontrar una función de ordenamiento personalizada en las columnas
+    if (columns) {
+        const column = columns.find(col => col.key.toString() === sortField) as ExtendedColumn<T>;
+        const sortFn = column?.sortFunction;
+
+        if (sortFn) {
+            const sortedItems = [...items].sort((a, b) => {
+                const result = sortFn(a, b);
+                return sortDirection === 'asc' ? result : -result;
+            });
+            return sortedItems;
+        }
+    }
+
+    // Si no hay función personalizada, ordenar de manera genérica
     return [...items].sort((a, b) => {
         const valueA = a[sortField as keyof T];
         const valueB = b[sortField as keyof T];

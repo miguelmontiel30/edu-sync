@@ -22,8 +22,12 @@ export async function loadDeletedCycles(schoolId: number): Promise<SchoolCycle[]
     return deleted;
 }
 
-export async function saveCycle(cycle: CycleData, cycleId?: number): Promise<void> {
-    return schoolYearRepository.saveCycle(cycle, cycleId);
+export async function saveCycle(
+    cycle: CycleData,
+    cycleId?: number,
+    userId?: string,
+): Promise<void> {
+    return schoolYearRepository.saveCycle(cycle, cycleId, userId);
 }
 
 export async function deleteCycle(id: number): Promise<void> {

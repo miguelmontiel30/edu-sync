@@ -174,9 +174,6 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
             cycleDataToSave.id = selectedCycle.id;
         }
 
-        // Limpiar los campos
-        resetForm();
-
         // Guardar el ciclo
         await onSave(cycleDataToSave);
     }
@@ -227,6 +224,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                         <Label className="font-outfit">
                             Estado del Ciclo
                         </Label>
+
                         {isLoadingStatus ? (
                             <div className="flex items-center justify-center h-[38px] bg-gray-50 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
                                 <IconFA icon="spinner" spin className="text-gray-400" />
@@ -246,6 +244,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                         <Label htmlFor="cycle-start-date" className="font-outfit">
                             Ingrese la fecha de inicio
                         </Label>
+
                         <Input
                             id="cycle-start-date"
                             type="date"
@@ -280,6 +279,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                     >
                         <span className="font-outfit">Cancelar</span>
                     </Button>
+
                     <Button
                         onClick={handleSaveCycle}
                         variant="primary"

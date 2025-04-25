@@ -92,7 +92,7 @@ export default function ItemsList<T extends BaseItem>({
 
     // Manejar el ordenamiento desde el DataTable
     const handleSort = (field: string, direction: SortDirection) => {
-        const sorted = sortItems<T>(filteredItems, field, direction);
+        const sorted = sortItems<T>(filteredItems, field, direction, columns);
         setFilteredItems(sorted);
     };
 

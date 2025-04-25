@@ -12,8 +12,8 @@ export interface ISchoolYearRepository {
     getAllCyclesBySchoolId(
         schoolId: number,
     ): Promise<{active: SchoolCycle[]; deleted: SchoolCycle[]}>;
-    getCurrentSchoolId(): Promise<number>;
-    saveCycle(cycle: CycleData, cycleId?: number): Promise<void>;
+    getCurrentSchoolId(userId?: string): Promise<number>;
+    saveCycle(cycle: CycleData, cycleId?: number, userId?: string): Promise<void>;
     deleteCycle(id: number): Promise<void>;
     restoreCycle(id: number): Promise<void>;
 }
@@ -68,24 +68,30 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
     }
 
     /**
-     * Obtener el ID de la escuela del usuario actual
+     * Obtener el ID de la escuela del usuario
+     * @param userId - ID del usuario (opcional, se obtiene de la sesión si no se proporciona)
      * @returns ID de la escuela
      */
-    async getCurrentSchoolId(): Promise<number> {
+    async getCurrentSchoolId(userId?: string): Promise<number> {
         try {
-            // Obtener el usuario de la sesión actual
-            const {data: sessionData} = await supabaseClient.auth.getSession();
+            let userIdToUse = userId;
 
-            // Validar que existe una sesión con un usuario válido
-            if (!sessionData?.session?.user) {
-                throw new Error('No hay una sesión activa o usuario válido');
+            // Si no se proporcionó un userId, intentamos obtenerlo de la sesión
+            if (!userIdToUse) {
+                const {data: sessionData} = await supabaseClient.auth.getSession();
+
+                if (!sessionData?.session?.user) {
+                    throw new Error('No hay una sesión activa o usuario válido');
+                }
+
+                userIdToUse = sessionData.session.user.id;
             }
 
             // Obtener el ID de la escuela del usuario
             const {data: userData, error: userError} = await supabaseClient
                 .from('users')
                 .select('school_id')
-                .eq('user_id', sessionData.session.user.id)
+                .eq('user_id', userIdToUse)
                 .single();
 
             if (userError || !userData?.school_id) {
@@ -103,10 +109,11 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
      * Guardar un ciclo escolar
      * @param cycle - Ciclo escolar a guardar
      * @param cycleId - ID del ciclo escolar (opcional)
+     * @param userId - ID del usuario (opcional)
      */
-    async saveCycle(cycle: CycleData, cycleId?: number): Promise<void> {
+    async saveCycle(cycle: CycleData, cycleId?: number, userId?: string): Promise<void> {
         try {
-            const schoolId = await this.getCurrentSchoolId();
+            const schoolId = await this.getCurrentSchoolId(userId);
 
             if (cycleId) {
                 // Actualizar ciclo existente
