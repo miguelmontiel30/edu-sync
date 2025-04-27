@@ -1,8 +1,12 @@
+// React
 import React, { useState, useEffect, ReactNode } from 'react';
+
+// Table components
 import { Table, TableHeader, TableBody, TableRow, TableCell } from './index';
-import Input from '@/components/form/input/InputField';
-import Button from '@/components/core/button/Button';
+
+// Components
 import IconFA from '@/components/ui/IconFA';
+import Input from '@/components/form/input/InputField';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -17,23 +21,23 @@ export interface Column<T> {
 }
 
 export interface DataTableProps<T> {
-    data: T[];
-    columns: Column<T>[];
-    keyExtractor: (item: T) => string | number;
-    searchable?: boolean;
-    searchPlaceholder?: string;
-    defaultSortField?: string;
-    defaultSortDirection?: SortDirection;
-    isLoading?: boolean;
-    noDataMessage?: string;
-    searchNoResultsMessage?: string;
-    className?: string;
-    itemsPerPage?: number;
-    maxHeight?: string;
-    emptyStateComponent?: ReactNode;
-    loadingComponent?: ReactNode;
-    onSearch?: (searchTerm: string) => void;
-    onSort?: (field: string, direction: SortDirection) => void;
+    readonly data: T[];
+    readonly columns: Column<T>[];
+    readonly keyExtractor: (item: T) => string | number;
+    readonly searchable?: boolean;
+    readonly searchPlaceholder?: string;
+    readonly defaultSortField?: string;
+    readonly defaultSortDirection?: SortDirection;
+    readonly isLoading?: boolean;
+    readonly noDataMessage?: string;
+    readonly searchNoResultsMessage?: string;
+    readonly className?: string;
+    readonly itemsPerPage?: number;
+    readonly maxHeight?: string;
+    readonly emptyStateComponent?: ReactNode;
+    readonly loadingComponent?: ReactNode;
+    readonly onSearch?: (searchTerm: string) => void;
+    readonly onSort?: (field: string, direction: SortDirection) => void;
 }
 
 export default function DataTable<T>({
@@ -190,7 +194,12 @@ export default function DataTable<T>({
                                     <TableCell
                                         key={column.key.toString()}
                                         isHeader
-                                        className={`px-5 py-3 text-center ${column.sortable ? 'cursor-pointer hover:text-gray-700 dark:hover:text-gray-300' : ''} ${column.className || ''} ${column.width ? `w-[${column.width}]` : ''}`}
+                                        className={[
+                                            'px-5 py-3 text-center',
+                                            column.sortable ? 'cursor-pointer hover:text-gray-700 dark:hover:text-gray-300' : '',
+                                            column.className || '',
+                                            column.width ? `w-[${column.width}]` : ''
+                                        ].filter(Boolean).join(' ')}
                                         onClick={column.sortable ? () => handleSort(column.key.toString()) : undefined}
                                     >
                                         {column.sortable ? (
@@ -245,27 +254,27 @@ export default function DataTable<T>({
             </div>
 
             {!isLoading && (
-                <div className="flex justify-between items-center mt-4 px-2">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                <div className="flex flex-col items-center md:flex-row md:justify-between md:items-center mt-4 px-2 gap-y-3 md:gap-y-0">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 font-outfit text-center md:text-left">
                         Mostrando {Math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage)} de {filteredData.length} registros
                     </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
+
+                    <div className="flex items-center space-x-2">
+                        <button
                             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
+                            className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white/[0.03] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                         >
-                            <IconFA icon="chevron-left" style="solid" className="text-gray-600" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
+                            Anterior
+                        </button>
+
+                        <button
                             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages || totalPages === 0}
+                            className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white/[0.03] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                         >
-                            <IconFA icon="chevron-right" style="solid" className="text-gray-600" />
-                        </Button>
+                            Siguiente
+                        </button>
                     </div>
                 </div>
             )}

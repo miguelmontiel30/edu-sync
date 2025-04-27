@@ -32,7 +32,7 @@ export default function Home() {
 
             // Usar método hasRole para verificar para garantizar consistencia
             if (hasRole('admin')) {
-              targetPath = '/admin-dashboard/dashboard';
+              targetPath = '/admin-dashboard';
             } else if (hasRole('teacher')) {
               targetPath = '/teacher-dashboard/dashboard';
             } else if (hasRole('student')) {

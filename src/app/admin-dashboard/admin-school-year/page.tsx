@@ -1,199 +1,108 @@
 'use client';
 
-// React
-import { useState, useEffect } from 'react';
-
 // Components
-import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import Metrics from './components/Metrics';
-import Charts from './components/Charts';
-import CycleList from './components/CycleList';
-import DeletedCycleList from './components/DeletedCycleList';
 import CycleFormModal from './components/CycleFormModal';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 
-// Types and Services
-import { SchoolCycle } from './components/types';
-import { loadSchoolYears, loadDeletedCycles, saveCycle, deleteCycle, restoreCycle } from './components/services';
+// Core
+import Alert from '@/components/core/alert/Alert';
+import MetricsGroup from '../core/Metrics/MetricsGroup';
+import BarChartsGroup from '../core/BarCharts/BarChartsGroup';
+import DeleteConfirmModal from '../core/Modals/DeleteConfirmModal';
+import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
+import DeletedItemsList from '../core/Tables/DeletedItemsList';
+import ItemsList from '../core/Tables/ItemsList';
+
+// Types
+import { CYCLE_STATUS } from './module-utils/types';
+
+// Hooks
+import {
+    useCycleManagement,
+    useMetricsConfig,
+    useTableConfig
+} from './hooks';
 
 export default function SchoolYearDashboard() {
-    // States
-    const [cycles, setCycles] = useState<SchoolCycle[]>([]);
-    const [deletedCycles, setDeletedCycles] = useState<SchoolCycle[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedCycle, setSelectedCycle] = useState<SchoolCycle | null>(null);
-    const [isLoadingCycles, setIsLoadingCycles] = useState(true);
-    const [isLoadingDeleted, setIsLoadingDeleted] = useState(true);
-    const [isLoadingMetrics, setIsLoadingMetrics] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
+    // Usar hook principal para gestión de ciclos
+    const {
+        cycles,
+        deletedCycles,
+        isModalOpen,
+        isDeleteModalOpen,
+        selectedCycle,
+        cycleToDelete,
+        errorAlert,
+        loadingState,
+        handleEdit,
+        handleDelete,
+        confirmDelete,
+        openModal,
+        closeModal,
+        setIsDeleteModalOpen,
+        handleSaveCycle,
+        handleRestore
+    } = useCycleManagement();
 
-    // Cargar datos al montar el componente
-    useEffect(() => {
-        loadAllCycles();
-    }, []);
+    // Configuración de métricas y gráficos
+    const { metricsConfig, chartConfigs } = useMetricsConfig(cycles);
 
-    // Función para cargar todos los ciclos
-    async function loadAllCycles() {
-        await Promise.all([
-            fetchSchoolYears(),
-            fetchDeletedCycles()
-        ]);
-    }
-
-    // Cargar ciclos escolares activos
-    async function fetchSchoolYears() {
-        setIsLoadingCycles(true);
-        setIsLoadingMetrics(true);
-        try {
-            const data = await loadSchoolYears();
-            setCycles(data);
-        } catch (error) {
-            console.error('Error al cargar los ciclos escolares:', error);
-            alert('Error al cargar los ciclos escolares. Por favor recarga la página.');
-        } finally {
-            setIsLoadingCycles(false);
-            setIsLoadingMetrics(false);
-        }
-    }
-
-    // Cargar ciclos eliminados
-    async function fetchDeletedCycles() {
-        setIsLoadingDeleted(true);
-        try {
-            const data = await loadDeletedCycles();
-            setDeletedCycles(data);
-        } catch (error) {
-            console.error('Error al cargar los ciclos eliminados:', error);
-        } finally {
-            setIsLoadingDeleted(false);
-        }
-    }
-
-    // Manejar la edición de un ciclo
-    const handleEdit = (id: number) => {
-        const cycleToEdit = cycles.find(cycle => cycle.id === id);
-        if (cycleToEdit) {
-            setSelectedCycle(cycleToEdit);
-            setIsModalOpen(true);
-        }
-    };
-
-    // Manejar la eliminación de un ciclo
-    async function handleDelete(id: number) {
-        if (!confirm('¿Estás seguro de que deseas eliminar este ciclo escolar?')) return;
-
-        setIsSaving(true);
-
-        try {
-            // Eliminar el ciclo
-            await deleteCycle(id);
-
-            // Actualizar la lista de ciclos
-            setCycles(prev => prev.filter(cycle => cycle.id !== id));
-
-            // Actualizar la lista de ciclos eliminados
-            await fetchDeletedCycles();
-        } catch (error) {
-            console.error('Error al eliminar el ciclo escolar:', error);
-
-            // Mostrar mensaje de error
-            alert('Error al eliminar el ciclo escolar. Por favor intenta nuevamente.');
-        } finally {
-            setIsSaving(false);
-        }
-    }
-
-    // Abrir modal para crear nuevo ciclo
-    function openModal() {
-        setSelectedCycle(null);
-        setIsModalOpen(true);
-    }
-
-    // Cerrar modal
-    function closeModal() {
-        setIsModalOpen(false);
-
-        // Limpiar los campos
-        setSelectedCycle(null);
-    }
-
-    // Guardar ciclo escolar (crear o actualizar)
-    async function handleSaveCycle(cycleData: { name: string; startDate: string; endDate: string; status: string }) {
-        setIsSaving(true);
-        try {
-            // Validar que todos los campos estén completados
-            if (!cycleData.name || !cycleData.startDate || !cycleData.endDate || !cycleData.status) {
-                alert('Por favor completa todos los campos');
-                setIsSaving(false);
-                return;
-            }
-
-            await saveCycle(cycleData, selectedCycle?.id);
-
-            // Actualizar estado local
-            await fetchSchoolYears();
-            closeModal();
-        } catch (error) {
-            console.error('Error al guardar el ciclo escolar:', error);
-            alert('Error al guardar el ciclo escolar. Por favor intenta nuevamente.');
-        } finally {
-            setIsSaving(false);
-        }
-    }
-
-    // Restaurar ciclo eliminado
-    async function handleRestore(id: number) {
-        try {
-            // Primero restauramos el ciclo
-            await restoreCycle(id);
-
-            // Actualizamos los datos
-            const [activeCycles] = await Promise.all([
-                loadSchoolYears(),
-                loadDeletedCycles()
-            ]);
-
-            // Actualizamos el estado
-            setCycles(activeCycles);
-            setDeletedCycles(prevDeleted => prevDeleted.filter(cycle => cycle.id !== id));
-        } catch (error) {
-            console.error('Error al restaurar el ciclo:', error);
-            alert('Error al restaurar el ciclo. Por favor intenta nuevamente.');
-        }
-    }
+    // Configuraciones de tablas
+    const {
+        cycleColumns,
+        cycleActionButtons,
+        cycleListConfig,
+        deletedCycleListConfig,
+        deleteConfirmModalConfig
+    } = useTableConfig({ handleEdit, handleDelete });
 
     return (
-        <div className="mx-auto max-w-screen-2xl p-4 md:p-6">
+        <div className="mx-auto max-w-screen-2xl md:p-6">
             {/* Breadcrumb */}
             <PageBreadcrumb pageTitle="Ciclos escolares" />
 
-            <div className="grid grid-cols-1 gap-6 xl:grid-cols-1">
-                {/* Metrics */}
-                <Metrics
-                    cycles={cycles}
-                    isLoading={isLoadingMetrics}
+            {/* Error Alert */}
+            {errorAlert && (
+                <Alert
+                    title={errorAlert.title}
+                    message={errorAlert.message}
+                    variant="error"
+                />
+            )}
+
+            {/* Metrics and Charts Wrapper */}
+            <MetricsChartsWrapper title="Estadísticas y Gráficos de Ciclos Escolares">
+                <MetricsGroup
+                    metricsConfig={metricsConfig}
+                    isLoading={loadingState.metrics}
+                    isEmpty={cycles.length === 0}
+                    emptyMessage="No hay ciclos activos"
                 />
 
-                {/* Charts */}
-                <Charts
-                    cycles={cycles}
-                    isLoading={isLoadingMetrics}
+                <BarChartsGroup
+                    data={cycles}
+                    isLoading={loadingState.cycles}
+                    charts={chartConfigs}
                 />
+            </MetricsChartsWrapper>
 
-                {/* Cycle List */}
-                <CycleList
-                    cycles={cycles}
-                    isLoading={isLoadingCycles}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onAddNew={openModal}
-                />
-            </div>
+            {/* Cycle List */}
+            <ItemsList
+                items={cycles}
+                columns={cycleColumns}
+                isLoading={loadingState.cycles}
+                onAddNew={openModal}
+                config={cycleListConfig}
+                actionButtons={cycleActionButtons}
+            />
 
             {/* Deleted Cycles */}
-            <DeletedCycleList
-                cycles={deletedCycles}
-                isLoading={isLoadingDeleted}
+            <DeletedItemsList
+                className="mt-6"
+                items={deletedCycles}
                 onRestore={handleRestore}
+                isLoading={loadingState.deleted}
+                config={deletedCycleListConfig}
             />
 
             {/* Form Modal */}
@@ -202,7 +111,20 @@ export default function SchoolYearDashboard() {
                 onClose={closeModal}
                 onSave={handleSaveCycle}
                 selectedCycle={selectedCycle}
-                isSaving={isSaving}
+                isSaving={loadingState.processing}
+                currentCycles={cycles}
+            />
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={confirmDelete}
+                itemName={cycleToDelete?.name || ''}
+                itemType="ciclo"
+                isDeleting={loadingState.processing}
+                isActiveItem={cycleToDelete?.status === CYCLE_STATUS.ACTIVE}
+                customMessages={deleteConfirmModalConfig}
             />
         </div>
     );

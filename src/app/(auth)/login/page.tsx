@@ -58,7 +58,7 @@ const LoginPage: React.FC = () => {
                     let targetPath = '/login';
 
                     if (updatedSession.role === 'admin') {
-                        targetPath = '/admin-dashboard/dashboard';
+                        targetPath = '/admin-dashboard';
                     } else if (updatedSession.role === 'teacher') {
                         targetPath = '/teacher-dashboard/dashboard';
                     } else if (updatedSession.role === 'student') {
@@ -137,7 +137,7 @@ const LoginPage: React.FC = () => {
 
             // Redirigimos al dashboard según el rol real del usuario en la base de datos
             if (session.role === 'admin') {
-                router.push('/admin-dashboard/dashboard');
+                router.push('/admin-dashboard');
             } else if (session.role === 'teacher') {
                 router.push('/teacher-dashboard/dashboard');
             } else if (session.role === 'student') {
@@ -145,7 +145,7 @@ const LoginPage: React.FC = () => {
             } else {
                 // Por defecto usar selección del tipo de usuario
                 if (selectedUserType === 'admin') {
-                    router.push('/admin-dashboard/dashboard');
+                    router.push('/admin-dashboard');
                 } else if (selectedUserType === 'teacher') {
                     router.push('/teacher-dashboard/dashboard');
                 } else {

@@ -1,21 +1,23 @@
 // React
 import { useState, useEffect } from 'react';
 
-// Types
-import { SchoolCycle } from './types';
-
-// Hooks personalizados
-import { useStatusOptions } from '@/hooks/useStatusData';
-
 // Componentes UI
-import { Modal } from '@/components/ui/modal';
-import Button from '@/components/core/button/Button';
 import IconFA from '@/components/ui/IconFA';
+import { Modal } from '@/components/ui/modal';
+import Alert from '@/components/core/alert/Alert';
+import Button from '@/components/core/button/Button';
 
 // Componentes de formulario
 import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import Select from '@/components/form/Select';
+
+// Types & Utils
+import { SchoolCycle } from '../module-utils/types';
+import { mapStatusCodeToId, mapStatusIdToCode } from '../module-utils/utils';
+
+// Hooks
+import { useStatusOptions } from '@/hooks/useStatusData';
 
 interface CycleFormModalProps {
     readonly isOpen: boolean;
@@ -23,9 +25,17 @@ interface CycleFormModalProps {
     readonly onSave: (cycleData: { name: string; startDate: string; endDate: string; status: string }) => Promise<void>;
     readonly selectedCycle: SchoolCycle | null;
     readonly isSaving: boolean;
+    readonly currentCycles: SchoolCycle[];
 }
 
-export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving }: CycleFormModalProps) {
+interface AlertState {
+    show: boolean;
+    variant: 'warning' | 'error' | 'success' | 'info';
+    title: string;
+    message: string;
+}
+
+export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving, currentCycles }: CycleFormModalProps) {
     // Obtener estados de ciclo escolar usando nuestro hook
     const { options: statusOptions, isLoading: isLoadingStatus } = useStatusOptions('school_year');
 
@@ -36,24 +46,50 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
         status: ''
     });
 
+    const [alertState, setAlertState] = useState<AlertState>({
+        show: false,
+        variant: 'warning',
+        title: '',
+        message: ''
+    });
+
+    // Efecto para cerrar automáticamente la alerta después de 5 segundos
+    useEffect(() => {
+        if (alertState.show) {
+            const timer = setTimeout(() => {
+                setAlertState(prev => ({ ...prev, show: false }));
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [alertState.show]);
+
+    // Función para obtener el valor inicial del estado
+    const getInitialStatus = () => {
+        if (selectedCycle) {
+            return mapStatusIdToCode(selectedCycle.status.toString());
+        }
+
+        return statusOptions.find(option => option.value === 'SCHOOL_YEAR_ACTIVE')?.value || '';
+    };
+
+    // Efecto para obtener el valor inicial del estado
     useEffect(() => {
         if (isOpen) {
             if (selectedCycle) {
+                // Cuando hay un ciclo seleccionado (edición)
                 setCycleForm({
-                    name: selectedCycle.name || '',
-                    startDate: selectedCycle.startDate || '',
-                    endDate: selectedCycle.endDate || '',
-                    status: selectedCycle.status || ''
+                    name: selectedCycle.name,
+                    startDate: selectedCycle.startDate,
+                    endDate: selectedCycle.endDate,
+                    status: getInitialStatus()
                 });
-            } else {
-                // Buscar el status SCHOOL_YEAR_ACTIVE
-                const activeStatusOption = statusOptions.find(option => option.value === 'SCHOOL_YEAR_ACTIVE');
-
+            } else if (statusOptions.length > 0) {
+                // Cuando no hay ciclo seleccionado (nuevo ciclo)
                 setCycleForm({
                     name: '',
                     startDate: new Date().toISOString().split('T')[0],
                     endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-                    status: activeStatusOption ? activeStatusOption.value : ''
+                    status: getInitialStatus()
                 });
             }
         } else {
@@ -88,21 +124,58 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
     async function handleSaveCycle() {
         // Validar que los campos requeridos estén completos
         if (!cycleForm.name || !cycleForm.startDate || !cycleForm.endDate || !cycleForm.status) {
-            alert('Por favor, complete todos los campos requeridos.');
+            setAlertState({
+                show: true,
+                variant: 'error',
+                title: 'Error',
+                message: 'Por favor, complete todos los campos requeridos.'
+            });
             return;
         }
 
         // Validar que la fecha de inicio sea anterior a la fecha de fin
         if (new Date(cycleForm.startDate) >= new Date(cycleForm.endDate)) {
-            alert('La fecha de inicio debe ser anterior a la fecha de fin.');
+            setAlertState({
+                show: true,
+                variant: 'error',
+                title: 'Error',
+                message: 'La fecha de inicio debe ser anterior a la fecha de fin.'
+            });
             return;
         }
 
-        // Limpiar los campos
-        resetForm();
+        // Validar que no se cree un ciclo activo si ya existe uno
+        if (cycleForm.status === 'SCHOOL_YEAR_ACTIVE') {
+            const hasActiveCycle = currentCycles.some(cycle =>
+                cycle.status.toString() === '1' &&
+                (!selectedCycle || cycle.id !== selectedCycle.id)
+            );
+            if (hasActiveCycle) {
+                setAlertState({
+                    show: true,
+                    variant: 'error',
+                    title: 'Error',
+                    message: 'Lo sentimos, pero ya existe un ciclo escolar activo. No es posible tener más de un ciclo activo al mismo tiempo.'
+                });
+                return;
+            }
+        }
+
+        // Convertir el código de estado a ID antes de guardar
+        const cycleDataToSave: { name: string; startDate: string; endDate: string; status: string; id?: number } = {
+            name: cycleForm.name,
+            startDate: cycleForm.startDate,
+            endDate: cycleForm.endDate,
+            status: mapStatusCodeToId(cycleForm.status)
+        };
+
+        // Si es una edición, incluimos el ID
+        if (selectedCycle) {
+            cycleDataToSave.id = selectedCycle.id;
+        }
 
         // Guardar el ciclo
-        await onSave(cycleForm);
+        await onSave(cycleDataToSave);
     }
 
     return (
@@ -112,15 +185,25 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
             className="max-w-[700px] p-6 lg:p-10"
         >
             <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
-                <div>
+                <div className="mb-4">
                     <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
                         {selectedCycle ? "Editar ciclo escolar" : "Define un nuevo ciclo escolar"}
                     </h5>
+
                     <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
                         El conjunto de fechas clave que delimitan el periodo académico, en el que se asignan grupos, materias y alumnos para organizar eficazmente el año escolar.
                     </p>
                 </div>
-                <div className="mt-8">
+
+                {alertState.show && (
+                    <Alert
+                        variant={alertState.variant}
+                        title={alertState.title}
+                        message={alertState.message}
+                    />
+                )}
+
+                <div className="mt-4">
                     <div>
                         <div>
                             <Label htmlFor="cycle-name" className="font-outfit">
@@ -136,17 +219,19 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                             />
                         </div>
                     </div>
+
                     <div className="mt-6">
                         <Label className="font-outfit">
                             Estado del Ciclo
                         </Label>
+
                         {isLoadingStatus ? (
                             <div className="flex items-center justify-center h-[38px] bg-gray-50 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
                                 <IconFA icon="spinner" spin className="text-gray-400" />
                             </div>
                         ) : (
                             <Select
-                                key={`status-select-${cycleForm.status}-${isOpen}-${selectedCycle?.id || 'new'}`}
+                                key={`status-select-${selectedCycle?.id || 'new'}-${cycleForm.status}`}
                                 options={statusOptions}
                                 placeholder="Seleccione un estado"
                                 onChange={(value) => handleSelectChange(value)}
@@ -159,6 +244,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                         <Label htmlFor="cycle-start-date" className="font-outfit">
                             Ingrese la fecha de inicio
                         </Label>
+
                         <Input
                             id="cycle-start-date"
                             type="date"
@@ -183,6 +269,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                         />
                     </div>
                 </div>
+
                 <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
                     <Button
                         onClick={onClose}
@@ -192,6 +279,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                     >
                         <span className="font-outfit">Cancelar</span>
                     </Button>
+
                     <Button
                         onClick={handleSaveCycle}
                         variant="primary"
