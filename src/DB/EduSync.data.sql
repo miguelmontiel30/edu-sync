@@ -379,23 +379,6 @@ INSERT INTO
     )
 VALUES
     (
-        '1',
-        '1',
-        'Miguel',
-        'Ortega',
-        'Montiel',
-        '2025-03-12',
-        'Masculino',
-        'OEMM89789DS2H08',
-        '312312',
-        'migueel.angelom@gmail.com',
-        '1A',
-        'false',
-        '2025-03-27 10:29:24.891616+00',
-        '2025-03-27 10:29:24.891616+00',
-        null
-    ),
-    (
         '3',
         '1',
         'Juan',
