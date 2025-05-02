@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import statusService, {Status} from '../services/status/statusService';
 
-type StatusCategory = 'school_year' | 'group' | 'student_group' | 'evaluation_period';
+type StatusCategory = 'school_year' | 'group' | 'student_group' | 'evaluation_period' | 'student';
 
 /**
  * Hook para obtener datos de estado desde el servicio con caché
@@ -23,6 +23,9 @@ export function useStatusData(category: StatusCategory) {
                 switch (category) {
                     case 'school_year':
                         data = await statusService.getSchoolYearStatuses();
+                        break;
+                    case 'student':
+                        data = await statusService.getStudentStatuses();
                         break;
                     case 'group':
                         data = await statusService.getGroupStatuses();
@@ -87,7 +90,7 @@ export function useStatusOptions(category: StatusCategory) {
     useEffect(() => {
         if (statuses.length > 0) {
             const statusOptions = statuses.map(status => ({
-                value: status.code,
+                value: status.status_id.toString(),
                 label: status.name,
             }));
 
