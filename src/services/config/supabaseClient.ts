@@ -43,7 +43,6 @@ export async function checkSupabaseConnection(verbose = false): Promise<boolean>
 
         // Solo mostrar mensaje si se solicita explícitamente o no se ha comprobado antes
         if (verbose || !connectionChecked) {
-            console.log('Conexión a Supabase OK, sesión:', data.session ? 'Activa' : 'Inactiva');
             connectionChecked = true;
         }
 

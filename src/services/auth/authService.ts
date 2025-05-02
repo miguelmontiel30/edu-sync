@@ -14,8 +14,6 @@ export async function login(email: string, password: string): Promise<UserSessio
             throw new Error('Debes ingresar un correo y contraseña');
         }
 
-        console.log('Intentando iniciar sesión con:', email);
-
         // Autenticar directamente contra tabla users
         const {data: userData, error: userError} = await supabaseClient
             .from('users')
@@ -40,8 +38,6 @@ export async function login(email: string, password: string): Promise<UserSessio
             console.error('Contraseña incorrecta');
             throw new Error('Contraseña incorrecta');
         }
-
-        console.log('Autenticación exitosa con la base de datos');
 
         try {
             // Buscar roles del usuario
@@ -90,8 +86,6 @@ export async function login(email: string, password: string): Promise<UserSessio
             // Guardar en caché
             sessionService.saveSession(userSession);
 
-            console.log('Sesión guardada en caché correctamente');
-
             return userSession;
         } catch (profileError) {
             console.error('Error al procesar los roles del usuario:', profileError);
@@ -109,8 +103,6 @@ export async function login(email: string, password: string): Promise<UserSessio
 
             // Guardar sesión mínima
             sessionService.saveSession(minimumSession);
-
-            console.log('Sesión mínima guardada en caché');
 
             return minimumSession;
         }

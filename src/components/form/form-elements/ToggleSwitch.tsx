@@ -4,7 +4,7 @@ import Switch from '../switch/Switch';
 
 export default function ToggleSwitch() {
     const handleSwitchChange = (checked: boolean) => {
-        console.log('Switch is now:', checked ? 'ON' : 'OFF');
+        // TODO: Implementar la lógica para el cambio del switch
     };
     return (
         <ComponentCard title="Toggle switch input">
