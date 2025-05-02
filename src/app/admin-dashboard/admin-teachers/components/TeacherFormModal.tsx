@@ -213,6 +213,7 @@ export default function TeacherFormModal({
                                 onChange={handleInputChange}
                                 placeholder="CURP (opcional)"
                                 className="w-full"
+                                maxLength={18}
                             />
                         </div>
 

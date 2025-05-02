@@ -1,4 +1,4 @@
-import {useState, useEffect, useMemo} from 'react';
+import {useState, useEffect} from 'react';
 
 // Types and Services
 import {
@@ -7,6 +7,7 @@ import {
     CYCLE_STATUS,
     CycleManagementHook,
     LoadingState,
+    CycleData,
 } from '../module-utils/types';
 import {
     loadAllSchoolYearData,
@@ -153,12 +154,9 @@ export function useCycleManagement(): CycleManagementHook {
     }
 
     // Guardar ciclo (crear o actualizar)
-    async function handleSaveCycle(cycleData: {
-        name: string;
-        startDate: string;
-        endDate: string;
-        status: string;
-    }) {
+    async function handleSaveCycle(
+        cycleData: CycleData,
+    ): Promise<{success: boolean; errorMessage?: string}> {
         setLoadingState(prev => ({...prev, processing: true}));
 
         try {
@@ -166,14 +164,13 @@ export function useCycleManagement(): CycleManagementHook {
             const validation = validateCycleData(cycleData, cycles, selectedCycle?.id);
 
             if (!validation.isValid) {
-                setErrorAlert({
-                    title: 'Error de validación',
-                    message: validation.errorMessage || 'Por favor verifica los datos ingresados.',
-                });
-
                 setLoadingState(prev => ({...prev, processing: false}));
-
-                return;
+                // Retornamos el error para que se muestre en el formulario
+                return {
+                    success: false,
+                    errorMessage:
+                        validation.errorMessage || 'Por favor verifica los datos ingresados.',
+                };
             }
 
             // Guardar ciclo
@@ -184,13 +181,16 @@ export function useCycleManagement(): CycleManagementHook {
 
             // Cerrar modal
             closeModal();
+
+            return {success: true};
         } catch (error) {
             console.error('Error al guardar el ciclo:', error);
 
-            setErrorAlert({
-                title: 'Error al guardar el ciclo',
-                message: 'No se pudo guardar el ciclo. Por favor intenta nuevamente.',
-            });
+            // Retornamos el error para que se muestre en el formulario
+            return {
+                success: false,
+                errorMessage: 'No se pudo guardar el ciclo. Por favor intenta nuevamente.',
+            };
         } finally {
             setLoadingState(prev => ({...prev, processing: false}));
         }
@@ -198,56 +198,26 @@ export function useCycleManagement(): CycleManagementHook {
 
     // Restaurar ciclo eliminado
     async function handleRestore(id: number) {
-        setLoadingState(prev => ({...prev, processing: true}));
+        setLoadingState(prev => ({...prev, deleted: true}));
 
         try {
-            // Restauramos el ciclo
+            // Restaurar ciclo
             await restoreCycle(id);
 
-            // Actualizamos los datos
+            // Actualizar listas
             await loadAllCycles();
         } catch (error) {
             console.error('Error al restaurar el ciclo:', error);
+
+            // Mostrar mensaje de error
             setErrorAlert({
                 title: 'Error al restaurar el ciclo',
                 message: 'No se pudo restaurar el ciclo. Por favor intenta nuevamente.',
             });
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({...prev, deleted: false}));
         }
     }
-
-    // Calcular métricas de manera segura con useMemo y valores atómicos
-    const totalCycles = useMemo(() => cycles.length, [cycles]);
-
-    const activeCycles = useMemo(
-        () => cycles.filter(cycle => cycle.status === CYCLE_STATUS.ACTIVE).length,
-        [cycles],
-    );
-
-    const totalStudents = useMemo(
-        () => cycles.reduce((acc, cycle) => acc + cycle.studentsCount, 0),
-        [cycles],
-    );
-
-    const averageGrade = useMemo(
-        () =>
-            cycles.length > 0
-                ? cycles.reduce((acc, cycle) => acc + cycle.averageGrade, 0) / cycles.length
-                : 0,
-        [cycles],
-    );
-
-    // Agrupar las métricas en un solo objeto memoizado
-    const metricsData = useMemo(
-        () => ({
-            totalCycles,
-            activeCycles,
-            totalStudents,
-            averageGrade,
-        }),
-        [totalCycles, activeCycles, totalStudents, averageGrade],
-    );
 
     return {
         // Data
@@ -261,9 +231,6 @@ export function useCycleManagement(): CycleManagementHook {
         cycleToDelete,
         errorAlert,
         loadingState,
-
-        // Metrics
-        metricsData,
 
         // Actions
         handleEdit,

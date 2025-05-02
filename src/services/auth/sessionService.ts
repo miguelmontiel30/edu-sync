@@ -39,8 +39,6 @@ class SessionService {
             sessionData.role = 'user';
         }
 
-        console.log('Guardando sesión para', sessionData.email, 'con rol:', sessionData.role);
-
         cacheService.set(SESSION_CACHE_KEY, sessionData, SESSION_EXPIRY);
 
         // Opcional: Guardar también en localStorage para persistencia entre pestañas
@@ -80,13 +78,6 @@ class SessionService {
                         parsedSession.role = 'user';
                     }
 
-                    console.log(
-                        'Recuperando sesión para',
-                        parsedSession.email,
-                        'con rol:',
-                        parsedSession.role,
-                    );
-
                     // Restaurar en la caché en memoria
                     this.saveSession(parsedSession);
                     session = parsedSession;
@@ -111,7 +102,6 @@ class SessionService {
      * Elimina la sesión del usuario
      */
     clearSession(): void {
-        console.log('Eliminando sesión');
         cacheService.remove(SESSION_CACHE_KEY);
 
         if (typeof window !== 'undefined') {
@@ -130,26 +120,17 @@ class SessionService {
 
             // Si no hay sesión en caché, no podemos refrescar
             if (!currentSession) {
-                console.log('No hay sesión activa para refrescar');
                 return null;
             }
 
             // Evitar refrescos múltiples en un período corto
             const now = Date.now();
             if (now - lastRefreshTime < SESSION_REFRESH_COOLDOWN) {
-                console.log('Refresco de sesión ignorado - muy reciente');
                 return currentSession;
             }
 
             // Actualizar tiempo de refresco
             lastRefreshTime = now;
-
-            console.log(
-                'Refrescando datos del usuario:',
-                currentSession.email,
-                'rol actual:',
-                currentSession.role,
-            );
 
             // Obtener datos actualizados del usuario desde la base de datos
             const {data: userData, error: userError} = await supabaseClient
@@ -178,7 +159,6 @@ class SessionService {
             // Actualizar rol solo si tenemos nueva información
             if (!rolesError && userRoles) {
                 roleFuente = 'tabla user_roles';
-                console.log('Información de rol encontrada en tabla user_roles:', userRoles);
 
                 if (userRoles.role_id === 1) {
                     userRole = 'admin';
@@ -203,7 +183,6 @@ class SessionService {
             } else if (userData.linked_type) {
                 // Alternativa basada en linked_type
                 roleFuente = 'campo linked_type';
-                console.log('Usando campo linked_type como fuente del rol:', userData.linked_type);
 
                 if (userData.linked_type === 'admin') {
                     userRole = 'admin';
@@ -213,8 +192,6 @@ class SessionService {
                     userRole = 'student';
                 }
             }
-
-            console.log(`Rol actualizado: ${userRole} (fuente: ${roleFuente})`);
 
             // Actualizar sesión con datos nuevos
             const updatedSession: UserSession = {
@@ -230,7 +207,6 @@ class SessionService {
             // Guardar sesión actualizada
             this.saveSession(updatedSession);
 
-            console.log('Sesión refrescada correctamente con rol:', updatedSession.role);
             return updatedSession;
         } catch (error) {
             console.error('Error al refrescar la sesión:', error);

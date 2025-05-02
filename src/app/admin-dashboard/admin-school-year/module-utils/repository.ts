@@ -16,6 +16,10 @@ export interface ISchoolYearRepository {
     saveCycle(cycle: CycleData, cycleId?: number, userId?: string): Promise<void>;
     deleteCycle(id: number): Promise<void>;
     restoreCycle(id: number): Promise<void>;
+    getGroupGrades(groupIds: number[]): Promise<{
+        totalGrade: number;
+        gradesCount: number;
+    }>;
 }
 
 // Implementación de Supabase
@@ -191,6 +195,66 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
             if (error) throw error;
         } catch (error) {
             console.error('Error al restaurar el ciclo escolar:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Obtener las calificaciones de un conjunto de grupos
+     * @param groupIds - Array de IDs de grupos
+     * @returns Objeto con el total de calificaciones y cantidad
+     */
+    async getGroupGrades(groupIds: number[]): Promise<{totalGrade: number; gradesCount: number}> {
+        try {
+            if (groupIds.length === 0) {
+                return {totalGrade: 0, gradesCount: 0};
+            }
+
+            const {data: gradesData, error: gradesError} = await supabaseClient
+                .from('group_subjects')
+                .select(
+                    `
+                    group_subject_id,
+                    evaluation_periods (
+                        evaluation_period_id,
+                        grades (
+                            grade
+                        )
+                    )
+                `,
+                )
+                .in('group_id', groupIds);
+
+            if (gradesError) {
+                throw gradesError;
+            }
+
+            if (!gradesData) {
+                return {totalGrade: 0, gradesCount: 0};
+            }
+
+            // Procesar los datos para calcular el promedio
+            let totalGrade = 0;
+            let gradesCount = 0;
+
+            gradesData.forEach(gs => {
+                const evaluationPeriods = gs.evaluation_periods || [];
+
+                evaluationPeriods.forEach(ep => {
+                    const grades = ep.grades || [];
+
+                    grades.forEach(g => {
+                        if (g.grade && typeof g.grade === 'number') {
+                            totalGrade += g.grade;
+                            gradesCount++;
+                        }
+                    });
+                });
+            });
+
+            return {totalGrade, gradesCount};
+        } catch (error) {
+            console.error('Error al obtener calificaciones de grupos:', error);
             throw error;
         }
     }

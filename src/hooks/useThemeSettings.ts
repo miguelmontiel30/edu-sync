@@ -63,8 +63,6 @@ export function useThemeSettings() {
 
                 // 3. Si no se pudo obtener el ID de escuela, usar la configuración por defecto
                 if (!school_id) {
-                    console.log('No se encontró ID de escuela, usando configuración por defecto');
-
                     // Intentar cargar desde localStorage
                     if (typeof window !== 'undefined') {
                         const cachedTheme = localStorage.getItem('eduSync.theme');

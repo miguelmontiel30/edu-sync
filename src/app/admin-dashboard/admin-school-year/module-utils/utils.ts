@@ -5,8 +5,9 @@ import {
     CYCLE_STATUS,
     DatabaseGroup,
     DatabaseSchoolYear,
-} from '../module-utils/types';
-import {supabaseClient} from '@/services/config/supabaseClient';
+    CycleData,
+} from './types';
+import {calculateAverageGrade as calculateGradeFromService} from './services';
 
 // Función para ordenar los ciclos
 export const sortCycles = (
@@ -108,7 +109,7 @@ export const formatDate = (dateString: string): string => {
 
 // Función de validación de ciclos
 export const validateCycleData = (
-    cycleData: {name: string; startDate: string; endDate: string; status: string},
+    cycleData: CycleData,
     currentCycles: SchoolCycle[] = [],
     selectedCycleId?: number,
 ): {isValid: boolean; errorMessage?: string} => {
@@ -166,68 +167,19 @@ export function extractGroupAndStudentData(groups: DatabaseGroup[]) {
     return {groupIds, studentIds};
 }
 
-// Cache para almacenar las calificaciones calculadas
-const gradeCache = new Map<string, number>();
-
 // Función auxiliar para calcular la calificación promedio
-export async function calculateAverageGrade(groupIds: number[]): Promise<number> {
-    if (groupIds.length === 0) return 0;
+// Utiliza el servicio que a su vez utiliza el repositorio
+export const calculateAverageGrade = calculateGradeFromService;
 
-    // Clave única para este conjunto de grupos
-    const cacheKey = groupIds.sort().join('-');
-
-    // Verificar cache primero
-    if (gradeCache.has(cacheKey)) {
-        return gradeCache.get(cacheKey) || 0;
-    }
-
-    const {data: gradesData, error: gradesError} = await supabaseClient
-        .from('group_subjects')
-        .select(
-            `
-            group_subject_id,
-            evaluation_periods (
-                evaluation_period_id,
-                grades (
-                    grade
-                )
-            )
-        `,
-        )
-        .in('group_id', groupIds);
-
-    if (gradesError || !gradesData) return 0;
-
-    let totalGrades = 0;
-    let gradesCount = 0;
-
-    for (const groupSubject of gradesData) {
-        const evaluationPeriods = groupSubject.evaluation_periods || [];
-
-        for (const period of evaluationPeriods) {
-            const grades = period.grades || [];
-
-            for (const g of grades) {
-                if (g.grade) {
-                    totalGrades += Number(g.grade);
-                    gradesCount++;
-                }
-            }
-        }
-    }
-
-    const result = gradesCount > 0 ? Number((totalGrades / gradesCount).toFixed(2)) : 0;
-
-    // Guardar en cache
-    gradeCache.set(cacheKey, result);
-
-    return result;
-}
-
-// Función para formatear los datos del ciclo escolar
+// Función para formatear los datos del ciclo
 export async function formatCycleData(cycle: DatabaseSchoolYear): Promise<SchoolCycle> {
-    const groups = cycle.groups || [];
-    const {studentIds, groupIds} = extractGroupAndStudentData(groups);
+    // Extraer datos de grupos y estudiantes
+    const {groupIds, studentIds} =
+        cycle.groups && cycle.groups.length > 0
+            ? extractGroupAndStudentData(cycle.groups)
+            : {groupIds: [], studentIds: new Set<number>()};
+
+    // Calcular promedio de calificaciones
     const averageGrade = await calculateAverageGrade(groupIds);
 
     return {
@@ -236,10 +188,10 @@ export async function formatCycleData(cycle: DatabaseSchoolYear): Promise<School
         startDate: cycle.start_date,
         endDate: cycle.end_date,
         status: cycle.status_id.toString(),
-        statusName: cycle.status ? cycle.status.name : 'Desconocido',
-        groupsCount: groups.length,
+        statusName: cycle.status?.name || '',
+        groupsCount: groupIds.length,
         studentsCount: studentIds.size,
-        averageGrade,
-        deleteFlag: cycle.delete_flag || false,
+        averageGrade: parseFloat(averageGrade.toFixed(2)),
+        deleteFlag: !!cycle.delete_flag,
     };
 }

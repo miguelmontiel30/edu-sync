@@ -17,11 +17,9 @@ export default function Home() {
     if (!isRedirecting && !isLoading) {
       const verifySessionAndRedirect = async () => {
         try {
-          console.log('Estado de autenticación:', isAuthenticated ? 'Autenticado' : 'No autenticado');
           setIsRedirecting(true);
 
           if (!isAuthenticated) {
-            console.log('No hay sesión activa, redirigiendo a login');
             router.push('/login');
             return;
           }
@@ -39,19 +37,15 @@ export default function Home() {
               targetPath = '/student-dashboard/dashboard';
             } else {
               // Rol desconocido, ir al login
-              console.log('Rol no reconocido:', session.role);
               targetPath = '/login';
             }
 
-            console.log(`Redirigiendo a ${targetPath} basado en rol: ${session.role}`);
             router.push(targetPath);
           } else {
             // No hay información de rol, por seguridad ir al login
-            console.log('Sesión sin información de rol, redirigiendo a login');
             router.push('/login');
           }
         } catch (error) {
-          console.error('Error verificando sesión:', error);
           router.push('/login');
         }
       };
