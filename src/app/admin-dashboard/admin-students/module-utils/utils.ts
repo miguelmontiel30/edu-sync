@@ -208,3 +208,34 @@ export function calculateStudentMetrics(
 
     return metrics;
 }
+
+/**
+ * Determina el color del badge según el estado del estudiante
+ */
+export function getStudentStatusColor(statusId: number): 'success' | 'error' | 'primary' | 'dark' {
+    const statusCode = mapStatusIdToCode(statusId);
+
+    const colorMap: Record<string, 'success' | 'error' | 'primary' | 'dark'> = {
+        STUDENT_ACTIVE: 'success',
+        STUDENT_INACTIVE: 'dark',
+        STUDENT_GRADUATED: 'primary',
+        STUDENT_TRANSFERRED: 'error',
+    };
+
+    return colorMap[statusCode] || 'dark';
+}
+
+/**
+ * Determina el color del icono según el género del estudiante
+ */
+export function getGenderIconColor(genderCode?: string): string {
+    // La estructura es diferente para modo claro y oscuro
+    if (genderCode === 'M') {
+        return 'text-blue-600 dark:text-blue-400';
+    } else if (genderCode === 'F') {
+        return 'text-pink-600 dark:text-pink-400';
+    }
+
+    // Color por defecto si no hay género especificado
+    return 'text-gray-500 dark:text-gray-400';
+}

@@ -67,8 +67,6 @@ export class SupabaseStudentRepository implements IStudentRepository {
             if (error) throw error;
             if (!data || data.length === 0) return [];
 
-            console.log('data', data);
-
             // Procesamos los datos recibidos
             return data.map((student: any) =>
                 prepareStudentData({
@@ -186,7 +184,6 @@ export class SupabaseStudentRepository implements IStudentRepository {
             }
 
             const dataToSave = {
-                ...(studentData.id ? {student_id: studentData.id} : {}),
                 school_id: 1, // TODO: Obtener de contexto/session
                 first_name: studentData.first_name,
                 father_last_name: studentData.father_last_name,

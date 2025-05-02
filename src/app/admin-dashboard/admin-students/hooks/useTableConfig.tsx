@@ -12,11 +12,12 @@ import { DeletedItemsListConfig } from '../../core/Tables/DeletedItemsList';
 
 // Types and utils
 import { Student } from '../module-utils/types';
-import { formatDate } from '../module-utils/utils';
+import { formatDate, getStudentStatusColor, getGenderIconColor } from '../module-utils/utils';
 
 interface TableConfigProps {
     handleEdit: (student: Student) => void;
     handleDelete: (student: Student) => void;
+    students?: Student[];
 }
 
 interface StudentTableConfigs {
@@ -36,7 +37,7 @@ interface StudentTableConfigs {
 /**
  * Hook para configurar las tablas del módulo de estudiantes
  */
-export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): StudentTableConfigs {
+export function useTableConfig({ handleEdit, handleDelete, students = [] }: TableConfigProps): StudentTableConfigs {
     // Columnas para la tabla de estudiantes
     const studentColumns: Column<Student>[] = useMemo(() => [
         {
@@ -52,8 +53,8 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
                             className="w-8 h-8 rounded-full mr-2"
                         />
                     ) : (
-                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2">
-                            <IconFA icon="user" className="text-gray-500" />
+                        <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-2">
+                            <IconFA icon="user" className={getGenderIconColor(student.gender?.code)} />
                         </div>
                     )}
                     <span className="font-medium">{student.full_name}</span>
@@ -85,15 +86,15 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
             ),
         },
         {
-            key: 'gender',
-            header: 'Género',
+            key: 'status',
+            header: 'Estado',
             sortable: true,
             render: (student: Student) => (
                 <Badge
                     variant="light"
-                    color={student.gender?.code === 'MALE' ? 'primary' : 'info'}
+                    color={getStudentStatusColor(student.status?.status_id || 7)}
                 >
-                    {student.gender?.name || 'No especificado'}
+                    {student.status?.name || 'No especificado'}
                 </Badge>
             ),
         },
@@ -127,8 +128,8 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
             sortable: true,
             render: (student: Student) => (
                 <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2">
-                        <IconFA icon="user" className="text-gray-500" />
+                    <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-2">
+                        <IconFA icon="user" className={getGenderIconColor(student.gender?.code)} />
                     </div>
                     <span className="font-medium">{student.full_name}</span>
                 </div>
@@ -159,16 +160,32 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
             icon: 'pencil',
             iconStyle: 'duotone',
             variant: 'outline',
-            onClick: (id) => handleEdit({ id: Number(id) } as Student)
+            onClick: (id: number | string) => {
+                // Buscar el estudiante completo por ID
+                const studentId = Number(id);
+                const student = students.find(s => s.id === studentId);
+
+                if (student) {
+                    handleEdit(student);
+                }
+            }
         },
         {
             label: 'Eliminar',
             icon: 'trash',
             iconStyle: 'duotone',
             variant: 'outline',
-            onClick: (id) => handleDelete({ id: Number(id) } as Student)
+            onClick: (id: number | string) => {
+                // Buscar el estudiante completo por ID
+                const studentId = Number(id);
+                const student = students.find(s => s.id === studentId);
+
+                if (student) {
+                    handleDelete(student);
+                }
+            }
         }
-    ], [handleEdit, handleDelete]);
+    ], [handleEdit, handleDelete, students]);
 
     // Configuración de la tabla de estudiantes
     const studentListConfig: ItemsListConfig<Student> = useMemo(() => ({
