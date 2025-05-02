@@ -44,6 +44,12 @@ export class SupabaseStudentRepository implements IStudentRepository {
                 gender_id,
                 code,
                 name
+            ),
+            status:status_id (
+                status_id,
+                code,
+                name,
+                category
             )
         `);
     }
@@ -60,6 +66,8 @@ export class SupabaseStudentRepository implements IStudentRepository {
 
             if (error) throw error;
             if (!data || data.length === 0) return [];
+
+            console.log('data', data);
 
             // Procesamos los datos recibidos
             return data.map((student: any) =>
@@ -82,6 +90,15 @@ export class SupabaseStudentRepository implements IStudentRepository {
                     phone: student.phone,
                     email: student.email,
                     image_url: student.image_url,
+                    status_id: student.status_id,
+                    status: student.status
+                        ? {
+                              status_id: student.status.status_id,
+                              code: student.status.code,
+                              name: student.status.name,
+                              category: student.status.category,
+                          }
+                        : undefined,
                     delete_flag: student.delete_flag,
                     created_at: student.created_at,
                     updated_at: student.updated_at,
@@ -128,6 +145,15 @@ export class SupabaseStudentRepository implements IStudentRepository {
                     phone: student.phone,
                     email: student.email,
                     image_url: student.image_url,
+                    status_id: student.status_id,
+                    status: student.status
+                        ? {
+                              status_id: student.status.status_id,
+                              code: student.status.code,
+                              name: student.status.name,
+                              category: student.status.category,
+                          }
+                        : undefined,
                     delete_flag: student.delete_flag,
                     created_at: student.created_at,
                     updated_at: student.updated_at,
@@ -171,6 +197,7 @@ export class SupabaseStudentRepository implements IStudentRepository {
                 phone: studentData.phone || null,
                 email: studentData.email || null,
                 image_url: studentData.image_url || null,
+                ...(studentData.status_id ? {status_id: studentData.status_id} : {}),
                 updated_at: new Date().toISOString(),
             };
 
@@ -184,6 +211,11 @@ export class SupabaseStudentRepository implements IStudentRepository {
                 if (error) throw error;
                 return studentData.id;
             } else {
+                // Valor por defecto para status_id si no se proporciona (7 = STUDENT_ACTIVE)
+                if (!dataToSave.status_id) {
+                    dataToSave.status_id = 7;
+                }
+
                 // Crear
                 const {data, error} = await supabaseClient
                     .from('students')
@@ -253,7 +285,8 @@ export class SupabaseStudentRepository implements IStudentRepository {
                     status:status_id (
                         status_id,
                         name,
-                        code
+                        code,
+                        category
                     ),
                     group:group_id (
                         group_id,
@@ -323,7 +356,8 @@ export class SupabaseStudentRepository implements IStudentRepository {
                     status:status_id(
                         status_id, 
                         name, 
-                        code
+                        code,
+                        category
                     )
                 `,
                 )

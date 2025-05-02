@@ -86,7 +86,7 @@ export function filterStudents(
         }
 
         // Filtro por estado
-        if (filterOptions.status && student.status?.code !== filterOptions.status) {
+        if (filterOptions.status_id && student.status_id?.toString() !== filterOptions.status_id) {
             return false;
         }
 
@@ -131,26 +131,26 @@ export function sortStudents(
 /**
  * Convierte código de estado a ID
  */
-export function mapStatusCodeToId(statusCode: string): string {
-    const statusMap: Record<string, string> = {
-        STUDENT_ACTIVE: '1',
-        STUDENT_INACTIVE: '2',
-        STUDENT_GRADUATED: '3',
-        STUDENT_TRANSFERRED: '4',
+export function mapStatusCodeToId(statusCode: string): number {
+    const statusMap: Record<string, number> = {
+        STUDENT_ACTIVE: 7,
+        STUDENT_INACTIVE: 8,
+        STUDENT_GRADUATED: 9,
+        STUDENT_TRANSFERRED: 10,
     };
 
-    return statusMap[statusCode] || '1';
+    return statusMap[statusCode] || 7;
 }
 
 /**
  * Convierte ID de estado a código
  */
-export function mapStatusIdToCode(statusId: string): string {
-    const statusMap: Record<string, string> = {
-        '1': 'STUDENT_ACTIVE',
-        '2': 'STUDENT_INACTIVE',
-        '3': 'STUDENT_GRADUATED',
-        '4': 'STUDENT_TRANSFERRED',
+export function mapStatusIdToCode(statusId: number): string {
+    const statusMap: Record<number, string> = {
+        7: 'STUDENT_ACTIVE',
+        8: 'STUDENT_INACTIVE',
+        9: 'STUDENT_GRADUATED',
+        10: 'STUDENT_TRANSFERRED',
     };
 
     return statusMap[statusId] || 'STUDENT_ACTIVE';
@@ -177,16 +177,16 @@ export function calculateStudentMetrics(
     // Calcular métricas básicas
     students.forEach(student => {
         // Contar por estado
-        if (student.status?.code === 'STUDENT_ACTIVE') {
+        if (student.status?.code === 'STUDENT_ACTIVE' || student.status_id === 7) {
             metrics.active++;
         } else {
             metrics.inactive++;
         }
 
         // Contar por género
-        if (student.gender?.code === 'MALE') {
+        if (student.gender?.code === 'M') {
             metrics.male++;
-        } else if (student.gender?.code === 'FEMALE') {
+        } else if (student.gender?.code === 'F') {
             metrics.female++;
         }
     });

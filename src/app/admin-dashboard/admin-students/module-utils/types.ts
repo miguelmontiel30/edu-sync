@@ -28,15 +28,17 @@ export interface Student {
     phone: string | null;
     email: string | null;
     image_url: string | null;
+    status_id: number;
+    status?: {
+        status_id: number;
+        name: string;
+        code: string;
+        category: string;
+    };
     delete_flag: boolean;
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
-    status?: {
-        id: number;
-        name: string;
-        code: string;
-    };
     // Campos calculados
     full_name?: string;
     age?: number;
@@ -49,9 +51,10 @@ export interface StudentGroup {
     enrollment_date: string;
     status_id: number;
     status?: {
-        id: number;
+        status_id: number;
         name: string;
         code: string;
+        category: string;
     };
     group?: {
         id: number;
@@ -117,7 +120,7 @@ export interface StudentFilterOptions {
     grade?: string;
     groupName?: string;
     schoolYearId?: number;
-    status?: string;
+    status_id?: string;
 }
 
 export interface StudentMetrics {
