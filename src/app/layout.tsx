@@ -63,6 +63,13 @@ export default function RootLayout({
 
     return (
         <html lang="es" suppressHydrationWarning>
+            <head>
+                <link rel="icon" href="/images/EduSync-logo.png" type="image/png" />
+                <link rel="shortcut icon" href="/images/EduSync-logo.png" type="image/png" />
+                <title>EduSync</title>
+                <meta name="description" content="Plataforma educativa para gestión de aprendizaje" />
+                <meta name="theme-color" content="#465FFF" />
+            </head>
             <body className={`${outfit.variable} dark:bg-gray-900`} suppressHydrationWarning>
                 {isClient ? (
                     <SessionProvider>
