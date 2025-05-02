@@ -15,7 +15,7 @@ import {supabaseClient} from '@/services/config/supabaseClient';
 
 // Definición de la interfaz del repositorio
 export interface IStudentRepository {
-    getActiveStudents(): Promise<Student[]>;
+    getActiveStudents(schoolId: number): Promise<Student[]>;
     getDeletedStudents(): Promise<Student[]>;
     saveStudent(studentData: StudentFormData): Promise<number>;
     deleteStudent(studentId: number): Promise<void>;
@@ -57,11 +57,12 @@ export class SupabaseStudentRepository implements IStudentRepository {
     /**
      * Obtiene la lista de estudiantes activos (no eliminados)
      */
-    async getActiveStudents(): Promise<Student[]> {
+    async getActiveStudents(schoolId: number): Promise<Student[]> {
         try {
             // Consulta optimizada usando join en vez de consultas separadas
             const {data, error} = await this.baseStudentQuery()
                 .eq('delete_flag', false)
+                .eq('school_id', schoolId)
                 .order('created_at', {ascending: false});
 
             if (error) throw error;

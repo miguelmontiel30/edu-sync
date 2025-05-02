@@ -4,12 +4,12 @@ import {studentRepository} from './repository';
 /**
  * Carga todos los datos de estudiantes (activos y eliminados)
  */
-export async function loadAllStudentsData(): Promise<{
+export async function loadAllStudentsData(schoolId: number): Promise<{
     active: Student[];
     deleted: Student[];
 }> {
     // Obtener estudiantes activos
-    const active = await studentRepository.getActiveStudents();
+    const active = await studentRepository.getActiveStudents(schoolId);
 
     // Obtener estudiantes eliminados
     const deleted = await studentRepository.getDeletedStudents();
@@ -21,8 +21,8 @@ export async function loadAllStudentsData(): Promise<{
 /**
  * Obtiene todos los estudiantes activos
  */
-export async function fetchActiveStudents(): Promise<Student[]> {
-    return studentRepository.getActiveStudents();
+export async function fetchActiveStudents(schoolId: number): Promise<Student[]> {
+    return studentRepository.getActiveStudents(schoolId);
 }
 
 /**

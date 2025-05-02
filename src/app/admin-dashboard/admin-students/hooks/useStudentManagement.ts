@@ -5,6 +5,9 @@ import {useState, useEffect, useCallback} from 'react';
 import {Student, StudentFormData, StudentGroup, AlertState} from '../module-utils/types';
 import {studentRepository} from '../module-utils/repository';
 
+// Hooks
+import {useSession} from '@/hooks/useSession';
+
 interface LoadingState {
     students: boolean;
     deleted: boolean;
@@ -63,14 +66,19 @@ export function useStudentManagement() {
     const [sortField, setSortField] = useState<keyof Student>('full_name');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+    // Obtener datos de sesión
+    const {session} = useSession();
+
     /**
      * Carga inicial de datos
      */
     useEffect(() => {
-        loadStudents();
-        loadDeletedStudents();
-        loadStudentGroups();
-    }, []);
+        if (session?.school_id) {
+            loadStudents();
+            loadDeletedStudents();
+            loadStudentGroups();
+        }
+    }, [session]);
 
     /**
      * Efecto para filtrar y ordenar estudiantes cuando cambian los filtros
@@ -88,7 +96,11 @@ export function useStudentManagement() {
         setLoadingState(prev => ({...prev, students: true}));
 
         try {
-            const data = await studentRepository.getActiveStudents();
+            if (!session?.school_id) {
+                throw new Error('No se encontró el ID de la escuela en la sesión');
+            }
+
+            const data = await studentRepository.getActiveStudents(session.school_id);
             setStudents(data);
             setFilteredStudents(data);
         } catch (error) {
