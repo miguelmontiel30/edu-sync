@@ -1,3 +1,4 @@
+// Tipos principales para el ciclo escolar
 export interface SchoolCycle {
     id: number;
     name: string;
@@ -11,20 +12,12 @@ export interface SchoolCycle {
     deleteFlag?: boolean;
 }
 
-export type SortField =
-    | 'name'
-    | 'startDate'
-    | 'endDate'
-    | 'groupsCount'
-    | 'studentsCount'
-    | 'averageGrade'
-    | 'status';
-
 export interface CycleData {
     name: string;
     startDate: string;
     endDate: string;
     status: string;
+    id?: number;
 }
 
 // Constantes para estados de ciclos
@@ -34,11 +27,39 @@ export const CYCLE_STATUS = {
     COMPLETED: '3',
 };
 
-export type ErrorAlert = {
+// Tipos para la interfaz de usuario
+export interface AlertState {
+    show: boolean;
+    variant: 'warning' | 'error' | 'success' | 'info';
     title: string;
     message: string;
-};
+}
 
+export interface ErrorAlert {
+    title: string;
+    message: string;
+}
+
+export interface LoadingState {
+    cycles: boolean;
+    metrics: boolean;
+    deleted: boolean;
+    processing: boolean;
+}
+
+// Tipos para ordenamiento y filtrado
+export type SortField =
+    | 'name'
+    | 'startDate'
+    | 'endDate'
+    | 'groupsCount'
+    | 'studentsCount'
+    | 'averageGrade'
+    | 'status';
+
+export type SortDirection = 'asc' | 'desc';
+
+// Tipos para la base de datos
 export interface DatabaseSchoolYear {
     school_year_id: number;
     name: string;
@@ -61,16 +82,7 @@ export interface DatabaseGroup {
     }[];
 }
 
-export type SortDirection = 'asc' | 'desc';
-
-// Types for the School Year Dashboard
-export interface LoadingState {
-    cycles: boolean;
-    metrics: boolean;
-    deleted: boolean;
-    processing: boolean;
-}
-
+// Hook principal
 export interface CycleManagementHook {
     // Data
     cycles: SchoolCycle[];
@@ -84,14 +96,6 @@ export interface CycleManagementHook {
     errorAlert: ErrorAlert | null;
     loadingState: LoadingState;
 
-    // Metrics
-    metricsData: {
-        totalCycles: number;
-        activeCycles: number;
-        totalStudents: number;
-        averageGrade: number;
-    };
-
     // Actions
     handleEdit: (id: number) => void;
     handleDelete: (id: number) => void;
@@ -99,12 +103,7 @@ export interface CycleManagementHook {
     openModal: () => void;
     closeModal: () => void;
     setIsDeleteModalOpen: (isOpen: boolean) => void;
-    handleSaveCycle: (cycleData: {
-        name: string;
-        startDate: string;
-        endDate: string;
-        status: string;
-    }) => Promise<{success: boolean; errorMessage?: string}>;
+    handleSaveCycle: (cycleData: CycleData) => Promise<{success: boolean; errorMessage?: string}>;
     handleRestore: (id: number) => Promise<void>;
     loadAllCycles: () => Promise<void>;
 }

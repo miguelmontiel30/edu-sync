@@ -13,7 +13,7 @@ import Input from '@/components/form/input/InputField';
 import Select from '@/components/form/Select';
 
 // Types & Utils
-import { CYCLE_STATUS, SchoolCycle } from '../module-utils/types';
+import { CYCLE_STATUS, SchoolCycle, AlertState, CycleData } from '../module-utils/types';
 
 // Hooks
 import { useStatusOptions } from '@/hooks/useStatusData';
@@ -21,17 +21,10 @@ import { useStatusOptions } from '@/hooks/useStatusData';
 interface CycleFormModalProps {
     readonly isOpen: boolean;
     readonly onClose: () => void;
-    readonly onSave: (cycleData: { name: string; startDate: string; endDate: string; status: string }) => Promise<{ success: boolean; errorMessage?: string }>;
+    readonly onSave: (cycleData: CycleData) => Promise<{ success: boolean; errorMessage?: string }>;
     readonly selectedCycle: SchoolCycle | null;
     readonly isSaving: boolean;
     readonly currentCycles: SchoolCycle[];
-}
-
-interface AlertState {
-    show: boolean;
-    variant: 'warning' | 'error' | 'success' | 'info';
-    title: string;
-    message: string;
 }
 
 export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving, currentCycles }: CycleFormModalProps) {
@@ -79,7 +72,6 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                 status: statusOptions.find(option => option.value === CYCLE_STATUS.ACTIVE)?.value || ''
             });
         }
-
     }
 
     // Efecto para inicializar el formulario cuando se abre el modal
@@ -125,7 +117,6 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                 title: 'Error',
                 message: 'Por favor, complete todos los campos requeridos.'
             });
-
             return;
         }
 
@@ -141,7 +132,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
         }
 
         // Convertir el código de estado a ID antes de guardar
-        const cycleDataToSave: { name: string; startDate: string; endDate: string; status: string; id?: number } = {
+        const cycleDataToSave: CycleData = {
             name: cycleForm.name,
             startDate: cycleForm.startDate,
             endDate: cycleForm.endDate,
@@ -248,6 +239,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                         <Label htmlFor="cycle-end-date" className="font-outfit">
                             Ingrese la fecha de fin
                         </Label>
+
                         <Input
                             id="cycle-end-date"
                             type="date"
@@ -259,15 +251,15 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+                <div className="flex flex-col-reverse items-center gap-4 mt-8 md:flex-row md:justify-end">
                     <Button
-                        onClick={onClose}
                         variant="outline"
-                        className="sm:w-auto"
-                        disabled={isSaving}
+                        onClick={onClose}
+                        className="w-full md:w-auto"
                     >
-                        <span className="font-outfit">Cancelar</span>
+                        Cancelar
                     </Button>
+
 
                     <Button
                         onClick={handleSaveCycle}
@@ -281,7 +273,10 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                                 <span className="font-outfit">Guardando...</span>
                             </>
                         ) : (
-                            <span className="font-outfit">{selectedCycle ? "Actualizar Ciclo" : "Crear Ciclo"}</span>
+                            <span className="font-outfit">
+                                <IconFA icon={selectedCycle ? "sync" : "calendar-plus"} className="mr-2" />
+                                {selectedCycle ? "Actualizar Ciclo" : "Crear Ciclo"}
+                            </span>
                         )}
                     </Button>
                 </div>
