@@ -10,6 +10,7 @@ export interface InputProps {
     name?: string;
     defaultValue?: string;
     id?: string;
+    maxLength?: number;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -21,7 +22,8 @@ const Input: React.FC<InputProps> = ({
     onChange,
     name,
     defaultValue,
-    id
+    id,
+    maxLength
 }) => {
     return (
         <div className="relative">
@@ -39,6 +41,7 @@ const Input: React.FC<InputProps> = ({
                 onChange={onChange}
                 name={name}
                 defaultValue={defaultValue}
+                maxLength={maxLength}
             />
         </div>
     );

@@ -20,6 +20,7 @@ export const STATUS_CACHE_KEYS = {
     GROUP: 'status_group',
     STUDENT_GROUP: 'status_student_group',
     EVALUATION_PERIOD: 'status_evaluation_period',
+    STUDENT: 'status_student',
 };
 
 /**
@@ -88,6 +89,14 @@ class StatusService {
      */
     async getEvaluationPeriodStatuses(): Promise<Status[]> {
         return this.getStatusesByCategory('evaluation_period', STATUS_CACHE_KEYS.EVALUATION_PERIOD);
+    }
+
+    /**
+     * Obtiene los estados para estudiantes con caché
+     * @returns Lista de estados para estudiantes
+     */
+    async getStudentStatuses(): Promise<Status[]> {
+        return this.getStatusesByCategory('student', STATUS_CACHE_KEYS.STUDENT);
     }
 
     /**

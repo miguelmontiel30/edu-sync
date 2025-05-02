@@ -243,6 +243,7 @@ CREATE TABLE
         phone VARCHAR(15),
         email VARCHAR(100),
         image_url VARCHAR(255),
+        status_id INTEGER REFERENCES status (status_id) NOT NULL,
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
         updated_at TIMESTAMPTZ DEFAULT NOW (),

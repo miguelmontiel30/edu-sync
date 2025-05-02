@@ -91,6 +91,8 @@ interface ChartConfig {
     readonly dataKey: string;
     readonly color: string;
     readonly yAxisTitle: string;
+    readonly isEmpty?: boolean;
+    readonly blurMessage?: string;
 }
 
 export interface BarChartProps {
@@ -120,7 +122,7 @@ export function BarChart({
     emptyMessage = "Registra tus datos para poder ver las métricas",
     customOptions
 }: Readonly<BarChartProps>) {
-    const { title, dataKey, color, yAxisTitle } = chartConfig;
+    const { title, dataKey, color, yAxisTitle, isEmpty, blurMessage } = chartConfig;
 
     if (isLoading) {
         return (
@@ -130,7 +132,14 @@ export function BarChart({
         );
     }
 
-    if (data.length === 0) {
+    // Verificar si los datos son válidos (hay datos y tienen la propiedad dataKey)
+    const hasValidData = data && data.length > 0 && data.some(item => typeof item[dataKey] === 'number');
+
+    // Si isEmpty está definido explícitamente, usar ese valor; de lo contrario, usar la lógica existente
+    const shouldShowEmpty = isEmpty !== undefined ? isEmpty : !hasValidData;
+    const emptyDisplayMessage = blurMessage || emptyMessage;
+
+    if (shouldShowEmpty) {
         return (
             <>
                 <div className="flex items-center justify-between">
@@ -168,10 +177,23 @@ export function BarChart({
                     </div>
                 </div>
                 <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
-                    <span className="text-lg font-semibold text-white font-outfit text-center px-4">{emptyMessage}</span>
+                    <span className="text-lg font-semibold text-white font-outfit text-center px-4">{emptyDisplayMessage}</span>
                 </div>
             </>
         );
+    }
+
+    // Extraer datos válidos para el gráfico
+    const chartData = data
+        .filter(item => typeof item[dataKey] === 'number')
+        .map(item => ({
+            name: item.name || 'Sin nombre',
+            value: item[dataKey] || 0
+        }));
+
+    // Asegurarse de que siempre haya al menos un elemento en el array de datos
+    if (chartData.length === 0) {
+        chartData.push({ name: 'Sin datos', value: 0 });
     }
 
     return (
@@ -193,7 +215,7 @@ export function BarChart({
                                 },
                             },
                             xaxis: {
-                                categories: data.map(item => item.name),
+                                categories: chartData.map(item => item.name),
                             },
                             chart: {
                                 ...defaultBarOptions.chart,
@@ -203,7 +225,7 @@ export function BarChart({
                         }}
                         series={[{
                             name: yAxisTitle,
-                            data: data.map(item => item[dataKey] as number)
+                            data: chartData.map(item => item.value)
                         }]}
                         type="bar"
                         height={180}
