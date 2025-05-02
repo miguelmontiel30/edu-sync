@@ -13,8 +13,7 @@ import Input from '@/components/form/input/InputField';
 import Select from '@/components/form/Select';
 
 // Types & Utils
-import { SchoolCycle } from '../module-utils/types';
-import { mapStatusCodeToId, mapStatusIdToCode } from '../module-utils/utils';
+import { CYCLE_STATUS, SchoolCycle } from '../module-utils/types';
 
 // Hooks
 import { useStatusOptions } from '@/hooks/useStatusData';
@@ -22,7 +21,7 @@ import { useStatusOptions } from '@/hooks/useStatusData';
 interface CycleFormModalProps {
     readonly isOpen: boolean;
     readonly onClose: () => void;
-    readonly onSave: (cycleData: { name: string; startDate: string; endDate: string; status: string }) => Promise<void>;
+    readonly onSave: (cycleData: { name: string; startDate: string; endDate: string; status: string }) => Promise<{ success: boolean; errorMessage?: string }>;
     readonly selectedCycle: SchoolCycle | null;
     readonly isSaving: boolean;
     readonly currentCycles: SchoolCycle[];
@@ -63,35 +62,31 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
         }
     }, [alertState.show]);
 
-    // Función para obtener el valor inicial del estado
-    const getInitialStatus = () => {
+    // Función para inicializar un nuevo ciclo con valores por defecto
+    function initializeCycleForm() {
         if (selectedCycle) {
-            return mapStatusIdToCode(selectedCycle.status.toString());
+            setCycleForm({
+                name: selectedCycle.name,
+                startDate: selectedCycle.startDate,
+                endDate: selectedCycle.endDate,
+                status: selectedCycle.status.toString()
+            });
+        } else {
+            setCycleForm({
+                name: '',
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
+                status: statusOptions.find(option => option.value === CYCLE_STATUS.ACTIVE)?.value || ''
+            });
         }
 
-        return statusOptions.find(option => option.value === 'SCHOOL_YEAR_ACTIVE')?.value || '';
-    };
+    }
 
-    // Efecto para obtener el valor inicial del estado
+    // Efecto para inicializar el formulario cuando se abre el modal
     useEffect(() => {
         if (isOpen) {
-            if (selectedCycle) {
-                // Cuando hay un ciclo seleccionado (edición)
-                setCycleForm({
-                    name: selectedCycle.name,
-                    startDate: selectedCycle.startDate,
-                    endDate: selectedCycle.endDate,
-                    status: getInitialStatus()
-                });
-            } else if (statusOptions.length > 0) {
-                // Cuando no hay ciclo seleccionado (nuevo ciclo)
-                setCycleForm({
-                    name: '',
-                    startDate: new Date().toISOString().split('T')[0],
-                    endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-                    status: getInitialStatus()
-                });
-            }
+            // Inicializar el formulario con los datos del ciclo seleccionado
+            initializeCycleForm();
         } else {
             resetForm();
         }
@@ -130,6 +125,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                 title: 'Error',
                 message: 'Por favor, complete todos los campos requeridos.'
             });
+
             return;
         }
 
@@ -144,29 +140,12 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
             return;
         }
 
-        // Validar que no se cree un ciclo activo si ya existe uno
-        if (cycleForm.status === 'SCHOOL_YEAR_ACTIVE') {
-            const hasActiveCycle = currentCycles.some(cycle =>
-                cycle.status.toString() === '1' &&
-                (!selectedCycle || cycle.id !== selectedCycle.id)
-            );
-            if (hasActiveCycle) {
-                setAlertState({
-                    show: true,
-                    variant: 'error',
-                    title: 'Error',
-                    message: 'Lo sentimos, pero ya existe un ciclo escolar activo. No es posible tener más de un ciclo activo al mismo tiempo.'
-                });
-                return;
-            }
-        }
-
         // Convertir el código de estado a ID antes de guardar
         const cycleDataToSave: { name: string; startDate: string; endDate: string; status: string; id?: number } = {
             name: cycleForm.name,
             startDate: cycleForm.startDate,
             endDate: cycleForm.endDate,
-            status: mapStatusCodeToId(cycleForm.status)
+            status: cycleForm.status
         };
 
         // Si es una edición, incluimos el ID
@@ -175,7 +154,17 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
         }
 
         // Guardar el ciclo
-        await onSave(cycleDataToSave);
+        const result = await onSave(cycleDataToSave);
+
+        // Mostrar error si el guardado falló
+        if (!result.success && result.errorMessage) {
+            setAlertState({
+                show: true,
+                variant: 'error',
+                title: 'Error',
+                message: result.errorMessage
+            });
+        }
     }
 
     return (

@@ -104,7 +104,7 @@ export interface CycleManagementHook {
         startDate: string;
         endDate: string;
         status: string;
-    }) => Promise<void>;
+    }) => Promise<{success: boolean; errorMessage?: string}>;
     handleRestore: (id: number) => Promise<void>;
     loadAllCycles: () => Promise<void>;
 }

@@ -158,7 +158,7 @@ export function useCycleManagement(): CycleManagementHook {
         startDate: string;
         endDate: string;
         status: string;
-    }) {
+    }): Promise<{success: boolean; errorMessage?: string}> {
         setLoadingState(prev => ({...prev, processing: true}));
 
         try {
@@ -166,14 +166,13 @@ export function useCycleManagement(): CycleManagementHook {
             const validation = validateCycleData(cycleData, cycles, selectedCycle?.id);
 
             if (!validation.isValid) {
-                setErrorAlert({
-                    title: 'Error de validación',
-                    message: validation.errorMessage || 'Por favor verifica los datos ingresados.',
-                });
-
                 setLoadingState(prev => ({...prev, processing: false}));
-
-                return;
+                // Retornamos el error para que se muestre en el formulario
+                return {
+                    success: false,
+                    errorMessage:
+                        validation.errorMessage || 'Por favor verifica los datos ingresados.',
+                };
             }
 
             // Guardar ciclo
@@ -184,13 +183,16 @@ export function useCycleManagement(): CycleManagementHook {
 
             // Cerrar modal
             closeModal();
+
+            return {success: true};
         } catch (error) {
             console.error('Error al guardar el ciclo:', error);
 
-            setErrorAlert({
-                title: 'Error al guardar el ciclo',
-                message: 'No se pudo guardar el ciclo. Por favor intenta nuevamente.',
-            });
+            // Retornamos el error para que se muestre en el formulario
+            return {
+                success: false,
+                errorMessage: 'No se pudo guardar el ciclo. Por favor intenta nuevamente.',
+            };
         } finally {
             setLoadingState(prev => ({...prev, processing: false}));
         }
