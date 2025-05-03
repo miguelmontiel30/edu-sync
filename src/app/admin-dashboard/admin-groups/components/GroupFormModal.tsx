@@ -1,0 +1,343 @@
+'use client';
+
+// React
+import { useState, useEffect } from 'react';
+
+// Components
+import { Modal } from '@/components/ui/modal';
+import Label from '@/components/form/Label';
+import Input from '@/components/form/input/InputField';
+
+// Core Components
+import SelectWithCategories from '@/components/core/select/SelectWithCategories';
+import Button from '@/components/core/button/Button';
+import IconFA from '@/components/ui/IconFA';
+
+// Types
+import { Group, GroupFormData, GROUP_STATUS, ErrorAlert } from '../module-utils/types';
+import { CYCLE_STATUS } from '@/app/admin-dashboard/admin-school-year/module-utils/types';
+
+interface GroupFormModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSave: (groupData: GroupFormData) => Promise<void>;
+    selectedGroup: Group | null;
+    isSaving: boolean;
+    schoolYears: Array<{ id: number; name: string; status: string }>;
+    errorAlert: ErrorAlert | null;
+}
+
+export default function GroupFormModal({
+    isOpen,
+    onClose,
+    onSave,
+    selectedGroup,
+    isSaving,
+    schoolYears,
+    errorAlert
+}: GroupFormModalProps) {
+    // Estado del formulario
+    const [formData, setFormData] = useState<GroupFormData>({
+        grade: '',
+        group: '',
+        schoolYearId: '',
+        statusId: GROUP_STATUS.ACTIVE
+    });
+
+    /**
+     * Devuelve el ID del ciclo escolar inicial para el formulario
+     * @returns ID del ciclo escolar
+     */
+    const getInitialSchoolYear = () => {
+        // Si estamos editando un grupo, devolver su ciclo escolar
+        if (selectedGroup && selectedGroup.schoolYear) {
+            return selectedGroup.schoolYear.id.toString();
+        }
+
+        // Si no estamos editando, intentar encontrar un ciclo activo
+        const activeSchoolYears = schoolYears.filter(year => year.status === CYCLE_STATUS.ACTIVE);
+
+        // Si hay ciclos activos, devolver el primero
+        if (activeSchoolYears.length > 0) {
+            return activeSchoolYears[0].id.toString();
+        }
+
+        // Si no hay ciclos activos, devolver vacío
+        return '';
+    };
+
+    /**
+     * Resetea el formulario a sus valores iniciales
+     */
+    const resetForm = () => {
+        setFormData({
+            grade: '',
+            group: '',
+            schoolYearId: getInitialSchoolYear(),
+            statusId: GROUP_STATUS.ACTIVE
+        });
+    };
+
+    // Función para manejar el cierre del modal con reseteo de formulario
+    const handleClose = () => {
+        resetForm();
+        onClose();
+    };
+
+    // Actualizar formulario cuando cambia el grupo seleccionado
+    useEffect(() => {
+        if (selectedGroup) {
+            // Asegurar que status_id se maneje como string exactamente igual al enum GROUP_STATUS
+            // A veces viene como número y necesitamos convertirlo a string
+            let statusIdValue = selectedGroup.status_id;
+
+            // Si es un número, convertirlo a string
+            if (typeof statusIdValue === 'number') {
+                statusIdValue = String(statusIdValue);
+            }
+
+            setFormData({
+                grade: selectedGroup.grade.toString(),
+                group: selectedGroup.group,
+                schoolYearId: selectedGroup.schoolYear.id.toString(),
+                statusId: statusIdValue
+            });
+
+        } else {
+            // Reiniciar formulario para nuevo grupo
+            resetForm();
+        }
+    }, [selectedGroup, schoolYears]);
+
+    // Manejar cambios en inputs
+    function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    }
+
+    // Manejar cambio en selects personalizados
+    function handleSelectChange(name: string, value: string) {
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    }
+
+    // Manejar envío del formulario
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+
+        // Validar que los campos requeridos estén completos
+        if (!formData.grade || !formData.group || !formData.schoolYearId) {
+            alert('Por favor, complete todos los campos requeridos.');
+            return;
+        }
+
+        try {
+            await onSave(formData);
+            // Si llegamos aquí, significa que el guardado fue exitoso
+            // Resetear el formulario si no estamos editando un grupo existente
+            if (!selectedGroup) {
+                resetForm();
+            }
+        } catch (error) {
+            // El error ya debería ser manejado por el componente padre
+            console.error('Error al guardar el grupo:', error);
+        }
+    }
+
+    // Obtener opciones agrupadas para ciclos escolares
+    function getGroupedSchoolYears() {
+        const categories = [];
+
+        // Agregar ciclos activos
+        const activeYears = schoolYears.filter(year => year.status === CYCLE_STATUS.ACTIVE);
+        if (activeYears.length > 0) {
+            categories.push({
+                label: 'Ciclos Activos',
+                options: activeYears.map(year => ({
+                    value: year.id.toString(),
+                    label: year.name
+                }))
+            });
+        }
+
+        // Agregar ciclos inactivos
+        const inactiveYears = schoolYears.filter(year => year.status === CYCLE_STATUS.INACTIVE);
+
+        // Si hay ciclos inactivos, agregarlos a la lista
+        if (inactiveYears.length > 0) {
+            categories.push({
+                label: 'Ciclos Inactivos',
+                options: inactiveYears.map(year => ({
+                    value: year.id.toString(),
+                    label: year.name
+                }))
+            });
+        }
+
+        // Agregar ciclos finalizados
+        const completedYears = schoolYears.filter(year => year.status === CYCLE_STATUS.COMPLETED);
+
+        // Si hay ciclos finalizados, agregarlos a la lista
+        if (completedYears.length > 0) {
+            categories.push({
+                label: 'Ciclos Finalizados',
+                options: completedYears.map(year => ({
+                    value: year.id.toString(),
+                    label: year.name
+                }))
+            });
+        }
+
+        return categories;
+    }
+
+    return (
+        <Modal
+            isOpen={isOpen}
+            onClose={handleClose}
+            className="max-w-[700px] p-6 lg:p-10"
+        >
+            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+                <div>
+                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
+                        {selectedGroup ? "Editar grupo" : "Crear nuevo grupo"}
+                    </h5>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                        {selectedGroup
+                            ? "Modifica los detalles del grupo según sea necesario."
+                            : "Completa los campos para crear un nuevo grupo."
+                        }
+                    </p>
+                </div>
+
+                {/* Mostrar alerta de error si existe */}
+                {errorAlert && (
+                    <div className="p-4 mt-4 text-sm border rounded-md bg-red-50 border-red-200 text-red-600 relative error-alert">
+                        <button
+                            className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                            onClick={() => {
+                                // Este es un elemento para cerrar visualmente la alerta,
+                                // pero no elimina el error del estado
+                                const alertElement = document.querySelector('.error-alert');
+                                if (alertElement) alertElement.classList.add('hidden');
+                            }}
+                        >
+                            <IconFA icon="xmark" />
+                        </button>
+                        <div className="flex items-start">
+                            <div className="mr-3 mt-0.5">
+                                <IconFA icon="circle-exclamation" className="text-red-500" />
+                            </div>
+                            <div>
+                                <p className="font-semibold">{errorAlert.title}</p>
+                                <p>{errorAlert.message}</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="mt-8">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <Label htmlFor="grade" className="font-outfit">
+                                Grado
+                                <span className="text-red-500 ml-1">*</span>
+                            </Label>
+                            <Input
+                                id="grade"
+                                name="grade"
+                                type="number"
+                                placeholder="Ej. 1"
+                                onChange={handleInputChange}
+                                defaultValue={formData.grade}
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="group" className="font-outfit">
+                                Grupo
+                                <span className="text-red-500 ml-1">*</span>
+                            </Label>
+                            <Input
+                                id="group"
+                                name="group"
+                                type="text"
+                                placeholder="Ej. A"
+                                onChange={handleInputChange}
+                                defaultValue={formData.group}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="mt-6">
+                        <Label htmlFor="schoolYearId" className="font-outfit">
+                            Ciclo Escolar
+                            <span className="text-red-500 ml-1">*</span>
+                        </Label>
+
+                        <SelectWithCategories
+                            options={getGroupedSchoolYears()}
+                            placeholder="Seleccione un ciclo escolar"
+                            onChange={(value) => handleSelectChange('schoolYearId', value)}
+                            defaultValue={getInitialSchoolYear()}
+                            maxMenuHeight="max-h-96"
+                        />
+                    </div>
+
+                    <div className="mt-6">
+                        <Label className="font-outfit">
+                            Estado del Grupo
+                        </Label>
+                        <SelectWithCategories
+                            options={[
+                                {
+                                    label: 'Estados Disponibles',
+                                    options: [
+                                        { value: GROUP_STATUS.ACTIVE, label: 'Activo' },
+                                        { value: GROUP_STATUS.INACTIVE, label: 'Inactivo' },
+                                        { value: GROUP_STATUS.COMPLETED, label: 'Finalizado' }
+                                    ]
+                                }
+                            ]}
+                            placeholder="Seleccione un estado"
+                            onChange={(value) => handleSelectChange('statusId', value)}
+                            defaultValue={formData.statusId}
+                            maxMenuHeight="max-h-60"
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-3 mt-8 modal-footer sm:justify-end">
+                        <Button
+                            type="button"
+                            onClick={handleClose}
+                            variant="outline"
+                            className="sm:w-auto"
+                            disabled={isSaving}
+                        >
+                            <span className="font-outfit">Cancelar</span>
+                        </Button>
+
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            className="sm:w-auto"
+                            disabled={isSaving}
+                            startIcon={isSaving ? <IconFA icon="spinner" spin /> : undefined}
+                        >
+                            <span className="font-outfit">
+                                {isSaving
+                                    ? 'Guardando...'
+                                    : (selectedGroup ? "Actualizar Grupo" : "Crear Grupo")
+                                }
+                            </span>
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </Modal>
+    );
+} 
