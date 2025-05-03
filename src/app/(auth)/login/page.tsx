@@ -48,11 +48,8 @@ const LoginPage: React.FC = () => {
                     const updatedSession = await refreshSession();
 
                     if (!updatedSession) {
-                        console.log('No se pudo obtener la sesión actualizada');
                         return;
                     }
-
-                    console.log('Sesión activa en login, verificando rol:', updatedSession.role);
 
                     // Determinar a qué dashboard redireccionar según el rol
                     let targetPath = '/login';
@@ -65,7 +62,6 @@ const LoginPage: React.FC = () => {
                         targetPath = '/student-dashboard/dashboard';
                     }
 
-                    console.log('Redirigiendo desde login a:', targetPath);
                     router.push(targetPath);
                 } catch (error) {
                     console.error('Error verificando sesión en login:', error);
@@ -123,17 +119,11 @@ const LoginPage: React.FC = () => {
         setIsLoading(true);
 
         try {
-            console.log('Iniciando proceso de login con:', username);
-
             // Usar nuestro servicio de autenticación con caché
             const session = await login(username, password);
 
-            console.log('Login exitoso, refrescando sesión');
-
             // Refrescar la sesión en el contexto
             await refreshSession();
-
-            console.log('Sesión refrescada, redirigiendo según rol:', session.role);
 
             // Redirigimos al dashboard según el rol real del usuario en la base de datos
             if (session.role === 'admin') {

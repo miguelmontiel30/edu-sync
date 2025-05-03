@@ -25,7 +25,6 @@ export function AuthRedirectWrapper({ children }: AuthRedirectWrapperProps) {
 
         // Solo ejecutar cuando la carga termine
         if (!isLoading) {
-            console.log('Auth check en', pathname, 'autenticado:', isAuthenticated);
 
             // Marcar como verificado para no repetir
             setRedirectChecked(true);
@@ -35,7 +34,6 @@ export function AuthRedirectWrapper({ children }: AuthRedirectWrapperProps) {
             // 2. No está autenticado
             // 3. No estamos ya en proceso de redirección
             if (!isPublicPath && !isAuthenticated && !redirectInProgress) {
-                console.log('Redirigiendo a login desde', pathname);
                 setRedirectInProgress(true);
                 router.push('/login');
                 return;

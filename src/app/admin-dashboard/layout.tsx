@@ -25,12 +25,9 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
             // Solo ejecutar cuando no está cargando y hay datos de sesión
             if (!isLoading && session) {
                 const isAdmin = hasRole('admin');
-                console.log('Verificando acceso admin en AdminLayout:',
-                    session.role, 'isAdmin:', isAdmin);
 
                 // Si el usuario no es admin, redirigir a unauthorized
                 if (!isAdmin) {
-                    console.log('Usuario no es admin, redirigiendo a unauthorized');
                     router.push('/unauthorized');
                 }
             }

@@ -1,6 +1,5 @@
 INSERT INTO
     "public"."teachers" (
-        "teacher_id",
         "school_id",
         "first_name",
         "father_last_name",
@@ -19,7 +18,6 @@ INSERT INTO
 VALUES
     (
         '1',
-        '1',
         'Luis',
         'Hernández',
         'López',
@@ -35,7 +33,6 @@ VALUES
         null
     ),
     (
-        '2',
         '1',
         'María',
         'González',
@@ -52,7 +49,6 @@ VALUES
         null
     ),
     (
-        '3',
         '1',
         'Carlos',
         'Martínez',
@@ -69,7 +65,6 @@ VALUES
         null
     ),
     (
-        '4',
         '1',
         'Ana',
         'Fernández',
@@ -86,7 +81,6 @@ VALUES
         null
     ),
     (
-        '5',
         '1',
         'Javier',
         'Luna',
@@ -103,7 +97,6 @@ VALUES
         null
     ),
     (
-        '6',
         '1',
         'Sofía',
         'Pérez',
@@ -120,7 +113,6 @@ VALUES
         null
     ),
     (
-        '7',
         '1',
         'Miguel',
         'Santos',
@@ -137,7 +129,6 @@ VALUES
         null
     ),
     (
-        '8',
         '1',
         'Laura',
         'Díaz',
@@ -154,7 +145,6 @@ VALUES
         null
     ),
     (
-        '9',
         '1',
         'Héctor',
         'Valdez',
@@ -171,7 +161,6 @@ VALUES
         null
     ),
     (
-        '10',
         '2',
         'Gabriela',
         'Moreno',
@@ -188,7 +177,6 @@ VALUES
         null
     ),
     (
-        '11',
         '2',
         'Fernando',
         'Reyes',
@@ -205,7 +193,6 @@ VALUES
         null
     ),
     (
-        '12',
         '2',
         'Patricia',
         'Maldonado',
@@ -222,7 +209,6 @@ VALUES
         null
     ),
     (
-        '13',
         '2',
         'Andrés',
         'Ortega',
@@ -239,7 +225,6 @@ VALUES
         null
     ),
     (
-        '14',
         '2',
         'Mónica',
         'Rojas',
@@ -256,7 +241,6 @@ VALUES
         null
     ),
     (
-        '15',
         '2',
         'Diego',
         'Núñez',
@@ -273,7 +257,6 @@ VALUES
         null
     ),
     (
-        '16',
         '2',
         'Elena',
         'Vargas',
@@ -290,7 +273,6 @@ VALUES
         null
     ),
     (
-        '17',
         '2',
         'Adrián',
         'Solís',
@@ -307,7 +289,6 @@ VALUES
         null
     ),
     (
-        '18',
         '3',
         'Marisol',
         'Zamora',
@@ -324,7 +305,6 @@ VALUES
         null
     ),
     (
-        '19',
         '3',
         'Raúl',
         'Guerrero',
@@ -341,7 +321,6 @@ VALUES
         null
     ),
     (
-        '20',
         '3',
         'Verónica',
         'Medina',
@@ -358,7 +337,6 @@ VALUES
         null
     ),
     (
-        '21',
         '3',
         'José',
         'Padilla',
@@ -375,7 +353,6 @@ VALUES
         null
     ),
     (
-        '22',
         '3',
         'Adriana',
         'Garza',
@@ -392,7 +369,6 @@ VALUES
         null
     ),
     (
-        '23',
         '3',
         'Pablo',
         'Montes',
@@ -409,7 +385,6 @@ VALUES
         null
     ),
     (
-        '24',
         '3',
         'Daniela',
         'Huerta',
@@ -426,7 +401,6 @@ VALUES
         null
     ),
     (
-        '25',
         '3',
         'Samuel',
         'Vázquez',

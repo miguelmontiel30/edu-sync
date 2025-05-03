@@ -67,44 +67,33 @@ export default function ProtectedRoute({
         if (authVerified && !connectionError && !isLoading) {
             // Verificar si hay usuario autenticado
             if (!session) {
-                console.log('No hay sesión activa, redirigiendo a login');
+                // Redirigir a la página de login
                 router.push('/login');
                 return;
             }
-
-            console.log('Verificando acceso en ProtectedRoute:',
-                'rol:', session.role,
-                'adminOnly:', adminOnly,
-                'teacherOnly:', teacherOnly,
-                'studentOnly:', studentOnly);
 
             let isRoleAuthorized = true;
 
             // Verificar restricciones de rol
             if (adminOnly && !hasRole('admin')) {
-                console.log('Se requiere rol de admin pero el usuario tiene:', session.role);
                 isRoleAuthorized = false;
             }
 
             if (teacherOnly && !hasRole('teacher')) {
-                console.log('Se requiere rol de profesor pero el usuario tiene:', session.role);
                 isRoleAuthorized = false;
             }
 
             if (studentOnly && !hasRole('student')) {
-                console.log('Se requiere rol de estudiante pero el usuario tiene:', session.role);
                 isRoleAuthorized = false;
             }
 
             // Si no tiene el rol adecuado, redirigir a página no autorizada
             if (!isRoleAuthorized) {
-                console.log('Usuario no tiene el rol requerido, redirigiendo a /unauthorized');
                 router.push('/unauthorized');
                 return;
             }
 
             // Si llegamos aquí, el usuario está autorizado
-            console.log('Usuario autorizado con rol:', session.role);
             setIsAuthorized(true);
         }
     }, [

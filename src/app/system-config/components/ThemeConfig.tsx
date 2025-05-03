@@ -51,7 +51,6 @@ export default function ThemeConfig() {
         if (session && session.school_id) {
             setSchoolId(session.school_id);
         } else if (!isLoadingSession) {
-            console.log('No se encontró school_id en la sesión del usuario');
             setMessage({
                 type: 'error',
                 text: 'No se encontró la escuela asociada a tu usuario. Por favor, contacta al administrador.'

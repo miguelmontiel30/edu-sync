@@ -125,10 +125,6 @@ export default function RolesPermissions() {
 
             if (error) throw error;
 
-            console.log('Datos recibidos de la API:', data);
-            if (data && data.length > 0) {
-                console.log('Estructura del primer elemento:', JSON.stringify(data[0]));
-            }
 
             // Creamos una copia segura y tipada de los datos
             const formattedData: RolePermission[] = [];
