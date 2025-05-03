@@ -28,8 +28,15 @@ const SelectWithCategories: React.FC<SelectWithCategoriesProps> = ({
     maxMenuHeight = 'max-h-96',
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
+    const [selectedValue, setSelectedValue] = useState<string>(defaultValue || '');
     const selectRef = useRef<HTMLDivElement>(null);
+
+    // Actualizar el valor seleccionado cuando cambia defaultValue
+    useEffect(() => {
+        if (defaultValue) {
+            setSelectedValue(defaultValue);
+        }
+    }, [defaultValue]);
 
     // Cerrar el select cuando se hace clic fuera
     useEffect(() => {
