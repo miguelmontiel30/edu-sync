@@ -7,13 +7,14 @@ import Badge from '@/components/core/badge/Badge';
 
 // Types
 import { Group, GROUP_STATUS } from '../module-utils/types';
+import { ActionButton, ItemsListConfig } from '../../core/Tables/ItemsList';
 
 interface TableConfigProps {
     handleEdit: (id: number) => void;
     handleDelete: (id: number) => void;
 }
 
-// Definir el tipo BadgeColor para evitar errores
+// Definir tipos para evitar errores
 type BadgeColor = 'success' | 'warning' | 'error' | 'info' | undefined;
 
 /**
@@ -170,27 +171,25 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps) {
     ], []);
 
     // Botones de acción para la tabla de grupos
-    const groupActionButtons = useMemo(() => [
+    const groupActionButtons: ActionButton[] = useMemo(() => [
         {
-            key: 'edit',
             label: 'Editar',
             icon: 'pen-to-square',
             iconStyle: 'duotone',
-            onClick: (id: number) => handleEdit(id),
             variant: 'outline',
+            onClick: (id: string | number) => handleEdit(Number(id))
         },
         {
-            key: 'delete',
             label: 'Eliminar',
             icon: 'trash',
             iconStyle: 'duotone',
-            onClick: (id: number) => handleDelete(id),
             variant: 'outline',
+            onClick: (id: string | number) => handleDelete(Number(id))
         },
     ], [handleEdit, handleDelete]);
 
     // Configuración de la lista de grupos
-    const groupListConfig = useMemo(() => ({
+    const groupListConfig: ItemsListConfig<Group> = useMemo(() => ({
         title: 'Lista de grupos',
         description: 'Aquí podrás ver todos los grupos registrados, su información y gestionarlos. Puedes crear nuevos grupos, editar los existentes o eliminarlos según sea necesario.',
         addButtonLabel: 'Nuevo Grupo',
