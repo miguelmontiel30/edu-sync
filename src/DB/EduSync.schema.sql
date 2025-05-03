@@ -298,8 +298,7 @@ CREATE TABLE
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
         updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ,
-        UNIQUE (school_id, school_year_id, grade, group_name)
+        deleted_at TIMESTAMPTZ
     );
 
 COMMENT ON TABLE groups IS 'Define los grupos de estudiantes por grado';
