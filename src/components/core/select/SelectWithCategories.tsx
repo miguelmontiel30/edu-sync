@@ -16,6 +16,7 @@ interface SelectWithCategoriesProps {
     onChange: (value: string) => void;
     className?: string;
     defaultValue?: string;
+    maxMenuHeight?: string;
 }
 
 const SelectWithCategories: React.FC<SelectWithCategoriesProps> = ({
@@ -24,6 +25,7 @@ const SelectWithCategories: React.FC<SelectWithCategoriesProps> = ({
     onChange,
     className = '',
     defaultValue = '',
+    maxMenuHeight = 'max-h-96',
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState<string>(defaultValue);
@@ -71,11 +73,11 @@ const SelectWithCategories: React.FC<SelectWithCategoriesProps> = ({
             </div>
 
             {isOpen && (
-                <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-900 sm:text-sm">
+                <div className={`absolute z-50 mt-1 ${maxMenuHeight} w-full overflow-auto rounded-lg bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-900 sm:text-sm`}>
                     {options.map((category, index) => (
                         <div key={index}>
                             {/* Título de la categoría */}
-                            <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                            <div className="sticky top-0 px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 z-10">
                                 {category.label}
                             </div>
 
