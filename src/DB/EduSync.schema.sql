@@ -339,6 +339,7 @@ CREATE TABLE
         school_id INTEGER REFERENCES schools (school_id),
         name VARCHAR(100) NOT NULL,
         description TEXT,
+        status_id INTEGER REFERENCES status (status_id) NOT NULL,
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
         updated_at TIMESTAMPTZ DEFAULT NOW (),
