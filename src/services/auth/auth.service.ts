@@ -161,6 +161,7 @@ export async function login(email: string, password: string) {
             } catch (authError) {
                 console.warn(
                     'No se pudo autenticar con Supabase, usando autenticación personalizada',
+                    authError,
                 );
             }
         }
