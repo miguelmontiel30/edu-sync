@@ -3,7 +3,7 @@ import ComponentCard from '../../common/ComponentCard';
 import Switch from '../switch/Switch';
 
 export default function ToggleSwitch() {
-    const handleSwitchChange = (checked: boolean) => {
+    const handleSwitchChange = (_checked: boolean) => {
         // TODO: Implementar la lógica para el cambio del switch
     };
     return (

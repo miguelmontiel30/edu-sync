@@ -5,7 +5,7 @@ import {DatabaseSubject, Subject} from './types';
  * @param subjectData - Datos de la materia desde la base de datos
  * @returns Datos formateados para la interfaz
  */
-export async function formatSubjectData(subjectData: DatabaseSubject): Promise<Subject> {
+export function formatSubjectData(subjectData: DatabaseSubject): Subject {
     // Calcular contadores
     const groupsCount = subjectData.group_subjects?.length || 0;
 

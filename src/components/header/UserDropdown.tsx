@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 
 // Next.js
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 // Components
@@ -30,7 +29,7 @@ export default function UserDropdown() {
         setIsOpen(false);
     }
 
-    async function handleLogout() {
+    function handleLogout() {
         try {
             logout();
             router.push('/login');
@@ -44,6 +43,7 @@ export default function UserDropdown() {
     return (
         <div className="relative">
             <button
+                type="button"
                 onClick={toggleDropdown}
                 className="dropdown-toggle flex items-center font-outfit text-gray-700 dark:text-gray-400"
             >
@@ -115,6 +115,7 @@ export default function UserDropdown() {
                     </li>
                 </ul>
                 <button
+                    type="button"
                     onClick={handleLogout}
                     className="group mt-3 flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                 >

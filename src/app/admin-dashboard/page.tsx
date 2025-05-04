@@ -88,16 +88,6 @@ export default function AdminMainContent() {
         }
     }
 
-    const [isOpen, setIsOpen] = useState(false);
-
-    function toggleDropdown() {
-        setIsOpen(!isOpen);
-    }
-
-    function closeDropdown() {
-        setIsOpen(false);
-    }
-
     const barOptions: ApexOptions = {
         colors: ['#465fff'],
         chart: {

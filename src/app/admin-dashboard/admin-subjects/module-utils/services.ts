@@ -9,7 +9,7 @@ import {subjectRepository} from './repository';
  * @param schoolId - ID de la escuela
  * @returns Lista de materias activas y eliminadas
  */
-export async function loadAllSubjectsData(
+export function loadAllSubjectsData(
     schoolId: number,
 ): Promise<{active: Subject[]; deleted: Subject[]}> {
     return subjectRepository.getAllSubjectsBySchoolId(schoolId);
@@ -32,7 +32,7 @@ export async function loadDeletedSubjects(schoolId: number): Promise<Subject[]> 
  * @param subjectId - ID de la materia (opcional)
  * @param userId - ID del usuario (opcional)
  */
-export async function saveSubject(
+export function saveSubject(
     subject: SubjectData,
     subjectId?: number,
     userId?: string,
@@ -44,7 +44,7 @@ export async function saveSubject(
  * Eliminar materia
  * @param id - ID de la materia a eliminar
  */
-export async function deleteSubject(id: number): Promise<void> {
+export function deleteSubject(id: number): Promise<void> {
     return subjectRepository.deleteSubject(id);
 }
 
@@ -52,7 +52,7 @@ export async function deleteSubject(id: number): Promise<void> {
  * Restaurar materia eliminada
  * @param id - ID de la materia a restaurar
  */
-export async function restoreSubject(id: number): Promise<void> {
+export function restoreSubject(id: number): Promise<void> {
     return subjectRepository.restoreSubject(id);
 }
 
@@ -78,7 +78,7 @@ export async function getSubjectAverageGrade(subjectId: number): Promise<number>
         gradeCache.set(subjectId, averageGrade);
 
         return averageGrade;
-    } catch (error) {
+    } catch (_error) {
         return 0;
     }
 }

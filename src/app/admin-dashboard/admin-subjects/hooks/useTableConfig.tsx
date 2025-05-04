@@ -91,7 +91,7 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
                 <span className="text-sm text-gray-700 dark:text-white/70 font-outfit">
                     <Badge
                         size="sm"
-                        variant={'light'}
+                        variant='light'
                         color={subject?.status?.name === SubjectStatus.ACTIVE ? 'success' : subject?.status?.name === SubjectStatus.INACTIVE ? 'dark' : 'primary'}
                     >
                         {subject.status?.name}

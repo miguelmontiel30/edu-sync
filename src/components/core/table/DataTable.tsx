@@ -1,5 +1,5 @@
 // React
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // Table components
 import { Table, TableHeader, TableBody, TableRow, TableCell } from './index';
@@ -65,7 +65,7 @@ export default function DataTable<T>({
 
     // Procesar datos: ordenar y paginar
     useEffect(() => {
-        let processedData = [...filteredData];
+        const processedData = [...filteredData];
 
         // Ordenar datos si hay un campo de ordenamiento seleccionado y no hay un manejador externo
         if (sortField && !onSort) {

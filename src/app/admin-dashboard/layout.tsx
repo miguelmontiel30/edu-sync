@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
 
     // Verificación adicional de roles para evitar redirecciones innecesarias
     useEffect(() => {
-        const verifyAdminAccess = async () => {
+        const verifyAdminAccess = () => {
             // Solo ejecutar cuando no está cargando y hay datos de sesión
             if (!isLoading && session) {
                 const isAdmin = hasRole('admin');

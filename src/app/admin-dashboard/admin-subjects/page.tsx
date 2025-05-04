@@ -1,6 +1,4 @@
 'use client';
-import { useState } from 'react';
-
 
 // Components
 import ItemsList from '../core/Tables/ItemsList';
