@@ -1,17 +1,23 @@
 'use client';
 
+// Components
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import Alert from '@/components/core/alert/Alert';
+
+// Hooks
 import { useGroupManagement, useMetricsConfig, useTableConfig } from './hooks';
-import { GROUP_STATUS, Group } from './module-utils/types';
-import GroupFormModal from './components/GroupFormModal';
-import DeleteConfirmModal from '../core/Modals/DeleteConfirmModal';
-import MetricsGroup from '../core/Metrics/MetricsGroup';
-import BarChartsGroup from '../core/BarCharts/BarChartsGroup';
-import { ChartData } from '../core/BarCharts/BarChartsGroup';
-import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
+
+// Types
+import { GROUP_STATUS } from './module-utils/types';
+
+// Components
 import ItemsList from '../core/Tables/ItemsList';
+import MetricsGroup from '../core/Metrics/MetricsGroup';
+import GroupFormModal from './components/GroupFormModal';
 import DeletedItemsList from '../core/Tables/DeletedItemsList';
+import DeleteConfirmModal from '../core/Modals/DeleteConfirmModal';
+import BarChartsGroup, { ChartData } from '../core/BarCharts/BarChartsGroup';
+import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
 
 export default function GroupDashboard() {
     // Usar hook principal para gestión de grupos

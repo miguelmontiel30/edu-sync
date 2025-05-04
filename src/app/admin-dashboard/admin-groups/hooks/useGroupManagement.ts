@@ -1,7 +1,5 @@
+// React
 import {useState, useEffect, useMemo} from 'react';
-
-// Services and Clients
-import {supabaseClient} from '@/services/config/supabaseClient';
 
 // Types
 import {
@@ -13,7 +11,6 @@ import {
     LoadingState,
     GroupManagementHook,
     GROUP_STATUS,
-    DatabaseGroup,
 } from '../module-utils/types';
 
 // Services

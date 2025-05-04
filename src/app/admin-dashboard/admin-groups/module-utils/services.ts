@@ -8,7 +8,7 @@ import {groupRepository} from './repository';
 export async function loadAllGroupsData(
     schoolId: number,
 ): Promise<{active: Group[]; deleted: Group[]}> {
-    return groupRepository.getAllGroupsBySchoolId(schoolId);
+    return await groupRepository.getAllGroupsBySchoolId(schoolId);
 }
 
 export async function loadDeletedGroups(schoolId: number): Promise<Group[]> {
@@ -21,13 +21,13 @@ export async function saveGroup(
     schoolId: number,
     groupId: number,
 ): Promise<void> {
-    return groupRepository.saveGroup(group, schoolId, groupId);
+    return await groupRepository.saveGroup(group, schoolId, groupId);
 }
 
-export async function deleteGroup(id: number): Promise<void> {
+export function deleteGroup(id: number): Promise<void> {
     return groupRepository.deleteGroup(id);
 }
 
-export async function restoreGroup(id: number): Promise<void> {
+export function restoreGroup(id: number): Promise<void> {
     return groupRepository.restoreGroup(id);
 }

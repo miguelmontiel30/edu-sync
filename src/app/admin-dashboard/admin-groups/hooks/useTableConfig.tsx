@@ -152,8 +152,8 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps) {
                         Number(item.status_id) === Number(GROUP_STATUS.ACTIVE)
                             ? 'success'
                             : Number(item.status_id) === Number(GROUP_STATUS.INACTIVE)
-                                ? 'error'
-                                : 'warning'
+                                ? 'warning'
+                                : 'primary'
                     }
                 >
                     <span className="font-outfit">{item.statusName}</span>
