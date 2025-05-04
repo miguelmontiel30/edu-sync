@@ -21,6 +21,7 @@ export const STATUS_CACHE_KEYS = {
     STUDENT_GROUP: 'status_student_group',
     EVALUATION_PERIOD: 'status_evaluation_period',
     STUDENT: 'status_student',
+    SUBJECT: 'status_subject',
 };
 
 /**
@@ -106,6 +107,10 @@ class StatusService {
         Object.values(STATUS_CACHE_KEYS).forEach(key => {
             cacheService.remove(key);
         });
+    }
+
+    async getSubjectStatuses(): Promise<Status[]> {
+        return this.getStatusesByCategory('subject', STATUS_CACHE_KEYS.SUBJECT);
     }
 }
 
