@@ -1,5 +1,5 @@
 // React
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 // Components
 import Badge from '@/components/core/badge/Badge';
@@ -7,7 +7,7 @@ import { ActionButton, ItemsListConfig } from '../../core/Tables/ItemsList';
 import { DeletedItemsListConfig } from '../../core/Tables/DeletedItemsList';
 
 // Types & Utils
-import { Subject, SubjectStatus } from '../module-utils/types';
+import { Subject } from '../module-utils/types';
 import { Column } from '@/components/core/table/module-utils/types';
 interface TableConfigProps {
     handleEdit: (id: number) => void;
@@ -92,7 +92,7 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
                     <Badge
                         size="sm"
                         variant='light'
-                        color={subject?.status?.name === SubjectStatus.ACTIVE ? 'success' : subject?.status?.name === SubjectStatus.INACTIVE ? 'dark' : 'primary'}
+                        color={subject?.status?.name === 'ACTIVE' ? 'success' : subject?.status?.name === 'INACTIVE' ? 'dark' : 'primary'}
                     >
                         {subject.status?.name}
                     </Badge>

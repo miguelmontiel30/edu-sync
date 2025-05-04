@@ -1,9 +1,3 @@
-export enum SubjectStatus {
-    ACTIVE = 'Activo',
-    INACTIVE = 'Inactivo',
-    COMPLETED = 'Completado',
-}
-
 // Tipos principales para las materias
 export interface Subject {
     id: number;
@@ -27,12 +21,6 @@ export interface SubjectData {
     id?: number;
 }
 
-// Constantes para estados de materias
-export const SUBJECT_STATUS = {
-    ACTIVE: 'active',
-    INACTIVE: 'inactive',
-};
-
 // Tipos para la interfaz de usuario
 export interface AlertState {
     show: boolean;
@@ -52,11 +40,6 @@ export interface LoadingState {
     deleted: boolean;
     processing: boolean;
 }
-
-// Tipos para ordenamiento y filtrado
-export type SortField = 'name' | 'description' | 'groupsCount' | 'teachersCount' | 'averageGrade';
-
-export type SortDirection = 'asc' | 'desc';
 
 // Tipos para la base de datos
 export interface DatabaseSubject {
@@ -91,16 +74,8 @@ export interface SubjectManagementHook {
     isDeleteModalOpen: boolean;
     selectedSubject: Subject | null;
     subjectToDelete: Subject | null;
-    errorAlert: {
-        title: string;
-        message: string;
-    } | null;
-    loadingState: {
-        subjects: boolean;
-        metrics: boolean;
-        deleted: boolean;
-        processing: boolean;
-    };
+    errorAlert: ErrorAlert | null;
+    loadingState: LoadingState;
 
     // Actions
     handleEdit: (id: number) => void;
