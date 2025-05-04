@@ -93,7 +93,7 @@ export default function DeletedItemsList<T extends BaseItem>({
                     data={items}
                     columns={columns}
                     keyExtractor={(item) => item.id}
-                    searchable={true}
+                    searchable
                     searchPlaceholder={config.searchPlaceholder || 'Buscar elementos eliminados...'}
                     defaultSortField={config.defaultSortField || 'name'}
                     defaultSortDirection={config.defaultSortDirection || 'asc'}

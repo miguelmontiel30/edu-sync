@@ -166,7 +166,7 @@ export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onA
                         data={filteredTeachers}
                         columns={columns}
                         keyExtractor={(teacher) => teacher.teacher_id}
-                        searchable={true}
+                        searchable
                         searchPlaceholder="Buscar por nombre, email, teléfono..."
                         defaultSortField="name"
                         defaultSortDirection="asc"

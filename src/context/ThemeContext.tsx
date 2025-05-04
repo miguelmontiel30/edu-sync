@@ -67,7 +67,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 return savedTheme === 'dark';
             }
             // Si no hay preferencia guardada, usar preferencia del sistema
-            return window.matchMedia('(prefers-color-scheme: dark)').matches;
+            return globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
         };
 
         // Establecer tema inicial

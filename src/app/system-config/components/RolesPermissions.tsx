@@ -412,9 +412,9 @@ export default function RolesPermissions() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableCell isHeader={true}>Nombre</TableCell>
-                                    <TableCell isHeader={true}>Descripción</TableCell>
-                                    <TableCell isHeader={true} className="text-right">Acciones</TableCell>
+                                    <TableCell isHeader>Nombre</TableCell>
+                                    <TableCell isHeader>Descripción</TableCell>
+                                    <TableCell isHeader className="text-right">Acciones</TableCell>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -483,9 +483,9 @@ export default function RolesPermissions() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableCell isHeader={true}>Nombre</TableCell>
-                                    <TableCell isHeader={true}>Descripción</TableCell>
-                                    <TableCell isHeader={true} className="text-right">Acciones</TableCell>
+                                    <TableCell isHeader>Nombre</TableCell>
+                                    <TableCell isHeader>Descripción</TableCell>
+                                    <TableCell isHeader className="text-right">Acciones</TableCell>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>

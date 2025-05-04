@@ -46,7 +46,7 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
     }
 
     return (
-        <ProtectedRoute adminOnly={true}>
+        <ProtectedRoute adminOnly>
             <div className="min-h-screen xl:flex">
                 {/* Sidebar content */}
                 <AdminSidebar />
