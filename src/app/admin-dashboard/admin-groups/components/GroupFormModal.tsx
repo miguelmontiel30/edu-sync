@@ -219,6 +219,7 @@ export default function GroupFormModal({
                 {errorAlert && (
                     <div className="p-4 mt-4 text-sm border rounded-md bg-red-50 border-red-200 text-red-600 relative error-alert">
                         <button
+                            type="button"
                             className="absolute top-2 right-2 text-red-500 hover:text-red-700"
                             onClick={() => {
                                 // Este es un elemento para cerrar visualmente la alerta,
