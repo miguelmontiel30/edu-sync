@@ -1,12 +1,18 @@
+// React
 import React, { useMemo } from 'react';
+
+// Components
+import Badge from '@/components/core/badge/Badge';
+import { Column } from '@/components/core/table/DataTable';
+import { createPriorityComparator } from '../../core/Tables/utils';
+import { ActionButton, ItemsListConfig } from '../../core/Tables/ItemsList';
+import { DeletedItemsListConfig } from '../../core/Tables/DeletedItemsList';
+
+
+// Types & Utils
 import { SchoolCycle, CYCLE_STATUS } from '../module-utils/types';
 import { textStyles } from '../module-utils/theme';
 import { formatDate, getStatusColor } from '../module-utils/utils';
-import { Column } from '@/components/core/table/DataTable';
-import { ActionButton, ItemsListConfig } from '../../core/Tables/ItemsList';
-import { DeletedItemsListConfig } from '../../core/Tables/DeletedItemsList';
-import Badge from '@/components/core/badge/Badge';
-import { createPriorityComparator } from '../../core/Tables/utils';
 
 interface TableConfigProps {
     handleEdit: (id: number) => void;
