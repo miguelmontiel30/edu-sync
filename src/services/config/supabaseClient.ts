@@ -1,9 +1,6 @@
 // Supabase Client
 import {createClient} from '@supabase/supabase-js';
 
-// Environment variables
-import process from 'node:process';
-
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
