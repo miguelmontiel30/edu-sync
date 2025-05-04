@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 
 // Next
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+
 import Link from 'next/link';
 
 // Servicios de autenticación
@@ -88,14 +88,6 @@ const LoginPage: React.FC = () => {
     // Handler para seleccionar tipo de usuario
     const handleUserTypeSelect = (userType: UserType) => {
         setSelectedUserType(userType);
-        setError('');
-    };
-
-    // Volver a la selección de tipo de usuario
-    const handleBack = () => {
-        setSelectedUserType(null);
-        setUsername('');
-        setPassword('');
         setError('');
     };
 
