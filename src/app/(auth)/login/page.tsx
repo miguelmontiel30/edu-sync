@@ -207,6 +207,7 @@ const LoginPage: React.FC = () => {
 
             <div className="space-y-3 pt-4">
                 <button
+                    type="button"
                     onClick={() => handleUserTypeSelect('student')}
                     className="w-full rounded-lg border border-gray-200 bg-white p-4 text-left transition hover:border-indigo-200 hover:bg-indigo-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800 dark:hover:bg-indigo-900/30"
                 >
@@ -222,6 +223,7 @@ const LoginPage: React.FC = () => {
                 </button>
 
                 <button
+                    type="button"
                     onClick={() => handleUserTypeSelect('teacher')}
                     className="w-full rounded-lg border border-gray-200 bg-white p-4 text-left transition hover:border-indigo-200 hover:bg-indigo-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800 dark:hover:bg-indigo-900/30"
                 >
@@ -237,6 +239,7 @@ const LoginPage: React.FC = () => {
                 </button>
 
                 <button
+                    type="button"
                     onClick={() => handleUserTypeSelect('admin')}
                     className="w-full rounded-lg border border-gray-200 bg-white p-4 text-left transition hover:border-indigo-200 hover:bg-indigo-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-indigo-800 dark:hover:bg-indigo-900/30"
                 >
@@ -375,6 +378,7 @@ const LoginPage: React.FC = () => {
                                 <>
                                     {selectedUserType !== null && (
                                         <button
+                                            type="button"
                                             onClick={() => setSelectedUserType(null)}
                                             className="mr-2 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
                                         >
@@ -434,6 +438,7 @@ const LoginPage: React.FC = () => {
                                                 <div className="flex justify-center space-x-2 pt-4">
                                                     {[...Array(totalSlides)].map((_, index) => (
                                                         <button
+                                                            type="button"
                                                             key={index}
                                                             onClick={() => goToSlide(index)}
                                                             className={`h-2 w-2 rounded-full transition-colors ${currentSlide === index
@@ -490,6 +495,7 @@ const LoginPage: React.FC = () => {
                                                 <div className="flex justify-center space-x-2 pt-4">
                                                     {[...Array(totalSlides)].map((_, index) => (
                                                         <button
+                                                            type="button"
                                                             key={index}
                                                             onClick={() => goToSlide(index)}
                                                             className={`h-2 w-2 rounded-full transition-colors ${currentSlide === index
@@ -535,6 +541,7 @@ const LoginPage: React.FC = () => {
                                                 <div className="flex justify-center space-x-2 pt-4">
                                                     {[...Array(totalSlides)].map((_, index) => (
                                                         <button
+                                                            type="button"
                                                             key={index}
                                                             onClick={() => goToSlide(index)}
                                                             className={`h-2 w-2 rounded-full transition-colors ${currentSlide === index
