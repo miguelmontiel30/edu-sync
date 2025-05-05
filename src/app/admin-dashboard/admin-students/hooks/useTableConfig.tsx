@@ -1,10 +1,10 @@
 // React
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 // Components
 import Badge from '@/components/core/badge/Badge';
 import IconFA from '@/components/ui/IconFA';
-import { Column } from '@/components/core/table/DataTable';
+import { Column } from '@/components/core/table/module-utils/types';
 
 // Core Components
 import { ActionButton, ItemsListConfig } from '../../core/Tables/ItemsList';

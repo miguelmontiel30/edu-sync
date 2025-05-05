@@ -21,6 +21,7 @@ export const STATUS_CACHE_KEYS = {
     STUDENT_GROUP: 'status_student_group',
     EVALUATION_PERIOD: 'status_evaluation_period',
     STUDENT: 'status_student',
+    SUBJECT: 'status_subject',
 };
 
 /**
@@ -64,7 +65,7 @@ class StatusService {
      * @returns Lista de estados para ciclos escolares
      */
     async getSchoolYearStatuses(): Promise<Status[]> {
-        return this.getStatusesByCategory('school_year', STATUS_CACHE_KEYS.SCHOOL_YEAR);
+        return await this.getStatusesByCategory('school_year', STATUS_CACHE_KEYS.SCHOOL_YEAR);
     }
 
     /**
@@ -72,7 +73,7 @@ class StatusService {
      * @returns Lista de estados para grupos
      */
     async getGroupStatuses(): Promise<Status[]> {
-        return this.getStatusesByCategory('group', STATUS_CACHE_KEYS.GROUP);
+        return await this.getStatusesByCategory('group', STATUS_CACHE_KEYS.GROUP);
     }
 
     /**
@@ -80,7 +81,7 @@ class StatusService {
      * @returns Lista de estados para estudiantes en grupos
      */
     async getStudentGroupStatuses(): Promise<Status[]> {
-        return this.getStatusesByCategory('student_group', STATUS_CACHE_KEYS.STUDENT_GROUP);
+        return await this.getStatusesByCategory('student_group', STATUS_CACHE_KEYS.STUDENT_GROUP);
     }
 
     /**
@@ -88,7 +89,10 @@ class StatusService {
      * @returns Lista de estados para periodos de evaluación
      */
     async getEvaluationPeriodStatuses(): Promise<Status[]> {
-        return this.getStatusesByCategory('evaluation_period', STATUS_CACHE_KEYS.EVALUATION_PERIOD);
+        return await this.getStatusesByCategory(
+            'evaluation_period',
+            STATUS_CACHE_KEYS.EVALUATION_PERIOD,
+        );
     }
 
     /**
@@ -96,7 +100,7 @@ class StatusService {
      * @returns Lista de estados para estudiantes
      */
     async getStudentStatuses(): Promise<Status[]> {
-        return this.getStatusesByCategory('student', STATUS_CACHE_KEYS.STUDENT);
+        return await this.getStatusesByCategory('student', STATUS_CACHE_KEYS.STUDENT);
     }
 
     /**
@@ -106,6 +110,10 @@ class StatusService {
         Object.values(STATUS_CACHE_KEYS).forEach(key => {
             cacheService.remove(key);
         });
+    }
+
+    async getSubjectStatuses(): Promise<Status[]> {
+        return await this.getStatusesByCategory('subject', STATUS_CACHE_KEYS.SUBJECT);
     }
 }
 

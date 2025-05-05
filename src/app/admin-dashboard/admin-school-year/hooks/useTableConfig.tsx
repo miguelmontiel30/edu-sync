@@ -1,12 +1,16 @@
-import React, { useMemo } from 'react';
-import { SchoolCycle, CYCLE_STATUS } from '../module-utils/types';
-import { textStyles } from '../module-utils/theme';
-import { formatDate, getStatusColor } from '../module-utils/utils';
-import { Column } from '@/components/core/table/DataTable';
-import { ActionButton, ItemsListConfig } from '../../core/Tables/ItemsList';
-import { DeletedItemsListConfig } from '../../core/Tables/DeletedItemsList';
+import { useMemo } from 'react';
+
+// Components
 import Badge from '@/components/core/badge/Badge';
 import { createPriorityComparator } from '../../core/Tables/utils';
+import { ActionButton, ItemsListConfig } from '../../core/Tables/ItemsList';
+import { DeletedItemsListConfig } from '../../core/Tables/DeletedItemsList';
+
+// Types & Utils
+import { textStyles } from '../module-utils/theme';
+import { SchoolCycle, CYCLE_STATUS } from '../module-utils/types';
+import { formatDate, getStatusColor } from '../module-utils/utils';
+import { Column } from '@/components/core/table/module-utils/types';
 
 interface TableConfigProps {
     handleEdit: (id: number) => void;
@@ -160,7 +164,7 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
                 key: 'name',
                 header: 'Nombre',
                 sortable: true,
-                render: (cycle) => (
+                render: (cycle: SchoolCycle) => (
                     <span className={textStyles.title}>
                         {cycle.name}
                     </span>
@@ -170,7 +174,7 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
                 key: 'startDate',
                 header: 'Fecha de Inicio',
                 sortable: true,
-                render: (cycle) => (
+                render: (cycle: SchoolCycle) => (
                     <span className={textStyles.normal}>
                         {formatDate(cycle.startDate)}
                     </span>
@@ -180,7 +184,7 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
                 key: 'endDate',
                 header: 'Fecha de Fin',
                 sortable: true,
-                render: (cycle) => (
+                render: (cycle: SchoolCycle) => (
                     <span className={textStyles.normal}>
                         {formatDate(cycle.endDate)}
                     </span>
@@ -189,7 +193,7 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
             {
                 key: 'groupsCount',
                 header: 'Grupos',
-                render: (cycle) => (
+                render: (cycle: SchoolCycle) => (
                     <span className={textStyles.normal}>
                         {cycle.groupsCount}
                     </span>
@@ -198,7 +202,7 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
             {
                 key: 'studentsCount',
                 header: 'Alumnos',
-                render: (cycle) => (
+                render: (cycle: SchoolCycle) => (
                     <span className={textStyles.normal}>
                         {cycle.studentsCount}
                     </span>
@@ -207,7 +211,7 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
             {
                 key: 'averageGrade',
                 header: 'Promedio',
-                render: (cycle) => (
+                render: (cycle: SchoolCycle) => (
                     <span className={textStyles.normal}>
                         {cycle.averageGrade.toFixed(2)}
                     </span>
@@ -218,7 +222,7 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
                 header: 'Estado',
                 sortable: true,
                 sortFunction: compareByStatus,
-                render: (cycle) => (
+                render: (cycle: SchoolCycle) => (
                     <Badge
                         size="sm"
                         color={getStatusColor(cycle.status)}

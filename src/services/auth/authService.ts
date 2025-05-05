@@ -119,7 +119,7 @@ export async function logout(): Promise<void> {
     try {
         // Ya no necesitamos cerrar sesión en Supabase
         // Solo limpiamos la caché local
-        sessionService.clearSession();
+        await sessionService.clearSession();
     } catch (error) {
         console.error('Error al cerrar sesión:', error);
         throw error;
@@ -138,8 +138,8 @@ export function isAuthenticated(): boolean {
  * Obtener la sesión actual del usuario
  * @returns Datos de la sesión o null si no está autenticado
  */
-export function getCurrentSession(): UserSession | null {
-    return sessionService.getSession();
+export async function getCurrentSession(): Promise<UserSession | null> {
+    return await sessionService.getSession();
 }
 
 /**
@@ -148,5 +148,5 @@ export function getCurrentSession(): UserSession | null {
  */
 export async function refreshSession(): Promise<UserSession | null> {
     // Simplemente devolvemos la sesión de caché ya que no usamos tokens de Supabase
-    return sessionService.getSession();
+    return await sessionService.getSession();
 }

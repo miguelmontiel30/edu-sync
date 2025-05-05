@@ -31,7 +31,7 @@ export function useThemeSettings() {
 
             try {
                 // 1. Intentar obtener la sesión desde el servicio de sesión
-                let userSession = sessionService.getSession();
+                const userSession = sessionService.getSession();
                 let school_id = userSession?.school_id;
 
                 // 2. Si no hay sesión en el servicio, intentar obtenerla de Supabase

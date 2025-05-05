@@ -384,6 +384,7 @@ export default function ThemeConfig() {
 
                                 <div className="flex flex-wrap gap-2">
                                     <button
+                                        type="button"
                                         className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-sm font-medium text-white transition"
                                         style={{ backgroundColor: previewColor }}
                                     >

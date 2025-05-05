@@ -44,7 +44,7 @@ export default function RootLayout({
             document.documentElement.style.setProperty('--primary-color', defaultPrimaryColor);
 
             // Verificar preferencia de tema oscuro/claro
-            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const prefersDarkMode = globalThis.matchMedia('(prefers-color-scheme: dark)').matches;
             const savedTheme = localStorage.getItem('eduSync.darkMode');
             const isDarkMode = savedTheme === 'dark' || (savedTheme === null && prefersDarkMode);
 

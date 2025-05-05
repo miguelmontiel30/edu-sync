@@ -197,7 +197,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
         // Suscribirse a cambios de autenticación solo si es necesario
         const { data: authListener } = supabaseClient.auth.onAuthStateChange(
-            async (event, session) => {
+            (event, _session) => {
                 if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
                     loadUserAndProfile();
                 } else if (event === 'SIGNED_OUT') {

@@ -24,7 +24,7 @@ export default function StudentDashboardLayout({ children }: Readonly<{ children
     }
 
     return (
-        <ProtectedRoute studentOnly={true}>
+        <ProtectedRoute studentOnly>
             <div className="min-h-screen xl:flex">
                 {/* Sidebar content */}
                 <AdminSidebar />

@@ -63,7 +63,11 @@ VALUES
         'EVALUATION_PERIOD_COMPLETED',
         'Completado',
         'evaluation_period'
-    );
+    ),
+    -- Estados para materias
+    ('SUBJECT_ACTIVE', 'Activo', 'subject'),
+    ('SUBJECT_INACTIVE', 'Inactivo', 'subject'),
+    ('SUBJECT_COMPLETED', 'Completado', 'subject');
 
 -- Generar datos para los roles y permisos
 INSERT INTO

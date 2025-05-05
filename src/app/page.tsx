@@ -1,9 +1,13 @@
 'use client';
 
+// React
 import { useEffect, useState } from 'react';
+
+// Next.js
 import { useRouter } from 'next/navigation';
+
+// Context
 import { useSessionContext } from '@/context/SessionContext';
-import IconFA from '@/components/ui/IconFA';
 
 export default function Home() {
   const router = useRouter();
@@ -15,7 +19,7 @@ export default function Home() {
     // 1. No estamos ya en proceso de redirección
     // 2. No estamos cargando la sesión
     if (!isRedirecting && !isLoading) {
-      const verifySessionAndRedirect = async () => {
+      const verifySessionAndRedirect = () => {
         try {
           setIsRedirecting(true);
 
@@ -45,7 +49,7 @@ export default function Home() {
             // No hay información de rol, por seguridad ir al login
             router.push('/login');
           }
-        } catch (error) {
+        } catch (_error) {
           router.push('/login');
         }
       };

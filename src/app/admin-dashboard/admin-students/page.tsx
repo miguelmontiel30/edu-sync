@@ -152,7 +152,7 @@ export default function StudentsDashboard() {
                 itemName={studentToDelete?.full_name || ''}
                 itemType="estudiante"
                 isDeleting={loadingState.processing}
-                isActiveItem={true}
+                isActiveItem
                 customMessages={deleteConfirmModalConfig}
             />
         </div>
