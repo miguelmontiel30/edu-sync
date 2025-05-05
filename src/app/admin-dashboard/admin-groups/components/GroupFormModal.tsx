@@ -4,8 +4,9 @@
 import { useState, useEffect } from 'react';
 
 // Components
-import { Modal } from '@/components/ui/modal';
 import Label from '@/components/form/Label';
+import Select from '@/components/form/Select';
+import { Modal } from '@/components/ui/modal';
 import Input from '@/components/form/input/InputField';
 
 // Core Components
@@ -16,6 +17,9 @@ import IconFA from '@/components/ui/IconFA';
 // Types
 import { Group, GroupFormData, GROUP_STATUS, ErrorAlert } from '../module-utils/types';
 import { CYCLE_STATUS } from '@/app/admin-dashboard/admin-school-year/module-utils/types';
+
+// Hooks
+import { useStatusOptions } from '@/hooks/useStatusData';
 
 interface GroupFormModalProps {
     isOpen: boolean;
@@ -36,6 +40,9 @@ export default function GroupFormModal({
     schoolYears,
     errorAlert
 }: GroupFormModalProps) {
+    // Obtener estados de grupos
+    const { options: groupStatuses, isLoading: isLoadingGroupStatuses } = useStatusOptions('group');
+
     // Estado del formulario
     const [formData, setFormData] = useState<GroupFormData>({
         grade: '',
@@ -78,6 +85,20 @@ export default function GroupFormModal({
         });
     };
 
+    // Función para inicializar un nuevo ciclo con valores por defecto
+    function initializeForm() {
+        if (selectedGroup) {
+            setFormData({
+                grade: selectedGroup.grade.toString(),
+                group: selectedGroup.group,
+                schoolYearId: selectedGroup.schoolYear.id.toString(),
+                statusId: selectedGroup.status_id.toString()
+            });
+        } else {
+            resetForm();
+        }
+    }
+
     // Función para manejar el cierre del modal con reseteo de formulario
     const handleClose = () => {
         resetForm();
@@ -86,28 +107,13 @@ export default function GroupFormModal({
 
     // Actualizar formulario cuando cambia el grupo seleccionado
     useEffect(() => {
-        if (selectedGroup) {
-            // Asegurar que status_id se maneje como string exactamente igual al enum GROUP_STATUS
-            // A veces viene como número y necesitamos convertirlo a string
-            let statusIdValue = selectedGroup.status_id;
-
-            // Si es un número, convertirlo a string
-            if (typeof statusIdValue === 'number') {
-                statusIdValue = String(statusIdValue);
-            }
-
-            setFormData({
-                grade: selectedGroup.grade.toString(),
-                group: selectedGroup.group,
-                schoolYearId: selectedGroup.schoolYear.id.toString(),
-                statusId: statusIdValue
-            });
-
+        if (isOpen) {
+            initializeForm();
         } else {
             // Reiniciar formulario para nuevo grupo
             resetForm();
         }
-    }, [selectedGroup, schoolYears]);
+    }, [isOpen, selectedGroup, schoolYears, groupStatuses]);
 
     // Manejar cambios en inputs
     function handleInputChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
@@ -289,27 +295,25 @@ export default function GroupFormModal({
                         />
                     </div>
 
-                    <div className="mt-6">
-                        <Label className="font-outfit">
-                            Estado del Grupo
-                        </Label>
-                        <SelectWithCategories
-                            options={[
-                                {
-                                    label: 'Estados Disponibles',
-                                    options: [
-                                        { value: GROUP_STATUS.ACTIVE, label: 'Activo' },
-                                        { value: GROUP_STATUS.INACTIVE, label: 'Inactivo' },
-                                        { value: GROUP_STATUS.COMPLETED, label: 'Finalizado' }
-                                    ]
-                                }
-                            ]}
-                            placeholder="Seleccione un estado"
-                            onChange={(value) => handleSelectChange('statusId', value)}
-                            defaultValue={formData.statusId}
-                            maxMenuHeight="max-h-60"
-                        />
-                    </div>
+                    {isLoadingGroupStatuses ? (
+                        <div className="flex items-center justify-center h-[38px] bg-gray-50 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
+                            <IconFA icon="spinner" spin className="text-gray-400" />
+                        </div>
+                    ) : (
+                        <div className="mt-6">
+                            <Label className="font-outfit">
+                                Estado del Grupo
+                            </Label>
+
+                            <Select
+                                key={`status-${formData.statusId}`}
+                                options={groupStatuses}
+                                placeholder="Seleccione un estado"
+                                onChange={(value) => handleSelectChange('statusId', value)}
+                                defaultValue={formData.statusId}
+                            />
+                        </div>
+                    )}
 
                     <div className="flex items-center gap-3 mt-8 modal-footer sm:justify-end">
                         <Button
