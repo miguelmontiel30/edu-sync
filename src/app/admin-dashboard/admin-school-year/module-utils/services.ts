@@ -9,7 +9,7 @@ import {schoolYearRepository} from './repository';
  * @param schoolId - ID de la escuela
  * @returns Lista de ciclos escolares activos y eliminados
  */
-export async function loadAllSchoolYearData(
+export function loadAllSchoolYearData(
     schoolId: number,
 ): Promise<{active: SchoolCycle[]; deleted: SchoolCycle[]}> {
     return schoolYearRepository.getAllCyclesBySchoolId(schoolId);
@@ -32,11 +32,7 @@ export async function loadDeletedCycles(schoolId: number): Promise<SchoolCycle[]
  * @param cycleId - ID del ciclo (opcional)
  * @param userId - ID del usuario (opcional)
  */
-export async function saveCycle(
-    cycle: CycleData,
-    cycleId?: number,
-    userId?: string,
-): Promise<void> {
+export function saveCycle(cycle: CycleData, cycleId?: number, userId?: string): Promise<void> {
     return schoolYearRepository.saveCycle(cycle, cycleId, userId);
 }
 
@@ -44,7 +40,7 @@ export async function saveCycle(
  * Eliminar ciclo escolar
  * @param id - ID del ciclo a eliminar
  */
-export async function deleteCycle(id: number): Promise<void> {
+export function deleteCycle(id: number): Promise<void> {
     return schoolYearRepository.deleteCycle(id);
 }
 
@@ -52,7 +48,7 @@ export async function deleteCycle(id: number): Promise<void> {
  * Restaurar ciclo escolar eliminado
  * @param id - ID del ciclo a restaurar
  */
-export async function restoreCycle(id: number): Promise<void> {
+export function restoreCycle(id: number): Promise<void> {
     return schoolYearRepository.restoreCycle(id);
 }
 

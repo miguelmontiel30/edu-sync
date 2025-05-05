@@ -27,7 +27,7 @@ interface CycleFormModalProps {
     readonly currentCycles: SchoolCycle[];
 }
 
-export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving, currentCycles }: CycleFormModalProps) {
+export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving }: CycleFormModalProps) {
     // Obtener estados de ciclo escolar usando nuestro hook
     const { options: statusOptions, isLoading: isLoadingStatus } = useStatusOptions('school_year');
 

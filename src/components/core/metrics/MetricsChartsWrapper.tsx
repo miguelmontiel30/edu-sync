@@ -1,4 +1,7 @@
-import React, { useState, ReactNode } from 'react';
+// React
+import { useState, ReactNode } from 'react';
+
+// Components
 import IconFA from '@/components/ui/IconFA';
 
 interface MetricsChartsWrapperProps {

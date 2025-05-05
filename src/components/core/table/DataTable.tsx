@@ -1,5 +1,5 @@
 // React
-import React, { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect } from 'react';
 
 // Table components
 import { Table, TableHeader, TableBody, TableRow, TableCell } from './index';
@@ -8,37 +8,8 @@ import { Table, TableHeader, TableBody, TableRow, TableCell } from './index';
 import IconFA from '@/components/ui/IconFA';
 import Input from '@/components/form/input/InputField';
 
-export type SortDirection = 'asc' | 'desc';
-
-export interface Column<T> {
-    key: keyof T | string;
-    header: string;
-    sortable?: boolean;
-    render?: (item: T) => ReactNode;
-    width?: string;
-    className?: string;
-    searchable?: boolean; // Indica si esta columna se usará para búsqueda
-}
-
-export interface DataTableProps<T> {
-    readonly data: T[];
-    readonly columns: Column<T>[];
-    readonly keyExtractor: (item: T) => string | number;
-    readonly searchable?: boolean;
-    readonly searchPlaceholder?: string;
-    readonly defaultSortField?: string;
-    readonly defaultSortDirection?: SortDirection;
-    readonly isLoading?: boolean;
-    readonly noDataMessage?: string;
-    readonly searchNoResultsMessage?: string;
-    readonly className?: string;
-    readonly itemsPerPage?: number;
-    readonly maxHeight?: string;
-    readonly emptyStateComponent?: ReactNode;
-    readonly loadingComponent?: ReactNode;
-    readonly onSearch?: (searchTerm: string) => void;
-    readonly onSort?: (field: string, direction: SortDirection) => void;
-}
+// Types
+import { DataTableProps, SortDirection, } from './module-utils/types';
 
 export default function DataTable<T>({
     data,
@@ -94,7 +65,7 @@ export default function DataTable<T>({
 
     // Procesar datos: ordenar y paginar
     useEffect(() => {
-        let processedData = [...filteredData];
+        const processedData = [...filteredData];
 
         // Ordenar datos si hay un campo de ordenamiento seleccionado y no hay un manejador externo
         if (sortField && !onSort) {
@@ -261,6 +232,7 @@ export default function DataTable<T>({
 
                     <div className="flex items-center space-x-2">
                         <button
+                            type="button"
                             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
                             className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white/[0.03] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
@@ -269,6 +241,7 @@ export default function DataTable<T>({
                         </button>
 
                         <button
+                            type="button"
                             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages || totalPages === 0}
                             className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white/[0.03] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"

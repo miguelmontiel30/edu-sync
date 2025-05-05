@@ -154,12 +154,9 @@ class SessionService {
 
             // Mantener el rol anterior por defecto si no obtenemos uno nuevo
             let userRole = currentSession.role || 'user';
-            let roleFuente = 'sesión anterior';
 
             // Actualizar rol solo si tenemos nueva información
             if (!rolesError && userRoles) {
-                roleFuente = 'tabla user_roles';
-
                 if (userRoles.role_id === 1) {
                     userRole = 'admin';
                 } else if (userRoles.role_id === 2) {
@@ -181,9 +178,6 @@ class SessionService {
                     }
                 }
             } else if (userData.linked_type) {
-                // Alternativa basada en linked_type
-                roleFuente = 'campo linked_type';
-
                 if (userData.linked_type === 'admin') {
                     userRole = 'admin';
                 } else if (userData.linked_type === 'teacher') {

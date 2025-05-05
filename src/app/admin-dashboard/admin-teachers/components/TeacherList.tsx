@@ -1,14 +1,15 @@
 // React
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Components
 import IconFA from '@/components/ui/IconFA';
 import Button from '@/components/core/button/Button';
-import DataTable, { SortDirection } from '@/components/core/table/DataTable';
+import DataTable from '@/components/core/table/DataTable';
 import ComponentCard from '@/components/common/ComponentCard';
 
 // Types
 import { Teacher, SortField } from './types';
+import { SortDirection } from '@/components/core/table/module-utils/types';
 
 // Utils
 import { sortTeachers, filterTeachers } from './utils';
@@ -166,7 +167,7 @@ export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onA
                         data={filteredTeachers}
                         columns={columns}
                         keyExtractor={(teacher) => teacher.teacher_id}
-                        searchable={true}
+                        searchable
                         searchPlaceholder="Buscar por nombre, email, teléfono..."
                         defaultSortField="name"
                         defaultSortDirection="asc"

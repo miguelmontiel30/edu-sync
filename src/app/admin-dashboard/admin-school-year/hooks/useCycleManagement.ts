@@ -1,10 +1,10 @@
+// React
 import {useState, useEffect} from 'react';
 
 // Types and Services
 import {
     ErrorAlert,
     SchoolCycle,
-    CYCLE_STATUS,
     CycleManagementHook,
     LoadingState,
     CycleData,

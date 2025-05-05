@@ -24,7 +24,7 @@ export default function SystemConfigLayout({ children }: Readonly<{ children: Re
     }
 
     return (
-        <ProtectedRoute adminOnly={true}>
+        <ProtectedRoute adminOnly>
             <div className="min-h-screen xl:flex">
                 {/* Sidebar content */}
                 <AdminSidebar />

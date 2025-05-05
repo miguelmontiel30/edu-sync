@@ -1,6 +1,8 @@
-import React from 'react';
+// Components
 import Badge from '@/components/core/badge/Badge';
 import IconFA from '@/components/ui/IconFA';
+
+// Types
 import { MetricConfig } from './types';
 
 interface MetricsGroupProps {

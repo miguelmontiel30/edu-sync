@@ -1,9 +1,9 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import {useState} from 'react';
-import {Dropdown} from '../ui/dropdown/Dropdown';
-import {DropdownItem} from '../ui/dropdown/DropdownItem';
+import { useState } from 'react';
+import { Dropdown } from '../ui/dropdown/Dropdown';
+import { DropdownItem } from '../ui/dropdown/DropdownItem';
 
 export default function NotificationDropdown() {
     const [isOpen, setIsOpen] = useState(false);
@@ -24,13 +24,13 @@ export default function NotificationDropdown() {
     return (
         <div className="relative">
             <button
+                type="button"
                 className="dropdown-toggle relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
                 onClick={handleClick}
             >
                 <span
-                    className={`absolute right-0 top-0.5 z-10 h-2 w-2 rounded-full bg-orange-400 ${
-                        !notifying ? 'hidden' : 'flex'
-                    }`}
+                    className={`absolute right-0 top-0.5 z-10 h-2 w-2 rounded-full bg-orange-400 ${!notifying ? 'hidden' : 'flex'
+                        }`}
                 >
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"></span>
                 </span>
@@ -59,6 +59,7 @@ export default function NotificationDropdown() {
                         Notification
                     </h5>
                     <button
+                        type="button"
                         onClick={toggleDropdown}
                         className="dropdown-toggle text-gray-500 transition hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                     >

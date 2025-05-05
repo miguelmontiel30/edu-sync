@@ -289,7 +289,7 @@ CREATE TABLE
         group_id SERIAL PRIMARY KEY,
         school_id INTEGER REFERENCES schools (school_id),
         school_year_id INTEGER REFERENCES school_years (school_year_id),
-        primary_teacher INTEGER REFERENCES teachers (teacher_id),
+        teacher_id INTEGER REFERENCES teachers (teacher_id),
         grade INTEGER NOT NULL,
         group_name VARCHAR(10) NOT NULL,
         description TEXT,
@@ -298,8 +298,7 @@ CREATE TABLE
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
         updated_at TIMESTAMPTZ DEFAULT NOW (),
-        deleted_at TIMESTAMPTZ,
-        UNIQUE (school_id, school_year_id, grade, group_name)
+        deleted_at TIMESTAMPTZ
     );
 
 COMMENT ON TABLE groups IS 'Define los grupos de estudiantes por grado';
@@ -308,7 +307,7 @@ COMMENT ON COLUMN groups.grade IS 'Grado escolar del grupo';
 
 COMMENT ON COLUMN groups.group_name IS 'Nombre del grupo (ej: A, B, C)';
 
-COMMENT ON COLUMN groups.primary_teacher IS 'ID del profesor titular del grupo';
+COMMENT ON COLUMN groups.teacher_id IS 'ID del profesor titular del grupo';
 
 -- Relación entre estudiantes y grupos
 CREATE TABLE
@@ -340,6 +339,7 @@ CREATE TABLE
         school_id INTEGER REFERENCES schools (school_id),
         name VARCHAR(100) NOT NULL,
         description TEXT,
+        status_id INTEGER REFERENCES status (status_id) NOT NULL,
         delete_flag BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMPTZ DEFAULT NOW (),
         updated_at TIMESTAMPTZ DEFAULT NOW (),

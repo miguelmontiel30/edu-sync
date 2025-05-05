@@ -140,7 +140,7 @@ export default function ItemsList<T extends BaseItem>({
                 data={filteredItems}
                 columns={tableColumns}
                 keyExtractor={(item) => String(item[idField])}
-                searchable={true}
+                searchable
                 searchPlaceholder={searchPlaceholder}
                 defaultSortField={defaultSortField}
                 defaultSortDirection={defaultSortDirection}

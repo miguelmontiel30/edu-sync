@@ -28,11 +28,11 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Cargar la sesión al montar el componente
     useEffect(() => {
-        const loadSession = async () => {
+        const loadSession = () => {
             setIsLoading(true);
             try {
                 // Intentar obtener la sesión desde la caché primero
-                let userSession = sessionService.getSession();
+                const userSession = sessionService.getSession();
 
                 // No necesitamos refrescar aquí, lo haremos bajo demanda
                 setSession(userSession);
