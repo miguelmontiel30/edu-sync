@@ -1,6 +1,3 @@
-// React
-import { useState, useEffect } from 'react';
-
 // Components
 import Badge from '@/components/core/badge/Badge';
 import IconFA from '@/components/ui/IconFA';
