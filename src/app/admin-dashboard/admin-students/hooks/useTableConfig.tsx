@@ -1,5 +1,5 @@
 // React
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 // Components
 import Badge from '@/components/core/badge/Badge';
