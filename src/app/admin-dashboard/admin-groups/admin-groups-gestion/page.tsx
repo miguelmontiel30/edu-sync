@@ -5,7 +5,13 @@ import Select from '@/components/form/Select';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 
+// Hooks
+import { useGroupStudentsManagement } from './hooks/useGroupStudentsManagement';
+import { Group } from '../module-utils/types';
+
 export default function GroupStudentsDashboard() {
+
+    const { groups, selectedGroup, isLoading, error, handleGroupChange } = useGroupStudentsManagement();
 
     return (
         <div className="container mx-auto p-6">
@@ -20,11 +26,12 @@ export default function GroupStudentsDashboard() {
 
                     <div className="relative">
                         <Select
-                            options={[
-                                { value: "", label: "Selecciona un grupo" }
-                            ]}
+                            options={groups.map((group: Group) => ({
+                                value: group.id.toString(),
+                                label: `${group.grade} ${group.group}`
+                            }))}
                             placeholder="Selecciona un grupo"
-                            onChange={() => { }}
+                            onChange={handleGroupChange}
                         />
                     </div>
                 </div>
