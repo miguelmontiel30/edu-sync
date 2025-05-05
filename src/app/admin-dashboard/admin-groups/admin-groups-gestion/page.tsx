@@ -1,5 +1,7 @@
 'use client';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import ComponentCard from '@/components/common/ComponentCard';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import Badge from '@/components/core/badge/Badge';
@@ -868,6 +870,36 @@ import { useGroupStudentsManagement } from './hooks/useGroupStudentsManagement';
 import ItemsList from '../../core/Tables/ItemsList';
 
 export default function GroupStudentsDashboard() {
+=======
+
+// Components
+import Label from '@/components/form/Label';
+import IconFA from '@/components/ui/IconFA';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import SelectWithCategories from '@/components/core/select/SelectWithCategories';
+
+// Hooks
+import { useGroupStudentsManagement } from './hooks/useGroupStudentsManagement';
+import ItemsList from '../../core/Tables/ItemsList';
+
+export default function GroupStudentsDashboard() {
+>>>>>>> Stashed changes
+=======
+
+// Components
+import Label from '@/components/form/Label';
+import IconFA from '@/components/ui/IconFA';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import SelectWithCategories from '@/components/core/select/SelectWithCategories';
+
+// Hooks
+import { useGroupStudentsManagement } from './hooks/useGroupStudentsManagement';
+import ItemsList from '../../core/Tables/ItemsList';
+
+export default function GroupStudentsDashboard() {
+>>>>>>> Stashed changes
     // Usar el hook para gestionar grupos y estudiantes
     const {
         groupCategories,
@@ -878,6 +910,12 @@ export default function GroupStudentsDashboard() {
     } = useGroupStudentsManagement();
 
     console.log('selectedGroup: ', selectedGroup);
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
     return (
@@ -892,6 +930,8 @@ export default function GroupStudentsDashboard() {
                     </Label>
 
                     <div className="relative">
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
                         <Select
                             options={[
@@ -909,6 +949,10 @@ export default function GroupStudentsDashboard() {
                                 <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
                             </div>
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
                         {isLoading ? (
                             <div className="flex items-center space-x-2 text-gray-500 mb-2">
                                 <IconFA icon="spinner" spin />
@@ -926,6 +970,12 @@ export default function GroupStudentsDashboard() {
                                 defaultValue={selectedGroup?.id.toString() || ''}
                                 maxMenuHeight="max-h-64"
                             />
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
                         )}
                     </div>
@@ -934,6 +984,8 @@ export default function GroupStudentsDashboard() {
             </ComponentCard>
 
             {selectedGroup && (
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
                 <>
                     {/* Métricas y Gráfica */}
@@ -1913,6 +1965,10 @@ export default function GroupStudentsDashboard() {
                 </div>
             </Modal>
 =======
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
                 <ItemsList
                     items={[{
                         id: 1,
@@ -1947,6 +2003,12 @@ export default function GroupStudentsDashboard() {
                     }}
                 />
             )}
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         </div>
     );
