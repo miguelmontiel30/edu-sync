@@ -1,0 +1,40 @@
+name: SonarQube Analysis
+on:
+    push:
+        branches: [main, develop]
+    pull_request:
+        branches: [main]
+
+jobs:
+    sonarqube:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  fetch-depth: 0 # Necesario para obtener historial completo para SonarQube
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '20'
+                  cache: 'npm'
+
+            - name: Instalar dependencias
+              run: npm ci
+
+            - name: Ejecutar lint
+              run: npm run lint
+
+            - name: Ejecutar tests con cobertura
+              run: npm test -- --coverage
+              continue-on-error: true # Continuar aunque los tests fallen para enviar los resultados a SonarQube
+
+            - name: Análisis SonarQube
+              uses: sonarsource/sonarqube-scan-action@master
+              env:
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                  SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+              with:
+                  args: >
+                      -Dsonar.projectKey=edu-sync
+                      -Dsonar.projectName=EduSync
