@@ -4,10 +4,13 @@ import { useState, useEffect } from 'react';
 // Componentes UI
 import IconFA from '@/components/ui/IconFA';
 import Button from '@/components/core/button/Button';
+import DataTable from '@/components/core/table/DataTable';
 import ComponentCard from '@/components/common/ComponentCard';
-import DataTable, { Column, SortDirection } from '@/components/core/table/DataTable';
 
-// Utilidades
+// Types
+import { Column, SortDirection } from '@/components/core/table/module-utils/types';
+
+// Utils
 import { filterItems, sortItems } from './utils';
 
 export interface BaseItem {
