@@ -1,4 +1,5 @@
 'use client';
+<<<<<<< Updated upstream
 import ComponentCard from '@/components/common/ComponentCard';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import Badge from '@/components/core/badge/Badge';
@@ -853,6 +854,31 @@ export default function GroupStudentsDashboard() {
             minute: '2-digit'
         });
     };
+=======
+
+// Components
+import Label from '@/components/form/Label';
+import IconFA from '@/components/ui/IconFA';
+import ComponentCard from '@/components/common/ComponentCard';
+import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import SelectWithCategories from '@/components/core/select/SelectWithCategories';
+
+// Hooks
+import { useGroupStudentsManagement } from './hooks/useGroupStudentsManagement';
+import ItemsList from '../../core/Tables/ItemsList';
+
+export default function GroupStudentsDashboard() {
+    // Usar el hook para gestionar grupos y estudiantes
+    const {
+        groupCategories,
+        isLoading,
+        error,
+        handleGroupChange,
+        selectedGroup
+    } = useGroupStudentsManagement();
+
+    console.log('selectedGroup: ', selectedGroup);
+>>>>>>> Stashed changes
 
     return (
         <div className="container mx-auto p-6">
@@ -866,6 +892,7 @@ export default function GroupStudentsDashboard() {
                     </Label>
 
                     <div className="relative">
+<<<<<<< Updated upstream
                         <Select
                             options={[
                                 { value: "", label: "Selecciona un grupo" },
@@ -881,12 +908,33 @@ export default function GroupStudentsDashboard() {
                             <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                                 <i className="fa-duotone fa-solid fa-spinner fa-spin text-gray-400"></i>
                             </div>
+=======
+                        {isLoading ? (
+                            <div className="flex items-center space-x-2 text-gray-500 mb-2">
+                                <IconFA icon="spinner" spin />
+                                <span>Cargando grupos...</span>
+                            </div>
+                        ) : error ? (
+                            <div className="text-red-500 mb-2">
+                                {error}
+                            </div>
+                        ) : (
+                            <SelectWithCategories
+                                options={groupCategories}
+                                placeholder="Selecciona un grupo"
+                                onChange={handleGroupChange}
+                                defaultValue={selectedGroup?.id.toString() || ''}
+                                maxMenuHeight="max-h-64"
+                            />
+>>>>>>> Stashed changes
                         )}
                     </div>
+
                 </div>
             </ComponentCard>
 
             {selectedGroup && (
+<<<<<<< Updated upstream
                 <>
                     {/* Métricas y Gráfica */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
@@ -1864,6 +1912,42 @@ export default function GroupStudentsDashboard() {
                     </div>
                 </div>
             </Modal>
+=======
+                <ItemsList
+                    items={[{
+                        id: 1,
+                        first_name: 'Juan',
+                        last_name: 'Perez',
+                        curp: '1234567890',
+                        status: 'active'
+                    }]}
+                    columns={[
+                        {
+                            key: 'full_name',
+                            header: 'Nombre Completo',
+                            render: (item) => `${item.first_name} ${item.last_name}`
+                        },
+                        {
+                            key: 'curp',
+                            header: 'CURP',
+                        },
+                        {
+                            key: 'status',
+                            header: 'Estado',
+                            render: (item) => item.status === 'active' ? 'Activo' : 'Inactivo'
+                        }
+                    ]}
+                    isLoading={false}
+                    config={{
+                        title: 'Estudiantes del grupo',
+                        description: 'Lista de estudiantes del grupo seleccionado',
+                        addButtonLabel: 'Añadir estudiante',
+                        addButtonIcon: 'plus',
+                        noDataMessage: 'No hay estudiantes en este grupo',
+                    }}
+                />
+            )}
+>>>>>>> Stashed changes
         </div>
     );
 } 
