@@ -15,7 +15,6 @@ import { useSession } from '@/hooks/useSession';
 
 // Utils
 import {
-    calculateAge,
     formatStudentData,
     filterActiveGroups,
     groupAndSortGroupsBySchoolYear,

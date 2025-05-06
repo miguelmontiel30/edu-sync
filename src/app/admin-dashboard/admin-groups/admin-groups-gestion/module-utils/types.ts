@@ -1,5 +1,3 @@
-import {Student} from '@/app/admin-dashboard/admin-students/module-utils/types';
-
 export const STUDENT_GROUP_STATUS = {
     STUDENT_GROUP_ACTIVE: 11,
     STUDENT_GROUP_INACTIVE: 12,
