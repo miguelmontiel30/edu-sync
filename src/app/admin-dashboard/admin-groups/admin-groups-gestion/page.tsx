@@ -1,17 +1,46 @@
 'use client';
 // Components
 import Label from '@/components/form/Label';
-import Select from '@/components/form/Select';
 import ComponentCard from '@/components/common/ComponentCard';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
+import AssignGroupStudentsModal from './components/AssignGroupStudentsModal';
 
 // Hooks
-import { useGroupStudentsManagement } from './hooks/useGroupStudentsManagement';
-import { Group } from '../module-utils/types';
+import { useGroupStudentsManagement, useTableConfig } from './hooks/index';
+
+// Types
+import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';
+
+// Core Components
+import ItemsList from '../../core/Tables/ItemsList';
+import SelectWithCategories from '@/components/core/select/SelectWithCategories';
 
 export default function GroupStudentsDashboard() {
+    // Estado de gestión de grupos y estudiantes
+    const {
+        selectedGroup,
+        groupCategories,
+        isLoading,
+        isModalOpen,
+        handleModalOpen,
+        handleModalClose,
+        handleGroupChange,
+        handleEditStudent,
+        handleDeleteStudent
+    } = useGroupStudentsManagement();
 
-    const { groups, selectedGroup, isLoading, error, handleGroupChange } = useGroupStudentsManagement();
+    // Configuración de tabla de estudiantes
+    const {
+        studentColumns,
+        studentActionButtons,
+        studentListConfig,
+        groupStudents,
+        isLoadingStudents,
+    } = useTableConfig({
+        handleEdit: handleEditStudent,
+        handleDelete: handleDeleteStudent,
+        selectedGroup
+    });
 
     return (
         <div className="container mx-auto p-6">
@@ -25,17 +54,37 @@ export default function GroupStudentsDashboard() {
                     </Label>
 
                     <div className="relative">
-                        <Select
-                            options={groups.map((group: Group) => ({
-                                value: group.id.toString(),
-                                label: `${group.grade} ${group.group}`
-                            }))}
+                        <SelectWithCategories
+                            options={groupCategories}
                             placeholder="Selecciona un grupo"
                             onChange={handleGroupChange}
                         />
                     </div>
                 </div>
             </ComponentCard>
+
+            {selectedGroup && (
+                <>
+                    <ItemsList
+                        items={groupStudents}
+                        columns={studentColumns}
+                        isLoading={isLoadingStudents || isLoading}
+                        onAddNew={handleModalOpen}
+                        actionButtons={studentActionButtons}
+                        config={studentListConfig}
+                    />
+
+                    <AssignGroupStudentsModal
+                        isOpen={isModalOpen}
+                        onClose={handleModalClose}
+                        selectedGroup={selectedGroup}
+                        isSaving={false}
+                        availableStudents={[]}
+                        isLoadingStudents={isLoadingStudents}
+                        onAddStudents={() => Promise.resolve()}
+                    />
+                </>
+            )}
         </div>
     );
 }
