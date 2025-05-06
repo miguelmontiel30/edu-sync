@@ -1,7 +1,8 @@
 // Supabase Client
 import {supabaseClient} from '@/services/config/supabaseClient';
 
-// Tipos
+// Types
+import {STUDENT_GROUP_STATUS} from './types';
 import {Student} from '@/app/admin-dashboard/admin-students/module-utils/types';
 
 // Definición de la interfaz del repositorio
@@ -159,11 +160,12 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
 
             // Preparamos los registros a insertar
             const currentDate = new Date().toISOString();
+
             const studentGroupRecords = studentIds.map(studentId => ({
                 student_id: studentId,
                 group_id: groupId,
                 enrollment_date: currentDate.split('T')[0], // Formato YYYY-MM-DD
-                status_id: 1, // Estado activo
+                status_id: STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE,
                 delete_flag: false,
                 created_at: currentDate,
                 updated_at: currentDate,
@@ -174,6 +176,7 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
 
             if (error) {
                 console.error('Error al asignar estudiantes al grupo:', error);
+
                 return {success: false, error};
             }
 
