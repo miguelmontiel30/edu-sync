@@ -24,10 +24,14 @@ export default function GroupStudentsDashboard() {
         isModalOpen,
         groupStudents,
         isLoadingStudents,
+        availableStudents,
+        isLoadingAvailableStudents,
+        isSaving,
         handleModalOpen,
         handleModalClose,
         handleGroupChange,
-        handleDeleteStudent
+        handleDeleteStudent,
+        handleAddStudents
     } = useGroupStudentsManagement();
 
     // Configuración de tabla de estudiantes
@@ -64,7 +68,7 @@ export default function GroupStudentsDashboard() {
             {selectedGroup && (
                 <>
                     <ItemsList
-                        items={[]}
+                        items={groupStudents}
                         columns={studentColumns}
                         isLoading={isLoadingStudents || isLoading}
                         onAddNew={handleModalOpen}
@@ -76,10 +80,10 @@ export default function GroupStudentsDashboard() {
                         isOpen={isModalOpen}
                         onClose={handleModalClose}
                         selectedGroup={selectedGroup}
-                        isSaving={false}
-                        availableStudents={[]}
-                        isLoadingStudents={isLoadingStudents}
-                        onAddStudents={() => Promise.resolve()}
+                        isSaving={isSaving}
+                        availableStudents={availableStudents}
+                        isLoadingStudents={isLoadingAvailableStudents}
+                        onAddStudents={handleAddStudents}
                     />
                 </>
             )}

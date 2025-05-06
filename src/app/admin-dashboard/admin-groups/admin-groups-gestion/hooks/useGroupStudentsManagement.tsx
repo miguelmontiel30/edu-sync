@@ -6,7 +6,8 @@ import { Group, GROUP_STATUS } from '@/app/admin-dashboard/admin-groups/module-u
 
 // Services
 import { loadAllGroupsData } from '@/app/admin-dashboard/admin-groups/module-utils/services';
-import { fetchActiveStudentsByGroup } from '@/app/admin-dashboard/admin-groups/admin-groups-gestion/module-utils/services';
+import { fetchActiveStudents } from '@/app/admin-dashboard/admin-students/module-utils/services';
+import { fetchActiveStudentsByGroup, assignStudentsToGroup } from '@/app/admin-dashboard/admin-groups/admin-groups-gestion/module-utils/services';
 
 // Hooks
 import { useSession } from '@/hooks/useSession';
@@ -43,6 +44,9 @@ export const useGroupStudentsManagement = () => {
     const [groupStudents, setGroupStudents] = useState<Student[]>([]);
     const [isLoadingStudents, setIsLoadingStudents] = useState(false);
     const [errorStudents, setErrorStudents] = useState<string | null>(null);
+    const [availableStudents, setAvailableStudents] = useState<Student[]>([]);
+    const [isLoadingAvailableStudents, setIsLoadingAvailableStudents] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Opciones para el SelectWithCategories
     const [groupCategories, setGroupCategories] = useState<Category[]>([]);
@@ -142,19 +146,30 @@ export const useGroupStudentsManagement = () => {
         setSelectedGroup(group || null);
     };
 
-    const handleModalOpen = () => {
-        setIsModalOpen(true);
-    };
+    // Cargar datos al iniciar
+    useEffect(() => {
+        // Cargar grupos
+        loadGroups();
+    }, [loadGroups]);
+    /********************************** Logica de grupos **********************************/
 
-    const handleModalClose = () => {
-        setIsModalOpen(false);
-    };
 
-    const handleDeleteStudent = (student_id: number) => {
-        console.log('Eliminar estudiante:', student_id);
-    };
+    /********************************** Logica de modal **********************************/
+    const handleModalOpen = () => setIsModalOpen(true);
+
+    const handleModalClose = () => setIsModalOpen(false);
+
+    const handleDeleteStudent = (student_id: number) => console.log('Eliminar estudiante:', student_id);
+    /********************************** Logica de modal **********************************/
+
 
     /********************************** Logica de estudiantes **********************************/
+    /**
+     * Carga los estudiantes del grupo seleccionado y los formatea para la tabla de estudiantes
+     * asignados al grupo
+     * @returns {Promise<void>}
+     * @throws {Error} Si no hay un grupo seleccionado o no hay una escuela en la sesión
+     */
     const loadGroupStudents = useCallback(async () => {
         if (!selectedGroup || !session?.school_id) return;
 
@@ -183,8 +198,6 @@ export const useGroupStudentsManagement = () => {
             // Actualizar el estado con los estudiantes formateados
             setGroupStudents(formattedStudents);
 
-            console.log('Estudiantes del grupo:', formattedStudents);
-
         } catch (error) {
             console.error('Error al cargar estudiantes del grupo:', error);
             setErrorStudents('No se pudieron cargar los estudiantes del grupo. Intenta nuevamente.');
@@ -194,21 +207,111 @@ export const useGroupStudentsManagement = () => {
         }
     }, [selectedGroup, session?.school_id]);
 
+    /**
+     * Carga los estudiantes activos que pueden ser asignados al grupo seleccionado
+     * (estudiantes que no están ya asignados al grupo)
+     */
+    const loadAvailableStudents = useCallback(async () => {
+        if (!selectedGroup || !session?.school_id) return [];
+
+        setIsLoadingAvailableStudents(true);
+
+        try {
+            // Obtener todos los estudiantes activos de la escuela
+            const allStudents = await fetchActiveStudents(session.school_id as number);
+
+            // Formatear todos los estudiantes para incluir nombre completo y edad
+            const formattedAllStudents = allStudents.map(student => {
+                const fullName = `${student.first_name} ${student.father_last_name} ${student.mother_last_name}`.trim();
+                const age = calculateAge(student.birth_date);
+
+                return {
+                    ...student,
+                    full_name: fullName,
+                    age: age
+                };
+            });
+
+            // Si no hay estudiantes en el grupo, todos están disponibles
+            if (groupStudents.length === 0) {
+                setAvailableStudents(formattedAllStudents);
+                return formattedAllStudents;
+            }
+
+            // Obtener los IDs de los estudiantes ya asignados al grupo
+            const assignedStudentIds = groupStudents.map(student => student.id);
+
+            // Filtrar para obtener solo los estudiantes que no están en el grupo
+            const studentsAvailable = formattedAllStudents.filter(
+                student => !assignedStudentIds.includes(student.id)
+            );
+
+            setAvailableStudents(studentsAvailable);
+            return studentsAvailable;
+
+        } catch (error) {
+            console.error('Error al cargar estudiantes disponibles:', error);
+            return [];
+        } finally {
+            setIsLoadingAvailableStudents(false);
+        }
+    }, [selectedGroup, session?.school_id, groupStudents]);
+
+    /**
+     * Asigna estudiantes al grupo seleccionado y recarga los datos
+     * @param studentIds - Array de IDs de estudiantes a asignar
+     */
+    const handleAddStudents = async (studentIds: number[]) => {
+        if (!selectedGroup || !session?.school_id || studentIds.length === 0) return;
+
+        setIsSaving(true);
+        setErrorStudents(null);
+
+        try {
+            // Realizar la asignación
+            const { success } = await assignStudentsToGroup(selectedGroup.id, studentIds);
+
+            if (!success) {
+                throw new Error('Error al asignar estudiantes');
+            }
+
+            // Recargar los datos después de la asignación exitosa
+            await loadGroupStudents();
+
+            // Cerrar el modal antes de cargar estudiantes disponibles
+            handleModalClose();
+
+            // Luego actualizamos los estudiantes disponibles
+            loadAvailableStudents();
+        } catch (error) {
+            console.error('Error al asignar estudiantes:', error);
+            setErrorStudents('No se pudieron asignar los estudiantes al grupo. Intenta nuevamente.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    /********************************** Logica de estudiantes **********************************/
+
     // Cargar estudiantes cuando cambia el grupo seleccionado
     useEffect(() => {
         if (!selectedGroup) {
             setGroupStudents([]);
+            setAvailableStudents([]);
             return;
         }
 
+        // Cargar estudiantes del grupo primero
         loadGroupStudents();
     }, [selectedGroup, loadGroupStudents]);
 
-    // Cargar datos al iniciar
+    // Cargar estudiantes disponibles solo después de que se carguen los del grupo
+    // y solo cuando el grupo esté seleccionado o cuando cambie la lista de estudiantes del grupo
     useEffect(() => {
-        // Cargar grupos
-        loadGroups();
-    }, [loadGroups]);
+        if (selectedGroup) {
+            loadAvailableStudents();
+        }
+    }, [selectedGroup, groupStudents.length]);
 
     return {
         groups,
@@ -219,11 +322,16 @@ export const useGroupStudentsManagement = () => {
         groupStudents,
         isLoadingStudents,
         errorStudents,
-        handleGroupChange,
+        availableStudents,
+        isLoadingAvailableStudents,
+        isSaving,
         isModalOpen,
+        handleGroupChange,
         handleModalOpen,
         handleModalClose,
         loadGroups,
-        handleDeleteStudent
+        handleDeleteStudent,
+        loadAvailableStudents,
+        handleAddStudents
     };
 };

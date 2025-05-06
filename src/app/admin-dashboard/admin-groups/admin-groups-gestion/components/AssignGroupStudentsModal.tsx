@@ -37,7 +37,7 @@ interface AssignGroupStudentsModalProps {
     isSaving: boolean;
     availableStudents: Student[];
     isLoadingStudents: boolean;
-    onAddStudents: (studentIds: number[]) => Promise<void>;
+    onAddStudents: (studentIds: number[]) => void;
 }
 
 export default function AssignGroupStudentsModal({
