@@ -8,9 +8,6 @@ import AssignGroupStudentsModal from './components/AssignGroupStudentsModal';
 // Hooks
 import { useGroupStudentsManagement, useTableConfig } from './hooks/index';
 
-// Types
-import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';
-
 // Core Components
 import ItemsList from '../../core/Tables/ItemsList';
 import SelectWithCategories from '@/components/core/select/SelectWithCategories';
