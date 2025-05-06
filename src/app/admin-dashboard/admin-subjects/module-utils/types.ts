@@ -1,3 +1,9 @@
+export const SUBJECT_STATUS = {
+    SUBJECT_ACTIVE: 18,
+    SUBJECT_INACTIVE: 19,
+    SUBJECT_COMPLETED: 20,
+};
+
 // Tipos principales para las materias
 export interface Subject {
     id: number;
