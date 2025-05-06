@@ -17,13 +17,10 @@ export default function GroupStudentsDashboard() {
     const {
         selectedGroup,
         groupCategories,
-        isLoading,
+        loadingState,
         isModalOpen,
         groupStudents,
-        isLoadingStudents,
         availableStudents,
-        isLoadingAvailableStudents,
-        isSaving,
         handleModalOpen,
         handleModalClose,
         handleGroupChange,
@@ -67,7 +64,7 @@ export default function GroupStudentsDashboard() {
                     <ItemsList
                         items={groupStudents}
                         columns={studentColumns}
-                        isLoading={isLoadingStudents || isLoading}
+                        isLoading={loadingState.groupStudents || loadingState.groups} // Usar estado de carga combinado
                         onAddNew={handleModalOpen}
                         actionButtons={studentActionButtons}
                         config={studentListConfig}
@@ -77,9 +74,9 @@ export default function GroupStudentsDashboard() {
                         isOpen={isModalOpen}
                         onClose={handleModalClose}
                         selectedGroup={selectedGroup}
-                        isSaving={isSaving}
+                        isSaving={loadingState.saving} // Usar estado de guardado
                         availableStudents={availableStudents}
-                        isLoadingStudents={isLoadingAvailableStudents}
+                        isLoadingStudents={loadingState.availableStudents} // Usar estado de carga de disponibles
                         onAddStudents={handleAddStudents}
                     />
                 </>
