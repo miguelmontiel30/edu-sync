@@ -20,3 +20,19 @@ export function assignStudentsToGroup(
 ): Promise<{success: boolean; error?: any}> {
     return groupStudentsRepository.assignStudentsToGroup(groupId, studentIds);
 }
+
+/**
+ * Elimina un estudiante de un grupo
+ */
+export function removeStudentFromGroup(
+    studentGroupId: number,
+): Promise<{success: boolean; error?: any}> {
+    return groupStudentsRepository.removeStudentFromGroup(studentGroupId);
+}
+
+/**
+ * Obtiene los estudiantes disponibles para asignar a un nuevo grupo
+ */
+export function getAvailableStudentsForNewGroupAssignment(schoolId: number): Promise<Student[]> {
+    return groupStudentsRepository.getAvailableStudentsForNewGroupAssignment(schoolId);
+}

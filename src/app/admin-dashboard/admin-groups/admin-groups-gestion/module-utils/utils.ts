@@ -1,5 +1,5 @@
 // Types
-import {Category} from './types';
+import {Category, STUDENT_GROUP_STATUS} from './types';
 import {Student} from '@/app/admin-dashboard/admin-students/module-utils/types';
 import {Group, GROUP_STATUS} from '@/app/admin-dashboard/admin-groups/module-utils/types';
 
@@ -114,19 +114,36 @@ export const createGroupCategories = (groupedGroups: Record<string, Group[]>): C
 };
 
 /**
- * Filtra estudiantes disponibles (todos los estudiantes activos menos los ya asignados al grupo).
- * @param allStudents - Array de todos los estudiantes activos.
- * @param assignedStudents - Array de estudiantes ya asignados al grupo.
- * @returns Array de estudiantes disponibles.
+ * Filtra estudiantes para asegurar que no estén ya en el grupo actual.
+ * Se asume que `allAvailableStudents` ya contiene estudiantes que no tienen
+ * ninguna otra asignación de grupo activa (filtrados previamente por el repositorio).
+ * @param allAvailableStudents - Array de todos los estudiantes disponibles (pre-filtrados).
+ * @param currentGroupStudents - Array de estudiantes ya asignados al grupo actual.
+ * @returns Array de estudiantes disponibles para el grupo actual.
  */
 export const filterAvailableStudents = (
-    allStudents: Student[],
-    assignedStudents: Student[],
+    allAvailableStudents: Student[],
+    currentGroupStudents: Student[],
 ): Student[] => {
-    if (assignedStudents.length === 0) {
-        return allStudents;
-    }
-    const assignedStudentIds = assignedStudents.map(student => student.id);
+    const currentGroupStudentIds = currentGroupStudents.map(student => student.id);
 
-    return allStudents.filter(student => !assignedStudentIds.includes(student.id));
+    return allAvailableStudents.filter(student => {
+        // Condición: No debe estar en el grupo actual
+        return !currentGroupStudentIds.includes(student.id);
+    });
 };
+
+export function getStudentStatusColorById(
+    statusId: number,
+): 'success' | 'warning' | 'dark' | 'primary' {
+    console.log('statusId', statusId);
+
+    const colorMap: Record<string, 'success' | 'warning' | 'dark' | 'primary'> = {
+        [STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE]: 'success',
+        [STUDENT_GROUP_STATUS.STUDENT_GROUP_INACTIVE]: 'dark',
+        [STUDENT_GROUP_STATUS.STUDENT_GROUP_GRADUATED]: 'primary',
+        [STUDENT_GROUP_STATUS.STUDENT_GROUP_TRANSFERRED]: 'warning',
+    };
+
+    return colorMap[statusId] || 'dark';
+}

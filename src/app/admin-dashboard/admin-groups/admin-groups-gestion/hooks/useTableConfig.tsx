@@ -11,9 +11,10 @@ import { ActionButton, ItemsListConfig } from '../../../core/Tables/ItemsList';
 import { DeletedItemsListConfig } from '../../../core/Tables/DeletedItemsList';
 
 // Types and utils
-import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';
-import { formatDate, getStudentStatusColor, getGenderIconColor } from '@/app/admin-dashboard/admin-students/module-utils/utils';
+import { getStudentStatusColorById } from '../module-utils/utils';
 import { Group } from '@/app/admin-dashboard/admin-groups/module-utils/types';
+import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';
+import { formatDate, getGenderIconColor } from '@/app/admin-dashboard/admin-students/module-utils/utils';
 
 // Extendemos la interfaz Group para incluir estudiantes asignados
 interface GroupWithStudents extends Group {
@@ -99,14 +100,18 @@ export function useTableConfig({
             key: 'status',
             header: 'Estado',
             sortable: true,
-            render: (student: Student) => (
-                <Badge
-                    variant="light"
-                    color={getStudentStatusColor(student.status?.status_id || 7)}
-                >
-                    {student.status?.name || 'No especificado'}
-                </Badge>
-            ),
+            render: (student: Student) => {
+                console.log('student from table', student);
+
+                return (
+                    <Badge
+                        variant="light"
+                        color={getStudentStatusColorById(student.student_group_status_id as number)}
+                    >
+                        {student.student_group_status?.name || 'No especificado'}
+                    </Badge>
+                );
+            },
         },
         {
             key: 'contact',

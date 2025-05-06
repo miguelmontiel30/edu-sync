@@ -8,8 +8,7 @@ import { Category, LoadingStates, ErrorStates } from '@/app/admin-dashboard/admi
 
 // Services
 import { loadAllGroupsData } from '@/app/admin-dashboard/admin-groups/module-utils/services';
-import { fetchActiveStudents } from '@/app/admin-dashboard/admin-students/module-utils/services';
-import { fetchActiveStudentsByGroup, assignStudentsToGroup } from '@/app/admin-dashboard/admin-groups/admin-groups-gestion/module-utils/services';
+import { fetchActiveStudentsByGroup, assignStudentsToGroup, getAvailableStudentsForNewGroupAssignment } from '@/app/admin-dashboard/admin-groups/admin-groups-gestion/module-utils/services';
 
 // Hooks
 import { useSession } from '@/hooks/useSession';
@@ -124,15 +123,26 @@ export const useGroupStudentsManagement = () => {
         setLoadingState((prev: LoadingStates) => ({ ...prev, availableStudents: true }));
 
         try {
-            const allStudentsRaw = await fetchActiveStudents(session.school_id as number);
+            // Get all students available for new group assignment
+            const allStudentsRaw = await getAvailableStudentsForNewGroupAssignment(session.school_id as number);
+
+            // Format student data
             const allStudentsFormatted = allStudentsRaw.map(formatStudentData);
+
+            // Filter available students
             const studentsAvailable = filterAvailableStudents(allStudentsFormatted, groupStudents);
+
+            // Set available students
             setAvailableStudents(studentsAvailable);
 
         } catch (error) {
             console.error('Error al cargar estudiantes disponibles:', error);
+
+            // Set error state
             setErrorState((prev: ErrorStates) => ({ ...prev, students: 'No se pudieron cargar los estudiantes disponibles.' }));
-            setAvailableStudents([]); // Limpiar en caso de error
+
+            // Clear available students
+            setAvailableStudents([]);
         } finally {
             setLoadingState((prev: LoadingStates) => ({ ...prev, availableStudents: false }));
         }
