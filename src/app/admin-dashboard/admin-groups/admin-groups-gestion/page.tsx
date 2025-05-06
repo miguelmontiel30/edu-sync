@@ -22,10 +22,11 @@ export default function GroupStudentsDashboard() {
         groupCategories,
         isLoading,
         isModalOpen,
+        groupStudents,
+        isLoadingStudents,
         handleModalOpen,
         handleModalClose,
         handleGroupChange,
-        handleEditStudent,
         handleDeleteStudent
     } = useGroupStudentsManagement();
 
@@ -34,10 +35,7 @@ export default function GroupStudentsDashboard() {
         studentColumns,
         studentActionButtons,
         studentListConfig,
-        groupStudents,
-        isLoadingStudents,
     } = useTableConfig({
-        handleEdit: handleEditStudent,
         handleDelete: handleDeleteStudent,
         selectedGroup
     });
@@ -66,7 +64,7 @@ export default function GroupStudentsDashboard() {
             {selectedGroup && (
                 <>
                     <ItemsList
-                        items={groupStudents}
+                        items={[]}
                         columns={studentColumns}
                         isLoading={isLoadingStudents || isLoading}
                         onAddNew={handleModalOpen}
