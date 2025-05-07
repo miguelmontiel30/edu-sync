@@ -37,6 +37,7 @@ export interface Student {
         category: string;
     };
     // Status of the student in the group
+    student_group_id?: number;
     student_group_status_id?: number;
     student_group_status?: {
         status_id: number;

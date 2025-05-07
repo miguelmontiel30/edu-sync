@@ -1,3 +1,6 @@
+// Services
+import {Status} from '@/services/status/statusService';
+
 // Types
 import {Category, STUDENT_GROUP_STATUS} from './types';
 import {Student} from '@/app/admin-dashboard/admin-students/module-utils/types';
@@ -136,8 +139,6 @@ export const filterAvailableStudents = (
 export function getStudentStatusColorById(
     statusId: number,
 ): 'success' | 'warning' | 'dark' | 'primary' {
-    console.log('statusId', statusId);
-
     const colorMap: Record<string, 'success' | 'warning' | 'dark' | 'primary'> = {
         [STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE]: 'success',
         [STUDENT_GROUP_STATUS.STUDENT_GROUP_INACTIVE]: 'dark',
@@ -146,4 +147,124 @@ export function getStudentStatusColorById(
     };
 
     return colorMap[statusId] || 'dark';
+}
+
+/**
+ * Crea un mapa de ID de estado a objeto Status para búsquedas eficientes
+ * @param statuses Array de objetos Status
+ * @returns Map con ID como clave y Status como valor
+ */
+export function createStatusMap(statuses: Status[]): Map<number, Status> {
+    const map = new Map<number, Status>();
+    statuses.forEach(status => {
+        map.set(status.status_id, status);
+    });
+    return map;
+}
+
+/**
+ * Transforma los datos de Supabase al formato Student
+ * @param data Datos crudos de estudiante desde Supabase
+ * @param studentGroupInfo Información opcional de la relación estudiante-grupo
+ * @returns Objeto Student formateado
+ */
+export function mapToStudent(data: any, studentGroupInfo?: any): Student {
+    return {
+        id: data.student_id,
+        school_id: data.school_id,
+        first_name: data.first_name,
+        father_last_name: data.father_last_name,
+        mother_last_name: data.mother_last_name,
+        birth_date: data.birth_date,
+        gender_id: data.gender_id,
+        gender: data.gender
+            ? {
+                  id: data.gender.gender_id,
+                  code: data.gender.code,
+                  name: data.gender.name,
+              }
+            : undefined,
+        curp: data.curp,
+        phone: data.phone,
+        email: data.email,
+        image_url: data.image_url,
+        status_id: data.status_id,
+        status: data.status
+            ? {
+                  status_id: data.status.status_id,
+                  code: data.status.code,
+                  name: data.status.name,
+                  category: data.status.category,
+              }
+            : undefined,
+        delete_flag: data.delete_flag,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        deleted_at: data.deleted_at,
+        student_group_id: studentGroupInfo?.student_group_id,
+        student_group_status_id: studentGroupInfo?.status_id,
+        student_group_status: studentGroupInfo?.status,
+    };
+}
+
+/**
+ * Crea un mapa de asignación de estudiantes a grupos para búsquedas eficientes
+ * @param studentGroupEntries Entradas de relación estudiante-grupo
+ * @param statusMap Mapa de estados con sus IDs como clave
+ * @returns Map con student_id como clave y detalles de grupo como valor
+ */
+export function createStudentGroupMap(
+    studentGroupEntries: any[],
+    statusMap: Map<number, Status>,
+): Map<number, any> {
+    return new Map(
+        studentGroupEntries.map(entry => {
+            const status = statusMap.get(entry.status_id);
+            return [
+                entry.student_id,
+                {
+                    student_group_id: entry.student_group_id,
+                    status_id: entry.status_id,
+                    status: status || null,
+                },
+            ];
+        }),
+    );
+}
+
+/**
+ * Formatea la fecha actual en formato ISO para la base de datos
+ * @returns Objeto con fecha completa y solo fecha (YYYY-MM-DD)
+ */
+export function getCurrentDateFormatted(): {isoDate: string; datePart: string} {
+    const currentDate = new Date().toISOString();
+    return {
+        isoDate: currentDate,
+        datePart: currentDate.split('T')[0], // Formato YYYY-MM-DD
+    };
+}
+
+/**
+ * Genera registros para insertar en la tabla student_groups
+ * @param studentIds Array de IDs de estudiantes
+ * @param groupId ID del grupo
+ * @param statusId ID del estado a asignar
+ * @returns Array de registros listos para insertar
+ */
+export function generateStudentGroupRecords(
+    studentIds: number[],
+    groupId: number,
+    statusId: number,
+): any[] {
+    const {isoDate, datePart} = getCurrentDateFormatted();
+
+    return studentIds.map(studentId => ({
+        student_id: studentId,
+        group_id: groupId,
+        enrollment_date: datePart,
+        status_id: statusId,
+        delete_flag: false,
+        created_at: isoDate,
+        updated_at: isoDate,
+    }));
 }

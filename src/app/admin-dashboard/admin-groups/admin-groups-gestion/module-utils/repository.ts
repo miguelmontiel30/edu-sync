@@ -4,6 +4,28 @@ import {supabaseClient} from '@/services/config/supabaseClient';
 // Types
 import {STUDENT_GROUP_STATUS} from './types';
 import {Student} from '@/app/admin-dashboard/admin-students/module-utils/types';
+import statusService from '@/services/status/statusService';
+
+// Utils
+import {
+    createStatusMap,
+    mapToStudent,
+    createStudentGroupMap,
+    generateStudentGroupRecords,
+    getCurrentDateFormatted,
+} from './utils';
+
+// Queries
+import {
+    getStudentGroupAssignments,
+    getStudentsByIdsAndSchool,
+    getActiveStudentGroupAssignments,
+    getStudentCountInGroupByStatus,
+    insertStudentGroupRecords,
+    updateStudentGroupStatus as updateStudentGroupStatusQuery,
+    removeStudentFromGroup as removeStudentFromGroupQuery,
+    baseStudentQuery,
+} from './queries';
 
 // Definición de la interfaz del repositorio
 export interface IGroupStudentsRepository {
@@ -26,27 +48,6 @@ export interface IGroupStudentsRepository {
  */
 export class GroupStudentsRepository implements IGroupStudentsRepository {
     /**
-     * Base query para obtener estudiantes con sus relaciones
-     * @returns QueryBuilder
-     */
-    private baseStudentQuery() {
-        return supabaseClient.from('students').select(`
-            *,
-            gender:gender_id (
-                gender_id,
-                code,
-                name
-            ),
-            status:status_id (
-                status_id,
-                code,
-                name,
-                category
-            )
-        `);
-    }
-
-    /**
      * Obtiene los estudiantes activos que están asignados a un grupo específico,
      * incluyendo el ID y estado de su asignación a ese grupo.
      * @param groupId - El ID del grupo para el cual se desea obtener los estudiantes
@@ -55,154 +56,34 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
      */
     async getActiveStudentsByGroup(groupId: number, schoolId: number): Promise<Student[]> {
         try {
-            // Primero, verifiquemos si podemos obtener información de estados directamente
-            console.log('Verificando si podemos acceder a la tabla de estados...');
-            const {data: statusesData, error: statusesError} = await supabaseClient
-                .from('status')
-                .select('*')
-                .limit(5);
+            // 1. Obtener estados relevantes del servicio de estados (caché)
+            const studentGroupStatuses = await statusService.getStudentGroupStatuses();
+            const statusMap = createStatusMap(studentGroupStatuses);
 
-            if (statusesError) {
-                console.error('Error al verificar estados:', statusesError);
-            } else {
-                console.log('Datos de estados disponibles:', statusesData);
-            }
+            // 2. Obtener asignaciones de estudiantes al grupo
+            const {data: studentGroupEntries, error: studentGroupError} =
+                await getStudentGroupAssignments(groupId);
 
-            // Obtenemos los detalles de asignación de estudiantes al grupo seleccionado
-            // Modificamos la consulta para obtener el status directamente de la tabla status
-            const {data: assignedStudentGroupDetails, error: assignedError} = await supabaseClient
-                .from('student_groups')
-                .select(
-                    `
-                    student_id, 
-                    student_group_id, 
-                    status_id
-                `,
-                )
-                .eq('delete_flag', false)
-                .eq('group_id', groupId);
+            if (studentGroupError) throw studentGroupError;
+            if (!studentGroupEntries || studentGroupEntries.length === 0) return [];
 
-            if (assignedError) throw assignedError;
-            if (!assignedStudentGroupDetails || assignedStudentGroupDetails.length === 0) return [];
+            // 3. Preparar IDs y mapa de asignaciones
+            const studentIds = studentGroupEntries.map(sg => sg.student_id);
+            const studentGroupMap = createStudentGroupMap(studentGroupEntries, statusMap);
 
-            console.log('Asignaciones encontradas:', assignedStudentGroupDetails.length);
-
-            // Obtenemos todos los status_id únicos para hacer una sola consulta a la tabla status
-            const uniqueStatusIds = [
-                ...new Set(assignedStudentGroupDetails.map(sg => sg.status_id)),
-            ];
-            console.log('Status IDs únicos:', uniqueStatusIds);
-
-            // Obtenemos la información de estados en una consulta separada
-            const {data: statusesInfo, error: statusesInfoError} = await supabaseClient
-                .from('status')
-                .select('*')
-                .in('status_id', uniqueStatusIds);
-
-            if (statusesInfoError) {
-                console.error('Error al obtener información de estados:', statusesInfoError);
-            }
-
-            console.log('Información de estados obtenida:', statusesInfo);
-
-            // Creamos un mapa para acceso rápido a la información de estados
-            const statusMap = new Map();
-            if (statusesInfo && statusesInfo.length > 0) {
-                statusesInfo.forEach(status => {
-                    statusMap.set(status.status_id, {
-                        status_id: status.status_id,
-                        code: status.code,
-                        name: status.name,
-                        category: status.category,
-                    });
-                });
-            }
-
-            // Creamos un mapa para fácil acceso a los detalles de asignación por student_id
-            const studentAssignmentDetailsMap = new Map(
-                assignedStudentGroupDetails.map(detail => {
-                    // Obtenemos información del estado desde nuestro mapa
-                    const statusInfo = statusMap.get(detail.status_id);
-
-                    console.log(`Datos para student_id ${detail.student_id}:`, {
-                        student_group_id: detail.student_group_id,
-                        status_id: detail.status_id,
-                        statusInfo,
-                    });
-
-                    return [
-                        detail.student_id,
-                        {
-                            student_group_id: detail.student_group_id,
-                            student_group_status_id: detail.status_id,
-                            student_group_status: statusInfo || null,
-                        },
-                    ];
-                }),
+            // 4. Obtener detalles de los estudiantes
+            const {data: studentsData, error: studentsError} = await getStudentsByIdsAndSchool(
+                studentIds,
+                schoolId,
             );
 
-            const studentIds = assignedStudentGroupDetails.map(sg => sg.student_id);
+            if (studentsError) throw studentsError;
+            if (!studentsData || studentsData.length === 0) return [];
 
-            // Consultamos los detalles completos de estos estudiantes
-            const {data, error} = await this.baseStudentQuery()
-                .eq('delete_flag', false)
-                .eq('school_id', schoolId)
-                .in('student_id', studentIds)
-                .order('first_name', {ascending: true});
-
-            if (error) throw error;
-            if (!data || data.length === 0) return [];
-
-            // Transformamos los datos para el formato esperado Student, añadiendo detalles de asignación
-            const result = data.map(student => {
-                const assignmentInfo = studentAssignmentDetailsMap.get(student.student_id);
-                const mappedStudent = {
-                    id: student.student_id,
-                    school_id: student.school_id,
-                    first_name: student.first_name,
-                    father_last_name: student.father_last_name,
-                    mother_last_name: student.mother_last_name,
-                    birth_date: student.birth_date,
-                    gender_id: student.gender_id,
-                    gender: student.gender
-                        ? {
-                              id: student.gender.gender_id,
-                              code: student.gender.code,
-                              name: student.gender.name,
-                          }
-                        : undefined,
-                    curp: student.curp,
-                    phone: student.phone,
-                    email: student.email,
-                    image_url: student.image_url,
-                    status_id: student.status_id,
-                    status: student.status
-                        ? {
-                              status_id: student.status.status_id,
-                              code: student.status.code,
-                              name: student.status.name,
-                              category: student.status.category,
-                          }
-                        : undefined,
-                    delete_flag: student.delete_flag,
-                    created_at: student.created_at,
-                    updated_at: student.updated_at,
-                    deleted_at: student.deleted_at,
-                    student_group_id: assignmentInfo?.student_group_id, // ID de la tabla student_groups
-                    student_group_status_id: assignmentInfo?.student_group_status_id, // status_id de student_groups
-                    student_group_status: assignmentInfo?.student_group_status, // Información completa del status
-                };
-
-                console.log(`Estudiante mapeado ${student.student_id}:`, {
-                    student_group_status_id: mappedStudent.student_group_status_id,
-                    student_group_status: mappedStudent.student_group_status,
-                });
-
-                return mappedStudent;
-            });
-
-            console.log('Total de estudiantes procesados:', result.length);
-            return result;
+            // 5. Mapear estudiantes con sus asignaciones
+            return studentsData.map(student =>
+                mapToStudent(student, studentGroupMap.get(student.student_id)),
+            );
         } catch (error) {
             console.error('Error al obtener estudiantes activos por grupo:', error);
             throw error;
@@ -220,30 +101,22 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
         studentIds: number[],
     ): Promise<{success: boolean; error?: any}> {
         try {
-            // Verificamos que haya estudiantes para asignar
             if (!studentIds || studentIds.length === 0) {
                 return {success: false, error: 'No se proporcionaron estudiantes para asignar'};
             }
 
-            // Preparamos los registros a insertar
-            const currentDate = new Date().toISOString();
+            // Generar registros a insertar
+            const studentGroupRecords = generateStudentGroupRecords(
+                studentIds,
+                groupId,
+                STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE,
+            );
 
-            const studentGroupRecords = studentIds.map(studentId => ({
-                student_id: studentId,
-                group_id: groupId,
-                enrollment_date: currentDate.split('T')[0], // Formato YYYY-MM-DD
-                status_id: STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE,
-                delete_flag: false,
-                created_at: currentDate,
-                updated_at: currentDate,
-            }));
-
-            // Insertamos los registros en la tabla student_groups
-            const {error} = await supabaseClient.from('student_groups').insert(studentGroupRecords);
+            // Insertar registros
+            const {error} = await insertStudentGroupRecords(studentGroupRecords);
 
             if (error) {
                 console.error('Error al asignar estudiantes al grupo:', error);
-
                 return {success: false, error};
             }
 
@@ -261,16 +134,8 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
      */
     async removeStudentFromGroup(studentGroupId: number): Promise<{success: boolean; error?: any}> {
         try {
-            const currentDate = new Date().toISOString();
-
-            const {error} = await supabaseClient
-                .from('student_groups')
-                .update({
-                    delete_flag: true,
-                    updated_at: currentDate,
-                    deleted_at: currentDate,
-                })
-                .eq('student_group_id', studentGroupId);
+            const {isoDate} = getCurrentDateFormatted();
+            const {error} = await removeStudentFromGroupQuery(studentGroupId, isoDate);
 
             if (error) {
                 console.error('Error al eliminar estudiante del grupo:', error);
@@ -295,13 +160,8 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
         statusId: number,
     ): Promise<{success: boolean; error?: any}> {
         try {
-            const {error} = await supabaseClient
-                .from('student_groups')
-                .update({
-                    status_id: statusId,
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('student_group_id', studentGroupId);
+            const {isoDate} = getCurrentDateFormatted();
+            const {error} = await updateStudentGroupStatusQuery(studentGroupId, statusId, isoDate);
 
             if (error) {
                 console.error('Error al actualizar estado del estudiante en el grupo:', error);
@@ -322,15 +182,12 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
      */
     async getStudentCountInGroup(groupId: number): Promise<number> {
         try {
-            const {count, error} = await supabaseClient
-                .from('student_groups')
-                .select('*', {count: 'exact', head: true})
-                .eq('group_id', groupId)
-                .eq('delete_flag', false)
-                .eq('status_id', STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE); // Usar constante
+            const {count, error} = await getStudentCountInGroupByStatus(
+                groupId,
+                STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE,
+            );
 
             if (error) throw error;
-
             return count || 0;
         } catch (error) {
             console.error('Error al obtener conteo de estudiantes:', error);
@@ -346,81 +203,32 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
     async getAvailableStudentsForNewGroupAssignment(schoolId: number): Promise<Student[]> {
         try {
             // 1. Obtener IDs de estudiantes que ya están en un grupo activo
-            const {data: activeStudentGroupEntries, error: activeStudentGroupError} =
-                await supabaseClient
-                    .from('student_groups')
-                    .select('student_id')
-                    .eq('delete_flag', false)
-                    .eq('status_id', STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE);
+            const {data: activeStudentGroups, error: activeStudentGroupError} =
+                await getActiveStudentGroupAssignments(STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE);
 
-            if (activeStudentGroupError) {
-                console.error(
-                    'Error al obtener IDs de estudiantes en grupos activos:',
-                    activeStudentGroupError,
-                );
-                throw activeStudentGroupError;
-            }
-
-            const activelyAssignedStudentIds = activeStudentGroupEntries
-                ? activeStudentGroupEntries.map(sg => sg.student_id)
-                : [];
+            if (activeStudentGroupError) throw activeStudentGroupError;
+            const assignedStudentIds = activeStudentGroups?.map(sg => sg.student_id) || [];
 
             // 2. Construir la consulta para estudiantes disponibles
-            let query = this.baseStudentQuery()
+            let query = baseStudentQuery()
                 .eq('delete_flag', false)
                 .eq('school_id', schoolId)
                 .order('first_name', {ascending: true});
 
             // Si hay estudiantes activamente asignados, excluirlos
-            if (activelyAssignedStudentIds.length > 0) {
-                query = query.not('student_id', 'in', `(${activelyAssignedStudentIds.join(',')})`);
+            if (assignedStudentIds.length > 0) {
+                query = query.not('student_id', 'in', `(${assignedStudentIds.join(',')})`);
             }
 
             const {data, error} = await query;
 
-            if (error) {
-                console.error('Error al obtener estudiantes disponibles para asignación:', error);
-                throw error;
-            }
-
+            if (error) throw error;
             if (!data || data.length === 0) return [];
 
-            // 3. Transformar los datos al formato Student
-            return data.map(student => ({
-                id: student.student_id,
-                school_id: student.school_id,
-                first_name: student.first_name,
-                father_last_name: student.father_last_name,
-                mother_last_name: student.mother_last_name,
-                birth_date: student.birth_date,
-                gender_id: student.gender_id,
-                gender: student.gender
-                    ? {
-                          id: student.gender.gender_id,
-                          code: student.gender.code,
-                          name: student.gender.name,
-                      }
-                    : undefined,
-                curp: student.curp,
-                phone: student.phone,
-                email: student.email,
-                image_url: student.image_url,
-                status_id: student.status_id,
-                status: student.status
-                    ? {
-                          status_id: student.status.status_id,
-                          code: student.status.code,
-                          name: student.status.name,
-                          category: student.status.category,
-                      }
-                    : undefined,
-                delete_flag: student.delete_flag,
-                created_at: student.created_at,
-                updated_at: student.updated_at,
-                deleted_at: student.deleted_at,
-            }));
+            // 3. Mapear a formato Student
+            return data.map(student => mapToStudent(student));
         } catch (error) {
-            console.error('Error general en getAvailableStudentsForNewGroupAssignment:', error);
+            console.error('Error en getAvailableStudentsForNewGroupAssignment:', error);
             throw error;
         }
     }
