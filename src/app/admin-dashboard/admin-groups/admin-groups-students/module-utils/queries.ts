@@ -1,4 +1,5 @@
 import {supabaseClient} from '@/services/config/supabaseClient';
+import {STUDENT_GROUP_STATUS} from './types';
 
 /**
  * Consulta base para obtener estudiantes con sus relaciones
@@ -32,6 +33,33 @@ export async function getStudentGroupAssignments(groupId: number) {
         .select('student_id, student_group_id, status_id')
         .eq('delete_flag', false)
         .eq('group_id', groupId);
+}
+
+/**
+ * Obtiene las asignaciones de estudiantes eliminados de un grupo específico
+ * @param groupId ID del grupo a consultar
+ * @returns Promise con los datos y posible error
+ */
+export async function getDeletedStudentGroupAssignments(groupId: number) {
+    return await supabaseClient
+        .from('student_groups')
+        .select('student_id, student_group_id, status_id')
+        .eq('delete_flag', true)
+        .eq('group_id', groupId);
+}
+
+/**
+ * Obtiene las asignaciones de estudiantes inactivos (no activos pero no eliminados) de un grupo específico
+ * @param groupId ID del grupo a consultar
+ * @returns Promise con los datos y posible error
+ */
+export async function getInactiveStudentGroupAssignments(groupId: number) {
+    return await supabaseClient
+        .from('student_groups')
+        .select('student_id, student_group_id, status_id')
+        .eq('delete_flag', false)
+        .eq('group_id', groupId)
+        .neq('status_id', STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE);
 }
 
 /**
@@ -119,6 +147,29 @@ export async function removeStudentFromGroup(studentGroupId: number, timestamp: 
             delete_flag: true,
             updated_at: timestamp,
             deleted_at: timestamp,
+        })
+        .eq('student_group_id', studentGroupId);
+}
+
+/**
+ * Restaura un estudiante eliminado y actualiza su estado
+ * @param studentGroupId ID de la relación estudiante-grupo
+ * @param statusId Nuevo ID de estado
+ * @param timestamp Fecha de la operación
+ * @returns Promise con el resultado y posible error
+ */
+export async function restoreStudentFromGroup(
+    studentGroupId: number,
+    statusId: number,
+    timestamp: string,
+) {
+    return await supabaseClient
+        .from('student_groups')
+        .update({
+            delete_flag: false,
+            status_id: statusId,
+            updated_at: timestamp,
+            deleted_at: null,
         })
         .eq('student_group_id', studentGroupId);
 }

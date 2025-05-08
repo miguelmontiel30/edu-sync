@@ -12,6 +12,23 @@ export function fetchActiveStudentsByGroup(groupId: number, schoolId: number): P
 }
 
 /**
+ * Obtiene estudiantes inactivos (no activos pero no eliminados) del grupo
+ */
+export function fetchInactiveStudentsByGroup(
+    groupId: number,
+    schoolId: number,
+): Promise<Student[]> {
+    return groupStudentsRepository.getInactiveStudentsByGroup(groupId, schoolId);
+}
+
+/**
+ * Obtiene estudiantes eliminados (delete_flag = true) del grupo
+ */
+export function fetchDeletedStudentsByGroup(groupId: number, schoolId: number): Promise<Student[]> {
+    return groupStudentsRepository.getDeletedStudentsByGroup(groupId, schoolId);
+}
+
+/**
  * Asigna estudiantes a un grupo
  */
 export function assignStudentsToGroup(
@@ -28,6 +45,25 @@ export function removeStudentFromGroup(
     studentGroupId: number,
 ): Promise<{success: boolean; error?: any}> {
     return groupStudentsRepository.removeStudentFromGroup(studentGroupId);
+}
+
+/**
+ * Restaura un estudiante eliminado del grupo
+ */
+export function restoreStudentToGroup(
+    studentGroupId: number,
+): Promise<{success: boolean; error?: any}> {
+    return groupStudentsRepository.restoreStudentToGroup(studentGroupId);
+}
+
+/**
+ * Actualiza el estado de un estudiante en un grupo
+ */
+export function updateStudentGroupStatus(
+    studentGroupId: number,
+    statusId: number,
+): Promise<{success: boolean; error?: any}> {
+    return groupStudentsRepository.updateStudentGroupStatus(studentGroupId, statusId);
 }
 
 /**
