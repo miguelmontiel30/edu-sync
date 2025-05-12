@@ -1,6 +1,3 @@
-// Supabase Client
-import {supabaseClient} from '@/services/config/supabaseClient';
-
 // Types
 import {STUDENT_GROUP_STATUS} from './types';
 import {Student} from '@/app/admin-dashboard/admin-students/module-utils/types';
