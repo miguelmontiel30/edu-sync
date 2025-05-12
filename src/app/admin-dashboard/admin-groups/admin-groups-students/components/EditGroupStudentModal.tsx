@@ -11,7 +11,7 @@ import Select from '@/components/form/Select';
 // Core Components
 import Button from '@/components/core/button/Button';
 import IconFA from '@/components/ui/IconFA';
-import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/core/table';
+import { Table, TableBody, TableRow, TableCell } from '@/components/core/table';
 
 // Tipos
 import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';

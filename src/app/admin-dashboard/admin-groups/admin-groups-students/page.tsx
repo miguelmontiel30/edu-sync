@@ -21,14 +21,13 @@ export default function GroupStudentsDashboard() {
         selectedGroup,
         groupCategories,
         loadingState,
-        errorState,
-        isModalOpen,
         activeStudents,
         inactiveStudents,
         deletedStudents,
         availableStudents,
         editingStudent,
         isEditModalOpen,
+        isModalOpen,
         handleModalOpen,
         handleModalClose,
         handleGroupChange,
@@ -45,9 +44,7 @@ export default function GroupStudentsDashboard() {
         studentColumns,
         activeStudentActionButtons,
         activeStudentListConfig,
-        inactiveStudentActionButtons,
         inactiveStudentListConfig,
-        deletedStudentActionButtons,
         deletedStudentListConfig
     } = useTableConfig({
         handleDelete: handleDeleteStudent,
@@ -135,7 +132,7 @@ export default function GroupStudentsDashboard() {
                                 status: createStatusFromStudent(editingStudent)
                             }}
                             isSaving={loadingState.saving}
-                            onSave={(studentId, newStatus) => {
+                            onSave={(_studentId, newStatus) => {
                                 if (editingStudent.student_group_id) {
                                     handleUpdateStudentStatus(
                                         editingStudent.student_group_id,
