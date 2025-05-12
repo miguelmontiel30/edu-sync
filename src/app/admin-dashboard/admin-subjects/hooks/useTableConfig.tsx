@@ -7,7 +7,7 @@ import { ActionButton, ItemsListConfig } from '../../core/Tables/ItemsList';
 import { DeletedItemsListConfig } from '../../core/Tables/DeletedItemsList';
 
 // Types & Utils
-import { Subject } from '../module-utils/types';
+import { Subject, SUBJECT_STATUS } from '../module-utils/types';
 import { Column } from '@/components/core/table/module-utils/types';
 interface TableConfigProps {
     handleEdit: (id: number) => void;
@@ -87,17 +87,21 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
             key: 'status',
             header: 'Estado',
             sortable: true,
-            render: (subject: Subject) => (
-                <span className="text-sm text-gray-700 dark:text-white/70 font-outfit">
-                    <Badge
-                        size="sm"
-                        variant='light'
-                        color={subject?.status?.name === 'ACTIVE' ? 'success' : subject?.status?.name === 'INACTIVE' ? 'dark' : 'primary'}
-                    >
-                        {subject.status?.name}
-                    </Badge>
-                </span>
-            )
+            render: (subject: Subject) => {
+                console.log('subject from table', subject);
+
+                return (
+                    <span className="text-sm text-gray-700 dark:text-white/70 font-outfit">
+                        <Badge
+                            size="sm"
+                            variant='light'
+                            color={subject?.status?.status_id === SUBJECT_STATUS.SUBJECT_ACTIVE ? 'success' : subject?.status?.status_id === SUBJECT_STATUS.SUBJECT_INACTIVE ? 'dark' : 'primary'}
+                        >
+                            {subject.status?.name}
+                        </Badge>
+                    </span>
+                )
+            }
         }
     ], []);
 

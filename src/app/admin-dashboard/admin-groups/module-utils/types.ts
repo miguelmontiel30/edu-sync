@@ -2,9 +2,9 @@
  * Enumeración de estados posibles para un grupo
  */
 export enum GROUP_STATUS {
-    ACTIVE = '1',
-    INACTIVE = '2',
-    COMPLETED = '3',
+    ACTIVE = '4',
+    INACTIVE = '5',
+    COMPLETED = '6',
 }
 
 /**

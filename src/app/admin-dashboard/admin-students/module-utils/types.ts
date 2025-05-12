@@ -28,12 +28,21 @@ export interface Student {
     phone: string | null;
     email: string | null;
     image_url: string | null;
+    // Status of the student
     status_id: number;
     status?: {
         status_id: number;
         name: string;
         code: string;
         category: string;
+    };
+    // Status of the student in the group
+    student_group_id?: number;
+    student_group_status_id?: number;
+    student_group_status?: {
+        status_id: number;
+        name: string;
+        code: string;
     };
     delete_flag: boolean;
     created_at: string;

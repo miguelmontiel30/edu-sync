@@ -61,10 +61,16 @@ const navItems: NavItem[] = [
                 icon: 'users',
             },
             {
-                name: 'Administración de grupos',
-                path: '/admin-dashboard/admin-groups/admin-groups-gestion',
+                name: 'Grupos y estudiantes',
+                path: '/admin-dashboard/admin-groups/admin-groups-students',
                 pro: false,
                 icon: 'user-graduate',
+            },
+            {
+                name: 'Grupos y materias',
+                path: '/admin-dashboard/admin-groups/admin-groups-subjects',
+                pro: false,
+                icon: 'book-open-reader',
             },
         ],
     },
@@ -77,13 +83,7 @@ const navItems: NavItem[] = [
                 path: '/admin-dashboard/admin-subjects',
                 pro: false,
                 icon: 'book',
-            },
-            {
-                name: 'Gestión de materias',
-                path: '/admin-dashboard/admin-subjects/manage',
-                pro: false,
-                icon: 'gear',
-            },
+            }
         ],
     },
     {
