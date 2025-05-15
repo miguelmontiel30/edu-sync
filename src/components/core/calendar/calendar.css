@@ -1,0 +1,57 @@
+.custom-calendar {
+    /* Estilos generales del calendario */
+    --fc-border-color: theme('colors.gray.200');
+    --fc-button-bg-color: theme('colors.brand.500');
+    --fc-button-border-color: theme('colors.brand.500');
+    --fc-button-hover-bg-color: theme('colors.brand.600');
+    --fc-button-hover-border-color: theme('colors.brand.600');
+    --fc-button-active-bg-color: theme('colors.brand.700');
+    --fc-button-active-border-color: theme('colors.brand.700');
+}
+
+/* Estilos para los días del calendario */
+.custom-calendar .fc-daygrid-day {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.custom-calendar .fc-daygrid-day:hover {
+    background-color: theme('colors.gray.50');
+}
+
+/* Estilos para los eventos */
+.custom-calendar .fc-event {
+    cursor: pointer;
+    border: none;
+    padding: 2px 4px;
+}
+
+/* Estilos para los colores de eventos */
+.custom-calendar .fc-bg-danger {
+    background-color: theme('colors.red.500');
+    color: white;
+}
+
+.custom-calendar .fc-bg-success {
+    background-color: theme('colors.green.500');
+    color: white;
+}
+
+.custom-calendar .fc-bg-primary {
+    background-color: theme('colors.brand.500');
+    color: white;
+}
+
+.custom-calendar .fc-bg-warning {
+    background-color: theme('colors.yellow.500');
+    color: white;
+}
+
+/* Estilos para el modo oscuro */
+.dark .custom-calendar {
+    --fc-border-color: theme('colors.gray.700');
+}
+
+.dark .custom-calendar .fc-daygrid-day:hover {
+    background-color: theme('colors.gray.800');
+}
