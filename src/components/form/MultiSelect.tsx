@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
 interface Option {
     value: string;
@@ -136,19 +136,24 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                                 {options.map((option, index) => (
                                     <div key={index}>
                                         <div
-                                            className={`hover:bg-primary/5 w-full cursor-pointer rounded-t border-b border-gray-200 dark:border-gray-800`}
+                                            className={`hover:bg-primary/5 w-full cursor-pointer border-b border-gray-200 dark:border-gray-800 last:border-b-0`}
                                             onClick={() => handleSelect(option.value)}
                                         >
                                             <div
-                                                className={`relative flex w-full items-center p-2 pl-2 ${
-                                                    selectedOptions.includes(option.value)
-                                                        ? 'bg-primary/10'
-                                                        : ''
-                                                }`}
+                                                className={`relative flex w-full items-center p-2 pl-3 ${selectedOptions.includes(option.value)
+                                                    ? 'bg-primary/10 font-medium text-primary-700 dark:text-primary-300'
+                                                    : 'text-gray-800 dark:text-white/90'
+                                                    }`}
                                             >
-                                                <div className="mx-2 leading-6 text-gray-800 dark:text-white/90">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedOptions.includes(option.value)}
+                                                    onChange={() => handleSelect(option.value)}
+                                                    className="mr-3 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-primary-600"
+                                                />
+                                                <span className="mx-2 leading-6">
                                                     {option.text}
-                                                </div>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
