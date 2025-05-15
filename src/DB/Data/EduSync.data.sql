@@ -67,7 +67,12 @@ VALUES
     -- Estados para materias
     ('SUBJECT_ACTIVE', 'Activo', 'subject'),
     ('SUBJECT_INACTIVE', 'Inactivo', 'subject'),
-    ('SUBJECT_COMPLETED', 'Completado', 'subject');
+    ('SUBJECT_COMPLETED', 'Completado', 'subject'),
+    -- Estados para eventos
+    ('EVENT_ACTIVE', 'Activo', 'event'),
+    ('EVENT_INACTIVE', 'Inactivo', 'event'),
+    ('EVENT_CANCELED', 'Cancelado', 'event'),
+    ('EVENT_COMPLETED', 'Completado', 'event');
 
 -- Generar datos para los roles y permisos
 INSERT INTO
@@ -96,789 +101,87 @@ VALUES
     (1, 3), -- Admin puede eliminar estudiante
     (1, 4);
 
--- Asignar rol de administrador al usuario de prueba
+-- Generar datos para los tipos de eventos
 INSERT INTO
-    user_roles (user_id, role_id)
-SELECT
-    user_id,
-    role_id
-FROM
-    users,
-    roles
-WHERE
-    email = 'test@email.com'
-    AND name = 'admin';
-
--- Insertar grupos
-INSERT INTO
-    "groups" (
-        "group_id",
-        "school_id",
-        "grade",
-        "group_name",
-        "school_year_id",
-        "students_number",
-        "subjects_number",
-        "status",
-        "general_average",
-        "description",
-        "group_image",
-        "delete_flag",
-        "created_at",
-        "updated_at",
-        "deleted_at"
-    )
+    event_types (school_id, name, color, icon, delete_flag)
 VALUES
-    (
-        '1',
-        '1',
-        '1',
-        'A',
-        '4',
-        '0',
-        '0',
-        'active',
-        null,
-        null,
-        null,
-        'false',
-        '2025-03-27 09:30:04.493446+00',
-        '2025-03-27 09:30:04.493446+00',
-        null
-    ),
-    (
-        '2',
-        '1',
-        '2',
-        'A',
-        '4',
-        '0',
-        '0',
-        'active',
-        null,
-        null,
-        null,
-        'false',
-        '2025-03-27 09:39:07.687581+00',
-        '2025-03-27 09:42:34.92+00',
-        null
-    ),
-    (
-        '3',
-        '1',
-        '1',
-        'A',
-        '2',
-        '0',
-        '0',
-        'completed',
-        null,
-        null,
-        null,
-        'false',
-        '2025-03-27 09:39:35.775707+00',
-        '2025-03-27 09:41:26.6+00',
-        null
-    ),
-    (
-        '4',
-        '1',
-        '3',
-        'A',
-        '4',
-        '0',
-        '0',
-        'active',
-        null,
-        null,
-        null,
-        'false',
-        '2025-03-27 09:40:23.170817+00',
-        '2025-03-27 09:40:23.170817+00',
-        null
-    ),
-    (
-        '5',
-        '1',
-        '1',
-        'C',
-        '4',
-        '0',
-        '0',
-        'inactive',
-        null,
-        null,
-        null,
-        'true',
-        '2025-03-27 09:41:06.152597+00',
-        '2025-03-27 09:41:06.152597+00',
-        '2025-03-27 09:41:09.799+00'
-    ),
-    (
-        '6',
-        '1',
-        '4',
-        'A',
-        '4',
-        '0',
-        '0',
-        'active',
-        null,
-        null,
-        null,
-        'false',
-        '2025-03-27 09:50:38.574834+00',
-        '2025-03-27 09:50:38.574834+00',
-        null
-    );
-
--- Insertar estudiantes en los grupos
-INSERT INTO
-    "student_groups" (
-        "student_group_id",
-        "student_id",
-        "group_id",
-        "enrollment_date",
-        "status",
-        "delete_flag",
-        "created_at",
-        "updated_at",
-        "deleted_at"
-    )
-VALUES
-    (
-        '1',
-        '1',
-        '1',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 21:37:00.290896+00',
-        '2025-03-27 21:37:00.290896+00',
-        '2025-03-28 00:45:17.179+00'
-    ),
-    (
-        '2',
-        '3',
-        '1',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 21:37:00.290896+00',
-        '2025-03-27 21:37:00.290896+00',
-        '2025-03-28 00:35:43.681+00'
-    ),
-    (
-        '3',
-        '4',
-        '1',
-        '2025-03-27',
-        'active',
-        'false',
-        '2025-03-27 21:37:00.290896+00',
-        '2025-03-27 21:37:00.290896+00',
-        null
-    ),
-    (
-        '5',
-        '3',
-        '2',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 22:48:55.767934+00',
-        '2025-03-27 22:48:55.767934+00',
-        '2025-03-27 23:45:17.957+00'
-    ),
-    (
-        '6',
-        '8',
-        '2',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-28 00:32:55.966+00'
-    ),
-    (
-        '7',
-        '6',
-        '2',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-28 00:32:31.711+00'
-    ),
-    (
-        '8',
-        '7',
-        '2',
-        '2025-03-27',
-        'active',
-        'false',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-27 22:55:36.480376+00',
-        null
-    ),
-    (
-        '9',
-        '21',
-        '2',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-28 00:32:55.966+00'
-    ),
-    (
-        '10',
-        '22',
-        '2',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-28 00:32:55.966+00'
-    ),
-    (
-        '11',
-        '1',
-        '2',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-28 00:45:17.179+00'
-    ),
-    (
-        '12',
-        '20',
-        '2',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-27 22:55:36.480376+00',
-        '2025-03-28 00:33:34.635+00'
-    ),
-    (
-        '13',
-        '5',
-        '1',
-        '2025-03-27',
-        'active',
-        'false',
-        '2025-03-27 23:52:16.326515+00',
-        '2025-03-27 23:52:16.326515+00',
-        null
-    ),
-    (
-        '14',
-        '9',
-        '2',
-        '2025-03-27',
-        'active',
-        'false',
-        '2025-03-27 23:53:13.649874+00',
-        '2025-03-27 23:53:13.649874+00',
-        null
-    ),
-    (
-        '15',
-        '10',
-        '2',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 23:53:13.649874+00',
-        '2025-03-27 23:53:13.649874+00',
-        '2025-03-28 00:35:25.24+00'
-    ),
-    (
-        '16',
-        '11',
-        '2',
-        '2025-03-27',
-        'active',
-        'true',
-        '2025-03-27 23:53:13.649874+00',
-        '2025-03-27 23:53:13.649874+00',
-        '2025-03-28 00:35:25.24+00'
-    ),
-    (
-        '17',
-        '12',
-        '2',
-        '2025-03-27',
-        'active',
-        'false',
-        '2025-03-27 23:53:25.153906+00',
-        '2025-03-27 23:53:25.153906+00',
-        null
-    ),
-    (
-        '18',
-        '14',
-        '2',
-        '2025-03-27',
-        'active',
-        'false',
-        '2025-03-27 23:53:25.153906+00',
-        '2025-03-27 23:53:25.153906+00',
-        null
-    ),
-    (
-        '19',
-        '13',
-        '2',
-        '2025-03-27',
-        'active',
-        'false',
-        '2025-03-27 23:53:25.153906+00',
-        '2025-03-27 23:53:25.153906+00',
-        null
-    ),
-    (
-        '20',
-        '15',
-        '2',
-        '2025-03-27',
-        'active',
-        'false',
-        '2025-03-27 23:53:25.153906+00',
-        '2025-03-27 23:53:25.153906+00',
-        null
-    ),
-    (
-        '21',
-        '17',
-        '1',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:20:36.518793+00',
-        '2025-03-28 00:20:36.518793+00',
-        null
-    ),
-    (
-        '22',
-        '18',
-        '1',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:20:36.518793+00',
-        '2025-03-28 00:20:36.518793+00',
-        null
-    ),
-    (
-        '23',
-        '19',
-        '4',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:20:46.297775+00',
-        '2025-03-28 00:20:46.297775+00',
-        null
-    ),
-    (
-        '24',
-        '16',
-        '4',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:20:55.549006+00',
-        '2025-03-28 00:20:55.549006+00',
-        null
-    ),
-    (
-        '25',
-        '6',
-        '4',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:32:32.08057+00',
-        '2025-03-28 00:32:32.08057+00',
-        null
-    ),
-    (
-        '26',
-        '8',
-        '6',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:32:56.329424+00',
-        '2025-03-28 00:32:56.329424+00',
-        null
-    ),
-    (
-        '27',
-        '21',
-        '6',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:32:56.329424+00',
-        '2025-03-28 00:32:56.329424+00',
-        null
-    ),
-    (
-        '28',
-        '22',
-        '6',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:32:56.329424+00',
-        '2025-03-28 00:32:56.329424+00',
-        null
-    ),
-    (
-        '31',
-        '20',
-        '6',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:33:34.999746+00',
-        '2025-03-28 00:33:34.999746+00',
-        null
-    ),
-    (
-        '32',
-        '10',
-        '6',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:35:25.682456+00',
-        '2025-03-28 00:35:25.682456+00',
-        null
-    ),
-    (
-        '33',
-        '11',
-        '6',
-        '2025-03-28',
-        'active',
-        'false',
-        '2025-03-28 00:35:25.682456+00',
-        '2025-03-28 00:35:25.682456+00',
-        null
-    );
-
--- Insertar materias
-INSERT INTO
-    subjects (school_id, name, description)
-VALUES
+    -- Tipos del calendario oficial
+    (1, 'Inicio de Clases', '#000000', 'school', FALSE),
+    (1, 'Fin de Clases', '#000000', 'school', FALSE),
     (
         1,
-        'Matemáticas I',
-        'Introducción a operaciones básicas y razonamiento lógico.'
+        'Suspensión Labores Docentes',
+        '#000000',
+        'no_work',
+        FALSE
+    ),
+    (1, 'Receso de Clases', '#2E7D32', 'beach', FALSE),
+    (1, 'Vacaciones', '#9E9E9E', 'vacation', FALSE),
+    (
+        1,
+        'Consejo Técnico (Intensiva)',
+        '#8D1C16',
+        'council',
+        FALSE
     ),
     (
         1,
-        'Matemáticas II',
-        'Resolución de problemas con suma, resta y conceptos de geometría.'
+        'Consejo Técnico (Ordinaria)',
+        '#EC407A',
+        'council',
+        FALSE
     ),
     (
         1,
-        'Español I',
-        'Desarrollo de la lectura, escritura y comprensión de textos.'
+        'Sesión Comité Salud/Limpieza',
+        '#FFA000',
+        'health',
+        FALSE
     ),
     (
         1,
-        'Español II',
-        'Producción de textos y análisis gramatical.'
+        'Jornadas de Limpieza',
+        '#FFA000',
+        'cleaning',
+        FALSE
+    ),
+    (1, 'Entrega Boletas', '#000000', 'report', FALSE),
+    (
+        1,
+        'Taller Dir. (Intensivo)',
+        '#FFD600',
+        'workshop',
+        FALSE
     ),
     (
         1,
-        'Ciencias Naturales I',
-        'Observación del entorno natural y seres vivos.'
+        'Taller Docente (Intensivo)',
+        '#D7CCC8',
+        'workshop',
+        FALSE
     ),
     (
         1,
-        'Ciencias Naturales II',
-        'Cuerpo humano, energía y ecosistemas.'
+        'Preinscripción',
+        '#D32F2F',
+        'registration',
+        FALSE
     ),
     (
         1,
-        'Geografía I',
-        'Ubicación espacial y características del entorno.'
+        'Registro de Calificaciones',
+        '#42A5F5',
+        'grades',
+        FALSE
     ),
-    (
-        1,
-        'Historia I',
-        'Conocimiento de hechos históricos relevantes en México.'
-    ),
-    (
-        1,
-        'Formación Cívica y Ética I',
-        'Valores, normas y convivencia.'
-    ),
-    (
-        1,
-        'Educación Socioemocional',
-        'Autoconocimiento, empatía y gestión emocional.'
-    ),
-    (
-        1,
-        'Educación Física I',
-        'Desarrollo motor, juegos y actividades físicas.'
-    ),
-    (
-        1,
-        'Educación Física II',
-        'Coordinación, trabajo en equipo y habilidades motrices.'
-    ),
-    (
-        1,
-        'Educación Artística I',
-        'Expresión a través del dibujo, pintura y manualidades.'
-    ),
-    (
-        1,
-        'Educación Artística II',
-        'Teatro, música y creatividad.'
-    ),
-    (
-        1,
-        'Inglés I',
-        'Vocabulario básico y frases comunes en inglés.'
-    ),
-    (
-        1,
-        'Inglés II',
-        'Comprensión oral, lectura y escritura de frases simples.'
-    ),
-    (
-        1,
-        'Computación I',
-        'Uso básico de computadoras y programas educativos.'
-    ),
-    (
-        1,
-        'Computación II',
-        'Procesadores de texto y exploración segura de internet.'
-    ),
-    (
-        1,
-        'Lectura y Redacción',
-        'Fomento a la lectura y escritura de cuentos y relatos.'
-    ),
-    (
-        1,
-        'Valores y Convivencia',
-        'Respeto, tolerancia y solución de conflictos.'
-    ),
-    (
-        1,
-        'Ciencias Sociales',
-        'Relaciones familiares, escolares y comunitarias.'
-    ),
-    (
-        1,
-        'Biología Básica',
-        'Animales, plantas y el cuerpo humano.'
-    ),
-    (
-        1,
-        'Aritmética',
-        'Operaciones numéricas y problemas cotidianos.'
-    ),
-    (
-        1,
-        'Geometría Básica',
-        'Figuras planas, cuerpos geométricos y medidas.'
-    ),
-    (
-        1,
-        'Ortografía',
-        'Reglas básicas de escritura y puntuación.'
-    ),
-    (
-        1,
-        'Música',
-        'Ritmo, instrumentos y apreciación musical.'
-    ),
-    (
-        1,
-        'Teatro',
-        'Expresión escénica, improvisación y dramatización.'
-    ),
-    (
-        1,
-        'Manualidades',
-        'Habilidades creativas con materiales diversos.'
-    ),
-    (
-        1,
-        'Medio Ambiente',
-        'Cuidado del entorno y recursos naturales.'
-    ),
-    (
-        1,
-        'Expresión Corporal',
-        'Comunicación no verbal y movimiento consciente.'
-    );
-
--- Insertar asignaciones de grupos a materias y profesores
-INSERT INTO
-    "public"."group_subjects" (
-        "group_subject_id",
-        "group_id",
-        "subject_id",
-        "teacher_id",
-        "delete_flag",
-        "created_at",
-        "deleted_at"
-    )
-VALUES
-    (
-        '1',
-        '1',
-        '1',
-        '1',
-        'true',
-        '2025-04-01 16:42:42.539956+00',
-        '2025-04-01 23:11:04.866+00'
-    ),
-    (
-        '2',
-        '2',
-        '2',
-        '3',
-        'false',
-        '2025-04-01 16:43:57.263795+00',
-        null
-    ),
-    (
-        '3',
-        '1',
-        '2',
-        '8',
-        'true',
-        '2025-04-01 22:20:50.771287+00',
-        '2025-04-01 23:10:31.278+00'
-    ),
-    (
-        '4',
-        '1',
-        '3',
-        '1',
-        'false',
-        '2025-04-01 22:53:03.863759+00',
-        null
-    ),
-    (
-        '5',
-        '1',
-        '5',
-        '1',
-        'false',
-        '2025-04-01 22:53:03.863759+00',
-        null
-    ),
-    (
-        '6',
-        '1',
-        '7',
-        '4',
-        'false',
-        '2025-04-01 22:53:03.863759+00',
-        null
-    ),
-    (
-        '7',
-        '1',
-        '9',
-        '2',
-        'false',
-        '2025-04-01 22:53:03.863759+00',
-        null
-    ),
-    (
-        '8',
-        '1',
-        '10',
-        '1',
-        'false',
-        '2025-04-01 22:55:09.461703+00',
-        null
-    ),
-    (
-        '9',
-        '1',
-        '13',
-        '5',
-        'false',
-        '2025-04-01 23:17:22.943794+00',
-        null
-    ),
-    (
-        '10',
-        '1',
-        '15',
-        '5',
-        'false',
-        '2025-04-01 23:17:22.943794+00',
-        null
-    ),
-    (
-        '11',
-        '1',
-        '17',
-        '3',
-        'false',
-        '2025-04-01 23:17:22.943794+00',
-        null
-    ),
-    (
-        '12',
-        '1',
-        '19',
-        '3',
-        'false',
-        '2025-04-01 23:17:22.943794+00',
-        null
-    ),
-    (
-        '13',
-        '1',
-        '31',
-        '1',
-        'false',
-        '2025-04-02 01:10:37.664771+00',
-        null
-    ),
-    (
-        '14',
-        '1',
-        '30',
-        '6',
-        'false',
-        '2025-04-02 01:10:37.664771+00',
-        null
-    ),
-    (
-        '15',
-        '1',
-        '29',
-        '10',
-        'false',
-        '2025-04-02 01:10:37.664771+00',
-        null
-    );
+    (1, 'Día Conmemorativo', '#000000', 'flag', FALSE),
+    -- Tus tipos genéricos existentes
+    (1, 'Examen', '#000000', 'exam', FALSE),
+    (1, 'Reunión', '#000000', 'meeting', FALSE),
+    (1, 'Curso', '#000000', 'course', FALSE),
+    (1, 'Proyecto', '#000000', 'project', FALSE),
+    (1, 'Tarea', '#000000', 'task', FALSE),
+    (1, 'Otro', '#000000', 'other', FALSE);
 
 -- =============================================
 -- Configuración de tema para la escuela por defecto
