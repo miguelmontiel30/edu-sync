@@ -335,6 +335,7 @@ export function Calendar({
             }}
             dayMaxEventRows={false}
             height="auto"
+            weekends={false}
           />
         </div>
       )}
