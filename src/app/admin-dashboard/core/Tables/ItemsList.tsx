@@ -48,6 +48,7 @@ export interface ItemsListProps<T extends BaseItem> {
     readonly actionButtons?: ActionButton[];
     readonly isLoading: boolean;
     readonly onAddNew?: () => void;
+    readonly onRowClick?: (item: T) => void;
     readonly config: ItemsListConfig<T>;
 }
 
@@ -57,6 +58,7 @@ export default function ItemsList<T extends BaseItem>({
     actionButtons = [],
     isLoading,
     onAddNew,
+    onRowClick,
     config
 }: ItemsListProps<T>) {
     const {
@@ -153,6 +155,7 @@ export default function ItemsList<T extends BaseItem>({
                 itemsPerPage={itemsPerPage}
                 onSearch={handleSearch}
                 onSort={handleSort}
+                onRowClick={onRowClick}
             />
         </ComponentCard>
     );
