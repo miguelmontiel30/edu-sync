@@ -27,7 +27,7 @@ export function PopoverWithTitle({
             content={content}
             position={position}
             title={title}
-            showArrow={true}
+            showArrow
             withButton={false}
             withLink={false}
             className={className}

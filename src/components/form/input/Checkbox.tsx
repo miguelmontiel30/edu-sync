@@ -3,7 +3,6 @@ import React from "react";
 interface CheckboxProps {
     label?: string; // Optional label for the checkbox
     checked: boolean; // Checked state
-    className?: string;
     id?: string; // Unique ID for the checkbox
     onChange: (checked: boolean) => void; // Change handler
     disabled?: boolean; // Disabled state
@@ -14,7 +13,6 @@ const Checkbox: React.FC<CheckboxProps> = ({
     checked,
     id,
     onChange,
-    className = "",
     disabled = false,
 }) => (
     <label className={`flex items-center gap-2 cursor-pointer ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}>

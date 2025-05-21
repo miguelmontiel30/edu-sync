@@ -29,8 +29,8 @@ export function PopoverWithButton({
             content={content}
             position={position}
             title={title}
-            showArrow={true}
-            withButton={true}
+            showArrow
+            withButton
             buttonText={buttonText}
             className={className}
             trigger={trigger}

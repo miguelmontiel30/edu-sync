@@ -163,7 +163,7 @@ export function Popover({
 
                     {withButton && (
                         <div className="mt-3">
-                            <button className="rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-600">
+                            <button type="button" className="rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-600">
                                 {buttonText}
                             </button>
                         </div>

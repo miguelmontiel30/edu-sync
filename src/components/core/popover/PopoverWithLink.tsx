@@ -31,8 +31,8 @@ export function PopoverWithLink({
             content={content}
             position={position}
             title={title}
-            showArrow={true}
-            withLink={true}
+            showArrow
+            withLink
             linkText={linkText}
             linkIcon={linkIcon}
             className={className}
