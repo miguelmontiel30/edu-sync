@@ -140,11 +140,6 @@ export function EventModal({
             setEndTime("23:59");
             setAllDay(true);
 
-            // Debug de roles seleccionados
-            console.log("Evento seleccionado:", selectedEvent);
-            console.log("Roles seleccionados (array):", selectedRoles);
-            console.log("Roles disponibles (array):", availableRoles);
-
             // Registrar IDs de los roles seleccionados
             const roleIds = selectedRoles
                 .map(name => {
@@ -154,8 +149,6 @@ export function EventModal({
                     return role?.role_id;
                 })
                 .filter(Boolean);
-
-            console.log("IDs de roles que deberían estar seleccionados:", roleIds);
         }
     }, [isOpen, eventTitle, eventStartDate, eventEndDate, selectedEvent, selectedRoles, availableRoles]);
 
@@ -180,9 +173,6 @@ export function EventModal({
             selectedRole => selectedRole.toLowerCase() === role.name.toLowerCase()
         );
 
-        console.log(`Role: ${role.name}, ID: ${role.role_id}, Selected: ${isSelected}`);
-        console.log(`SelectedRoles contiene: ${selectedRoles.join(', ')}`);
-
         return {
             value: role.role_id,
             text: role.name.charAt(0).toUpperCase() + role.name.slice(1),
@@ -193,26 +183,23 @@ export function EventModal({
     // Obtener los IDs de los roles seleccionados para el MultiSelect con mejor depuración
     const selectedRoleIds = selectedRoles
         .map(roleName => {
+
             // Buscar el role_id correspondiente al nombre del rol seleccionado con comparación case-insensitive
             const matchingRole = availableRoles.find(
                 role => role.name.toLowerCase() === roleName.toLowerCase()
             );
 
             if (matchingRole) {
-                console.log(`Rol "${roleName}" coincide con ID: ${matchingRole.role_id}`);
                 return matchingRole.role_id;
             } else {
-                console.log(`No se encontró coincidencia para el rol "${roleName}"`);
                 return "";
             }
         })
         .filter(id => id !== ""); // Filtrar IDs vacíos
 
-    console.log("IDs de roles seleccionados finales:", selectedRoleIds);
 
     // Manejadores de eventos
     const handleRoleChange = (selectedIds: string[]) => {
-        console.log("IDs de roles seleccionados:", selectedIds);
 
         // Mapear IDs seleccionados a nombres de roles
         const newRoles = selectedIds
@@ -220,15 +207,12 @@ export function EventModal({
                 // Buscar el rol correspondiente al ID seleccionado
                 const role = availableRoles.find(r => r.role_id === id);
                 if (role) {
-                    console.log(`ID ${id} corresponde al rol "${role.name}"`);
                     return role.name;
                 }
-                console.log(`No se encontró rol para el ID ${id}`);
                 return "";
             })
             .filter(name => name !== ""); // Filtrar nombres vacíos
 
-        console.log("Nuevos roles seleccionados:", newRoles);
         onRolesChange(newRoles);
     };
 
