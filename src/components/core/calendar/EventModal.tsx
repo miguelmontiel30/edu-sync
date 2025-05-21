@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 // Components
 import { Modal } from "@/components/ui/modal";
-import { CalendarEvent } from "./types";
+import { CalendarEvent, Role } from "./types";
 import IconFA from "@/components/ui/IconFA";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
@@ -50,12 +50,12 @@ interface EventModalProps {
     eventStartDate: string;
     eventEndDate: string;
     eventLevel: string;
-    selectedRoles: string[];
+    selectedRoles: Role[];
     onTitleChange: (value: string) => void;
     onStartDateChange: (value: string) => void;
     onEndDateChange: (value: string) => void;
     onLevelChange: (value: string) => void;
-    onRolesChange: (roles: string[]) => void;
+    onRolesChange: (roles: Role[]) => void;
     onSave: () => void;
     availableRoles?: { role_id: string; name: string }[];
     _eventTypes?: any[];
@@ -139,16 +139,6 @@ export function EventModal({
             setStartTime("00:00");
             setEndTime("23:59");
             setAllDay(true);
-
-            // Registrar IDs de los roles seleccionados
-            const roleIds = selectedRoles
-                .map(name => {
-                    const role = availableRoles.find(r =>
-                        r.name.toLowerCase() === name.toLowerCase()
-                    );
-                    return role?.role_id;
-                })
-                .filter(Boolean);
         }
     }, [isOpen, eventTitle, eventStartDate, eventEndDate, selectedEvent, selectedRoles, availableRoles]);
 
@@ -170,7 +160,7 @@ export function EventModal({
     const roleOptions: Option[] = availableRoles.map(role => {
         // Detección mejorada de roles seleccionados con depuración
         const isSelected = selectedRoles.some(
-            selectedRole => selectedRole.toLowerCase() === role.name.toLowerCase()
+            selectedRole => selectedRole.name.toLowerCase() === role.name.toLowerCase()
         );
 
         return {
@@ -182,11 +172,10 @@ export function EventModal({
 
     // Obtener los IDs de los roles seleccionados para el MultiSelect con mejor depuración
     const selectedRoleIds = selectedRoles
-        .map(roleName => {
-
+        .map(role => {
             // Buscar el role_id correspondiente al nombre del rol seleccionado con comparación case-insensitive
             const matchingRole = availableRoles.find(
-                role => role.name.toLowerCase() === roleName.toLowerCase()
+                availableRole => availableRole.role_id === role.role_id
             );
 
             if (matchingRole) {
@@ -197,21 +186,22 @@ export function EventModal({
         })
         .filter(id => id !== ""); // Filtrar IDs vacíos
 
-
     // Manejadores de eventos
     const handleRoleChange = (selectedIds: string[]) => {
-
-        // Mapear IDs seleccionados a nombres de roles
+        // Mapear IDs seleccionados a objetos de roles
         const newRoles = selectedIds
             .map(id => {
                 // Buscar el rol correspondiente al ID seleccionado
                 const role = availableRoles.find(r => r.role_id === id);
                 if (role) {
-                    return role.name;
+                    return {
+                        role_id: role.role_id,
+                        name: role.name
+                    };
                 }
-                return "";
+                return null;
             })
-            .filter(name => name !== ""); // Filtrar nombres vacíos
+            .filter(role => role !== null) as Role[]; // Filtrar roles nulos
 
         onRolesChange(newRoles);
     };
@@ -281,7 +271,7 @@ export function EventModal({
                 const recipients = availableRoles
                     .filter(role =>
                         selectedRoles.some(selectedRole =>
-                            selectedRole.toLowerCase() === role.name.toLowerCase()
+                            selectedRole.name.toLowerCase() === role.name.toLowerCase()
                         )
                     )
                     .map(role => ({
@@ -289,7 +279,6 @@ export function EventModal({
                         role_id: role.role_id
                     }));
 
-                console.log("Destinatarios a guardar:", recipients);
                 await saveEventRecipients(recipients);
             }
 

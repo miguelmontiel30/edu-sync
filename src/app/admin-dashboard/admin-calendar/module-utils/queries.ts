@@ -53,12 +53,24 @@ export function getEventTypes() {
 /**
  * Obtiene todos los roles activos para una escuela
  */
-export function getActiveRoles() {
-    return supabaseClient
+export async function getActiveRoles(): Promise<{
+    data: Array<{id: number; name: string}> | null;
+    error: any;
+}> {
+    const {data, error} = await supabaseClient
         .from('roles')
         .select('role_id, name')
         .eq('delete_flag', false)
         .order('name', {ascending: true});
+
+    const transformedData = data
+        ? data.map(role => ({
+              id: parseInt(role.role_id),
+              name: role.name,
+          }))
+        : null;
+
+    return {data: transformedData, error};
 }
 
 /**

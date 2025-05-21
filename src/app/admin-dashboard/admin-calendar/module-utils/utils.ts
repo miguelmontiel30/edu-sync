@@ -1,4 +1,4 @@
-import {DatabaseEvent, EventType} from './types';
+import {DatabaseEvent, EventType, Role} from './types';
 import {CalendarEvent} from '@/components/core/calendar/types';
 
 /**
@@ -126,20 +126,29 @@ export function mapDatabaseEventsToCalendarEvents(dbEvents: DatabaseEvent[]): Ca
         // Extraer los IDs de roles de los destinatarios
         const roleIds = event.recipients?.map(r => r.role_id) || [];
 
-        // Convertir los IDs de roles a nombres
+        // Convertir los IDs de roles a objetos de rol con id y nombre
         const roles = roleIds.map(id => {
+            let roleName: string;
             switch (id) {
                 case 1:
-                    return 'admin';
+                    roleName = 'admin';
+                    break;
                 case 2:
-                    return 'teacher';
+                    roleName = 'teacher';
+                    break;
                 case 3:
-                    return 'student';
+                    roleName = 'student';
+                    break;
                 case 4:
-                    return 'tutor';
+                    roleName = 'tutor';
+                    break;
                 default:
-                    return `role-${id}`;
+                    roleName = `role-${id}`;
             }
+            return {
+                role_id: id.toString(),
+                name: roleName,
+            };
         });
 
         // Asegurar que las fechas estén en formato correcto para FullCalendar
@@ -235,24 +244,16 @@ export function mapDatabaseEventTypes(dbEventTypes: any[]): EventType[] {
  * @param roles Array de roles con id y nombre en inglés
  * @returns Array de roles con nombres traducidos al español
  */
-export function translateRolesToSpanish(
-    roles: Array<{role_id: string; name: string}>,
-): Array<{role_id: string; name: string}> {
+export function translateRolesToSpanish(roles: Role[]): Array<{role_id: string; name: string}> {
     const translations: {[key: string]: string} = {
         admin: 'Administrador',
         teacher: 'Profesor',
         student: 'Estudiante',
-        parent: 'Padre/Madre',
         tutor: 'Tutor',
-        director: 'Director',
-        coordinator: 'Coordinador',
-        staff: 'Personal',
-        secretary: 'Secretario/a',
-        // Agregar más traducciones según sea necesario
     };
 
     return roles.map(role => ({
-        role_id: role.role_id,
+        role_id: role.id.toString(),
         name: translations[role.name.toLowerCase()] || role.name, // Si no hay traducción, mantener el nombre original
     }));
 }

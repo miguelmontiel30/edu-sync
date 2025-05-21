@@ -1,6 +1,15 @@
 import {EventInput} from '@fullcalendar/core';
 
 /**
+ * Interfaz para representar un rol dentro del sistema
+ */
+export interface Role {
+    role_id: string;
+    name: string;
+    [key: string]: any;
+}
+
+/**
  * Interface para representar un evento de calendario
  * Extiende de EventInput de FullCalendar para mantener compatibilidad
  */
@@ -22,7 +31,7 @@ export interface CalendarEvent extends EventInput {
         /**
          * Roles a los que está dirigido el evento
          */
-        roles: string[];
+        roles: Role[];
 
         /**
          * Campos personalizados adicionales (opcional)

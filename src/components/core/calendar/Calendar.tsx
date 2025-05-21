@@ -16,7 +16,7 @@ import { EventModal } from "./EventModal";
 import IconFA from "@/components/ui/IconFA";
 
 // Types
-import { CalendarEvent } from "./types";
+import { CalendarEvent, Role } from "./types";
 
 // Styles
 import "./calendar.css";
@@ -87,19 +87,22 @@ export function Calendar({
   availableRoles = [],
   isLoading = false
 }: CalendarProps) {
-  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(events);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [eventTitle, setEventTitle] = useState("");
   const [eventStartDate, setEventStartDate] = useState("");
   const [eventEndDate, setEventEndDate] = useState("");
   const [eventLevel, setEventLevel] = useState(DEFAULT_COLOR);
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
   const [eventTypes, setEventTypes] = useState<any[]>([]);
   const calendarRef = useRef<FullCalendar>(null);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(events);
   const { isOpen, openModal, closeModal } = useModal();
 
   // Obtener la sesión del usuario
   const { session } = useSession();
+
+  // Usar un estado adicional para controlar la apertura del modal
+  const [shouldOpenModal, setShouldOpenModal] = useState(false);
 
   // Cargar tipos de eventos cuando se monta el componente
   useEffect(() => {
@@ -126,7 +129,7 @@ export function Calendar({
           ...event,
           extendedProps: {
             calendar: getConsistentColor(event.id),
-            roles: []
+            roles: [] as Role[]
           }
         };
       }
@@ -151,6 +154,14 @@ export function Calendar({
     setCalendarEvents(processedEvents);
   }, [processedEvents]);
 
+  // Efecto para abrir el modal cuando se solicita
+  useEffect(() => {
+    if (shouldOpenModal) {
+      openModal();
+      setShouldOpenModal(false);
+    }
+  }, [shouldOpenModal, openModal]);
+
   // Manejar cierre del modal
   const handleCloseModal = () => {
     closeModal();
@@ -163,7 +174,8 @@ export function Calendar({
     setEventStartDate(selectInfo.startStr);
     setEventEndDate(selectInfo.endStr || selectInfo.startStr);
     setEventLevel(getRandomColor()); // Asignar un color aleatorio por defecto
-    openModal();
+
+    setShouldOpenModal(true);
   };
 
   const handleEventClick = (clickInfo: EventClickArg) => {
@@ -189,8 +201,18 @@ export function Calendar({
     setEventStartDate(startDate);
     setEventEndDate(endDate);
     setEventLevel(event.extendedProps?.calendar || getRandomColor());
-    setSelectedRoles(event.extendedProps?.roles || []);
-    openModal();
+
+    // Convertir roles existentes al nuevo formato si es necesario
+    const eventRoles = event.extendedProps?.roles || [];
+    const typedRoles = Array.isArray(eventRoles)
+      ? eventRoles.map(role => typeof role === 'string'
+        ? { role_id: "0", name: role }
+        : role)
+      : [];
+
+    setSelectedRoles(typedRoles);
+
+    setShouldOpenModal(true);
   };
 
   const handleAddOrUpdateEvent = () => {
@@ -210,8 +232,9 @@ export function Calendar({
         end: eventEndDate || eventStartDate,
         allDay: true, // Marcar como todo el día para evitar problemas de zona horaria
         extendedProps: {
+          ...selectedEvent.extendedProps,
           calendar: finalEventLevel,
-          roles: selectedRoles
+          roles: selectedRoles as Role[]
         },
       };
 
@@ -231,7 +254,7 @@ export function Calendar({
         allDay: true, // Marcar como todo el día para evitar problemas de zona horaria
         extendedProps: {
           calendar: finalEventLevel,
-          roles: selectedRoles
+          roles: selectedRoles as Role[]
         },
       };
 
@@ -257,8 +280,12 @@ export function Calendar({
     setEventStartDate("");
     setEventEndDate("");
     setEventLevel(DEFAULT_COLOR); // Establecer color por defecto
-    setSelectedRoles([]);
+    setSelectedRoles([] as Role[]);
     setSelectedEvent(null);
+  };
+
+  const handleRolesChange = (roles: Role[]) => {
+    setSelectedRoles(roles);
   };
 
   return (
@@ -293,7 +320,10 @@ export function Calendar({
             customButtons={{
               addEventButton: {
                 text: "Agregar Evento +",
-                click: openModal,
+                click: () => {
+                  resetModalFields();
+                  setShouldOpenModal(true);
+                },
               },
             }}
             timeZone="UTC"
@@ -310,6 +340,7 @@ export function Calendar({
       )}
 
       <EventModal
+        key={`event-modal-${isOpen}-${selectedEvent?.id || 'new'}`}
         isOpen={isOpen}
         onClose={handleCloseModal}
         onDelete={handleDeleteEvent}
@@ -323,10 +354,10 @@ export function Calendar({
         onStartDateChange={setEventStartDate}
         onEndDateChange={setEventEndDate}
         onLevelChange={setEventLevel}
-        onRolesChange={setSelectedRoles}
+        onRolesChange={handleRolesChange}
         onSave={handleAddOrUpdateEvent}
         availableRoles={availableRoles}
-        eventTypes={eventTypes}
+        _eventTypes={eventTypes}
         schoolId={session?.school_id}
         schoolYearId={session?.school_id}
         userId={1}
@@ -365,7 +396,7 @@ const renderEventContent = (eventInfo: EventContentArg) => {
               <span className="truncate">
                 {roles.length > 1
                   ? `${roles.length} participantes`
-                  : roles[0]}
+                  : roles[0].name}
               </span>
             </div>
           </div>

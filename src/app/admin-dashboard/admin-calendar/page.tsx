@@ -44,8 +44,6 @@ export default function CalendarPage() {
         // Obtener datos del calendario usando el servicio
         const calendarData = await getCalendarData(session.school_id);
 
-        console.log("Datos del calendario:", calendarData);
-
         // Establecer eventos en el estado
         if (calendarData.events && calendarData.events.length > 0) {
           // Procesar eventos para corregir problemas de zona horaria
@@ -61,7 +59,7 @@ export default function CalendarPage() {
         if (calendarData.roles && calendarData.roles.length > 0) {
           // Traducir los nombres de roles a español
           const translatedRoles = translateRolesToSpanish(calendarData.roles);
-          console.log("Roles traducidos:", translatedRoles);
+
           setAvailableRoles(translatedRoles);
         } else {
           setAvailableRoles([]);
@@ -83,7 +81,6 @@ export default function CalendarPage() {
       allDay: true
     };
 
-    console.log("Evento añadido:", eventToAdd);
     setEvents(prev => [...prev, eventToAdd]);
   };
 
@@ -94,12 +91,10 @@ export default function CalendarPage() {
       allDay: true
     };
 
-    console.log("Evento actualizado:", eventToUpdate);
     setEvents(prev => prev.map(e => e.id === event.id ? eventToUpdate : e));
   };
 
   const handleEventDelete = (eventId: string) => {
-    console.log("Evento eliminado:", eventId);
     setEvents(prev => prev.filter(e => e.id !== eventId));
   };
 

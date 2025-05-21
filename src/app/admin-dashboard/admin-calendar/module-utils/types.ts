@@ -45,6 +45,7 @@ export interface EventType {
 }
 
 export interface Role {
-    role_id: string;
+    id: number;
     name: string;
+    [key: string]: any;
 }
