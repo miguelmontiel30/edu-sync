@@ -40,7 +40,7 @@ export function getActiveEvents(schoolId: number, schoolYearId?: number) {
 }
 
 /**
- * Obtiene todos los tipos de eventos para una escuela
+ * Obtiene todos los tipos de eventos
  */
 export function getEventTypes() {
     return supabaseClient
@@ -51,26 +51,14 @@ export function getEventTypes() {
 }
 
 /**
- * Obtiene todos los roles activos para una escuela
+ * Obtiene todos los roles activos
  */
-export async function getActiveRoles(): Promise<{
-    data: Array<{id: number; name: string}> | null;
-    error: any;
-}> {
-    const {data, error} = await supabaseClient
+export function getActiveRoles() {
+    return supabaseClient
         .from('roles')
         .select('role_id, name')
         .eq('delete_flag', false)
         .order('name', {ascending: true});
-
-    const transformedData = data
-        ? data.map(role => ({
-              id: parseInt(role.role_id),
-              name: role.name,
-          }))
-        : null;
-
-    return {data: transformedData, error};
 }
 
 /**
