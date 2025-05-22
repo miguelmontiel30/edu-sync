@@ -49,3 +49,30 @@ export interface Role {
     name: string;
     [key: string]: any;
 }
+
+export interface EventData {
+    school_id: number;
+    event_type_id: number;
+    school_year_id: number;
+    title: string;
+    description: string;
+    start_time: string;
+    end_time?: string;
+    all_day?: boolean;
+    status_id: number;
+    created_by: number;
+    [key: string]: any;
+}
+
+export interface EventRecipient {
+    event_id?: number;
+    role_id: number;
+    recipient_id?: number;
+    recipient_type?: string;
+}
+
+export interface RepositoryResponse {
+    success: boolean;
+    data?: any;
+    error?: any;
+}

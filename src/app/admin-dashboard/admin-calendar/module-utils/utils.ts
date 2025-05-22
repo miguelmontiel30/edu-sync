@@ -1,4 +1,4 @@
-import {DatabaseEvent, EventType, Role} from './types';
+import {DatabaseEvent, EventType, Role, EventRecipient, RepositoryResponse} from './types';
 import {CalendarEvent} from '@/components/core/calendar/types';
 
 /**
@@ -254,6 +254,46 @@ export function translateRolesToSpanish(roles: Role[]): Array<{role_id: string; 
 
     return roles.map(role => ({
         role_id: role.id.toString(),
-        name: translations[role.name.toLowerCase()] || role.name, // Si no hay traducción, mantener el nombre original
+        name: translations[role.name] || role.name,
     }));
+}
+
+/**
+ * Transforma los datos de roles de la base de datos al formato esperado
+ */
+export function transformRolesData(roles: any[]): Role[] {
+    return roles.map(role => ({
+        id: parseInt(role.role_id),
+        name: role.name,
+    }));
+}
+
+/**
+ * Prepara los destinatarios agregando el ID del evento
+ */
+export function prepareEventRecipients(
+    eventId: number,
+    recipients: EventRecipient[],
+): EventRecipient[] {
+    return recipients.map(recipient => ({
+        ...recipient,
+        event_id: eventId,
+    }));
+}
+
+/**
+ * Maneja errores en las respuestas del repositorio
+ */
+export function handleRepositoryError(error: any): RepositoryResponse {
+    return {success: false, error};
+}
+
+/**
+ * Comprueba si una respuesta del repositorio tiene error y lo maneja
+ */
+export function checkRepositoryResponse(response: RepositoryResponse): RepositoryResponse {
+    if (!response.success) {
+        return {success: false, error: response.error};
+    }
+    return response;
 }
