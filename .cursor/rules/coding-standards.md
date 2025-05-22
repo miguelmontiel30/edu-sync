@@ -17,23 +17,34 @@
 - Prefiere la iteración y modularización sobre la duplicación de código.
 - Emplea nombres de variables descriptivos con verbos auxiliares (ej: isLoading, hasError).
 - Estructura de archivos: componente exportado, subcomponentes, ayudantes, contenido estático, tipos.
+- Longitud máxima de línea: 100 caracteres.
 
 ## Convenciones de Nomenclatura
 
-- Usa minúsculas con guiones para directorios (ej: components/auth-wizard).
+- Usa minúsculas con guiones (kebab-case) para directorios (ej: components/auth-wizard).
 - Favorece exportaciones nombradas para componentes.
+- Archivos:
+    - Componentes: PascalCase.tsx (ej: UserProfile.tsx)
+    - Hooks: camelCase.ts o camelCase.tsx (ej: useAuthState.ts)
+    - Utilidades: camelCase.ts (ej: formatDate.ts)
+- Variables: camelCase
+- Constantes: UPPER_SNAKE_CASE
+- Tipos e interfaces: PascalCase
 
 ## Uso de TypeScript
 
 - Utiliza TypeScript para todo el código; prefiere interfaces sobre types.
-- Evita enums; usa mapas en su lugar.
+- Evita enums; usa mapas (objetos constantes) en su lugar.
 - Usa componentes funcionales con interfaces TypeScript.
+- Centraliza todos los tipos e interfaces del módulo en module-utils/types.ts.
+- Mantén la lógica de negocio fuera de repository.
+- Coloca hooks en la carpeta hooks/ y componentes en components/.
 
 ## Sintaxis y Formato
 
 - Usa la palabra clave "function" para funciones puras.
 - Evita llaves innecesarias en condicionales; utiliza sintaxis concisa para sentencias simples.
-- Usa JSX declarativo.
+- Usa JSX declarativo, evitando expresiones complejas inline.
 
 ## UI y Estilos
 
@@ -45,7 +56,10 @@
 - Minimiza 'use client', 'useEffect', y 'setState'; favorece React Server Components (RSC).
 - Envuelve componentes cliente en Suspense con fallback.
 - Usa carga dinámica para componentes no críticos.
-- Optimiza imágenes: usa formato WebP, incluye datos de tamaño, implementa carga diferida.
+- Optimiza imágenes:
+    - Usa formato WebP
+    - Incluye datos de tamaño
+    - Implementa carga diferida (lazy loading)
 
 ## Convenciones Clave
 
@@ -242,11 +256,14 @@ módulo/
 
     - Funciones CRUD básicas
     - Consultas específicas al módulo
+    - Diseñado como adaptador para facilitar migraciones futuras a otros backends
 
 2. **queries.ts** - Consultas SQL o funciones específicas:
 
     - Consultas SQL complejas
     - Construcción de consultas dinámicas
+    - Ubicación para todas las llamadas a la base de datos
+    - Uso de funciones base como baseStudentQuery() para selects con relaciones
 
 3. **services.ts** - Lógica de negocio:
 
@@ -257,10 +274,31 @@ módulo/
 4. **types.ts** - Definiciones de tipos:
 
     - Interfaces
-    - Enums/Constantes
+    - Constantes (en lugar de enums)
     - Tipos específicos del módulo
+    - Centraliza todos los tipos del módulo
 
 5. **utils.ts** - Funciones de utilidad:
     - Helpers para manipulación de datos
     - Funciones reutilizables
     - Transformadores
+
+## Creación de Nuevos Módulos y Formularios
+
+### Fuentes de Datos para Nuevos Módulos
+
+- Obtener esquemas y metadatos directamente del servidor MCP configurado con Supabase
+- Analizar archivos de esquema de la base de datos (schema.sql) para inferir tipos y relaciones
+
+### Patrón Repository
+
+- Usar el patrón Repository como adaptador para facilitar:
+    - Migración futura a un backend propio (Express u otro)
+    - Coexistencia de múltiples instancias de repositorio (Supabase + Express) sin cambios en la capa de servicio/hooks
+
+### Convenciones para llamadas a DB
+
+- Ubicación: Siempre en module-utils/queries.ts
+- Patrón: use supabaseClient.from(...)
+- Consultas base: Usar baseStudentQuery() para selects con relaciones
+- Manejo de errores: try/catch y throw en cada operación
