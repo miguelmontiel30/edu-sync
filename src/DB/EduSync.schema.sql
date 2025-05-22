@@ -834,12 +834,10 @@ WITH
 
 -- Otorgar permisos
 GRANT USAGE,
-SELECT
-    ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+UPDATE ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 
 GRANT USAGE,
-SELECT
-    ON ALL SEQUENCES IN SCHEMA public TO anon;
+UPDATE ON ALL SEQUENCES IN SCHEMA public TO anon;
 
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
 
