@@ -88,8 +88,6 @@ export function useTableConfig({ handleEdit, handleDelete }: TableConfigProps): 
             header: 'Estado',
             sortable: true,
             render: (subject: Subject) => {
-                console.log('subject from table', subject);
-
                 return (
                     <span className="text-sm text-gray-700 dark:text-white/70 font-outfit">
                         <Badge

@@ -148,3 +148,21 @@ DROP TRIGGER IF EXISTS update_permissions_updated_at ON permissions;
 
 CREATE TRIGGER update_permissions_updated_at BEFORE
 UPDATE ON permissions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column ();
+
+-- Tipos de eventos
+DROP TRIGGER IF EXISTS update_event_types_updated_at ON event_types;
+
+CREATE TRIGGER update_event_types_updated_at BEFORE
+UPDATE ON event_types FOR EACH ROW EXECUTE FUNCTION update_updated_at_column ();
+
+-- Eventos
+DROP TRIGGER IF EXISTS update_events_updated_at ON events;
+
+CREATE TRIGGER update_events_updated_at BEFORE
+UPDATE ON events FOR EACH ROW EXECUTE FUNCTION update_updated_at_column ();
+
+-- Destinatarios de eventos
+DROP TRIGGER IF EXISTS update_event_recipients_updated_at ON event_recipients;
+
+CREATE TRIGGER update_event_recipients_updated_at BEFORE
+UPDATE ON event_recipients FOR EACH ROW EXECUTE FUNCTION update_updated_at_column ();
