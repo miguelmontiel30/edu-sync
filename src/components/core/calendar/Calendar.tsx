@@ -1,7 +1,7 @@
 "use client";
 
 // React
-import { useRef } from "react";
+import { FC, useRef } from "react";
 
 // FullCalendar
 import FullCalendar from "@fullcalendar/react";
@@ -11,7 +11,6 @@ import interactionPlugin from "@fullcalendar/interaction";
 import esLocale from '@fullcalendar/core/locales/es';
 
 // Components
-import { EventModal } from "./EventModal";
 import IconFA from "@/components/ui/IconFA";
 import { renderEventContent } from "./renderEventContent";
 
@@ -21,63 +20,27 @@ import { CalendarEvent } from "./types";
 // Styles
 import "./calendar.css";
 
-// Hooks
-import { useCalendar } from "@/hooks/useCalendar";
-
 interface CalendarProps {
   /** Eventos para mostrar en el calendario */
   events: CalendarEvent[];
-  /** Callback al añadir un evento */
-  onEventAdd?: (event: CalendarEvent) => void;
-  /** Callback al actualizar un evento */
-  onEventUpdate?: (event: CalendarEvent) => void;
-  /** Callback al eliminar un evento */
-  onEventDelete?: (eventId: string) => void;
-  /** Lista de roles disponibles para asignar a los eventos */
-  availableRoles?: { role_id: string; name: string }[];
   /** Si está cargando los datos */
   isLoading?: boolean;
+  /** Callback cuando se hace click en un evento */
+  onEventClick?: (eventInfo: any) => void;
+  /** Callback cuando se selecciona una fecha o rango */
+  onDateSelect?: (info: any) => void;
+  /** Callback cuando se quiere agregar un evento */
+  onAddEventClick?: () => void;
 }
 
-export function Calendar({
+export const Calendar: FC<CalendarProps> = ({
   events = [],
-  onEventAdd,
-  onEventUpdate,
-  onEventDelete,
-  availableRoles = [],
-  isLoading = false
-}: CalendarProps) {
+  isLoading = false,
+  onEventClick,
+  onDateSelect,
+  onAddEventClick
+}) => {
   const calendarRef = useRef<FullCalendar>(null);
-
-  const {
-    calendarEvents,
-    selectedEvent,
-    eventTitle,
-    eventStartDate,
-    eventEndDate,
-    eventLevel,
-    selectedRoles,
-    eventTypes,
-    isOpen,
-    session,
-    handleDateSelect,
-    handleEventClick,
-    handleCloseModal,
-    handleAddOrUpdateEvent,
-    handleDeleteEvent,
-    handleRolesChange,
-    handleAddEventButtonClick,
-    setEventTitle,
-    setEventStartDate,
-    setEventEndDate,
-    setEventLevel
-  } = useCalendar({
-    events,
-    onEventAdd,
-    onEventUpdate,
-    onEventDelete,
-    _availableRoles: availableRoles
-  });
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
@@ -103,15 +66,15 @@ export function Calendar({
               week: 'Semana',
               day: 'Día'
             }}
-            events={calendarEvents}
+            events={events}
             selectable
-            select={handleDateSelect}
-            eventClick={handleEventClick}
+            select={onDateSelect}
+            eventClick={onEventClick}
             eventContent={renderEventContent}
             customButtons={{
               addEventButton: {
                 text: "Agregar Evento +",
-                click: handleAddEventButtonClick,
+                click: onAddEventClick,
               },
             }}
             timeZone="UTC"
@@ -127,30 +90,6 @@ export function Calendar({
           />
         </div>
       )}
-
-      <EventModal
-        key={`event-modal-${isOpen}-${selectedEvent?.id || 'new'}`}
-        isOpen={isOpen}
-        onClose={handleCloseModal}
-        onDelete={handleDeleteEvent}
-        selectedEvent={selectedEvent}
-        eventTitle={eventTitle}
-        eventStartDate={eventStartDate}
-        eventEndDate={eventEndDate}
-        eventLevel={eventLevel}
-        selectedRoles={selectedRoles}
-        onTitleChange={setEventTitle}
-        onStartDateChange={setEventStartDate}
-        onEndDateChange={setEventEndDate}
-        onLevelChange={setEventLevel}
-        onRolesChange={handleRolesChange}
-        onSave={handleAddOrUpdateEvent}
-        availableRoles={availableRoles}
-        _eventTypes={eventTypes}
-        schoolId={session?.school_id}
-        schoolYearId={session?.school_id}
-        userId={1}
-      />
     </div>
   );
-}
+};

@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 
 // Components
 import { Modal } from "@/components/ui/modal";
-import { CalendarEvent, Role } from "./types";
 import IconFA from "@/components/ui/IconFA";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
@@ -22,6 +21,9 @@ import {
     deleteEventRecipients,
     getEventTypes
 } from "@/app/admin-dashboard/admin-calendar/module-utils/queries";
+
+// Types
+import { CalendarEvent, Role } from "@/components/core/calendar/types";
 
 // Constantes
 const DEFAULT_COLOR = 'primary';
@@ -121,15 +123,30 @@ export function EventModal({
     // Inicializar datos cuando se abre el modal
     useEffect(() => {
         if (isOpen) {
+            console.log("Inicializando datos del modal con evento:", selectedEvent);
+
             // Datos básicos
             setTitle(eventTitle);
             setStartDate(eventStartDate);
             setEndDate(eventEndDate || eventStartDate);
 
             // Datos extendidos si hay un evento seleccionado
-            if (selectedEvent?.extendedProps) {
-                setDescription(selectedEvent.extendedProps.description || "");
-                setEventTypeId(selectedEvent.extendedProps.event_type_id);
+            if (selectedEvent) {
+                // Buscar descripción tanto en el nivel principal como en extendedProps
+                const eventDescription = selectedEvent.description ||
+                    selectedEvent.extendedProps?.description || "";
+
+                // Buscar tipo de evento tanto en el nivel principal como en extendedProps
+                const typeId = selectedEvent.event_type_id ||
+                    selectedEvent.extendedProps?.event_type_id;
+
+                console.log("Cargando datos existentes:", {
+                    descripcion: eventDescription,
+                    tipoEvento: typeId
+                });
+
+                setDescription(eventDescription);
+                setEventTypeId(typeId !== undefined ? Number(typeId) : undefined);
             } else {
                 setDescription("");
                 setEventTypeId(undefined);
@@ -140,7 +157,7 @@ export function EventModal({
             setEndTime("23:59");
             setAllDay(true);
         }
-    }, [isOpen, eventTitle, eventStartDate, eventEndDate, selectedEvent, selectedRoles, availableRoles]);
+    }, [isOpen, eventTitle, eventStartDate, eventEndDate, selectedEvent]);
 
     // Limpiar el error cuando cambia el estado del modal
     useEffect(() => {
@@ -239,6 +256,27 @@ export function EventModal({
                 ? `${endDate}T${allDay ? '23:59:59' : endTime}:00Z`
                 : `${startDate}T${allDay ? '23:59:59' : endTime}:00Z`;
 
+            // Añadir propiedades adicionales al evento para asegurar que se pasan correctamente
+            if (selectedEvent) {
+                // Si estamos editando, actualizamos las propiedades del evento seleccionado
+                selectedEvent.title = title;
+                selectedEvent.description = description;
+                selectedEvent.event_type_id = eventTypeId !== undefined ? eventTypeId.toString() : "";
+                selectedEvent.start = startDateTime;
+                selectedEvent.end = endDateTime;
+
+                // También actualizamos extendedProps para mantener consistencia
+                if (!selectedEvent.extendedProps) {
+                    selectedEvent.extendedProps = {
+                        calendar: eventLevel || DEFAULT_COLOR,
+                        roles: selectedRoles || []
+                    };
+                }
+
+                selectedEvent.extendedProps.description = description;
+                selectedEvent.extendedProps.event_type_id = eventTypeId;
+            }
+
             // Datos para el evento
             const eventData = {
                 school_id: schoolId,
@@ -252,6 +290,12 @@ export function EventModal({
                 status_id: ACTIVE_STATUS_ID,
                 created_by: userId
             };
+
+            console.log("Datos del evento a guardar:", {
+                ...eventData,
+                selectedRoles,
+                eventoActual: selectedEvent
+            });
 
             let savedEvent;
 
@@ -288,23 +332,61 @@ export function EventModal({
         } catch (err) {
             console.error("Error al guardar el evento:", err);
             setError("Ocurrió un error al guardar el evento. Inténtalo de nuevo.");
-        } finally {
             setIsLoading(false);
         }
     };
 
     // Eliminar evento
     const handleDeleteEvent = async () => {
-        if (selectedEvent?.extendedProps?.event_id && onDelete) {
-            setIsLoading(true);
+        setIsLoading(true);
+        setError("");
+
+        console.log("Solicitud de eliminación para evento:", selectedEvent);
+
+        // Extraer el ID del evento de FullCalendar (puede venir en diferentes formatos)
+        let eventDbId = null;
+
+        if (selectedEvent?.extendedProps?.event_id) {
+            // Formato estándar en nuestro modelo
+            eventDbId = selectedEvent.extendedProps.event_id;
+        } else if (selectedEvent?._def?.extendedProps?.event_id) {
+            // Formato de FullCalendar cuando viene como objeto nativo
+            eventDbId = selectedEvent._def.extendedProps.event_id;
+        } else if (typeof selectedEvent === 'object' && selectedEvent !== null) {
+            // Buscar en todas las propiedades anidadas posibles
+            console.log("Buscando ID en el objeto evento:", selectedEvent);
+
+            // Si es un objeto nativo de FullCalendar
+            const fcEvent = selectedEvent as any;
+            if (fcEvent._def?.extendedProps?.event_id) {
+                eventDbId = fcEvent._def.extendedProps.event_id;
+            }
+        }
+
+        console.log("ID de base de datos encontrado:", eventDbId);
+
+        if (eventDbId && onDelete) {
             try {
-                await deleteEvent(selectedEvent.extendedProps.event_id);
+                console.log("Eliminando evento con ID en DB:", eventDbId);
+                await deleteEvent(eventDbId);
+
+                // Llamar a onDelete para actualizar la UI
                 onDelete();
                 handleClose();
             } catch (err) {
                 console.error("Error al eliminar el evento:", err);
                 setError("Ocurrió un error al eliminar el evento.");
-            } finally {
+                setIsLoading(false);
+            }
+        } else {
+            console.error("No se puede eliminar el evento: ID de base de datos no disponible", selectedEvent);
+            // Si no tenemos ID de BD pero sí onDelete, intentemos eliminarlo solo de la UI
+            if (onDelete) {
+                console.log("Eliminando solo de la UI sin ID de base de datos");
+                onDelete();
+                handleClose();
+            } else {
+                setError("No se puede eliminar: falta información del evento");
                 setIsLoading(false);
             }
         }
@@ -324,16 +406,34 @@ export function EventModal({
 
     return (
         <Modal isOpen={isOpen} onClose={handleClose} isFullscreen={false} className="max-w-[900px] p-2 lg:p-6">
-            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar max-h-[80vh]">
-                {/* Cabecera */}
-                <div>
-                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
-                        {selectedEvent?.id ? 'Editar Evento' : 'Crear Nuevo Evento'}
-                    </h5>
+            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar max-h-[80vh] relative">
+                {/* Overlay de carga */}
+                {isLoading && (
+                    <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 z-50 flex items-center justify-center">
+                        <div className="flex flex-col items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
+                            <IconFA icon="spinner" className="animate-spin text-primary text-xl mb-2" />
+                            <span className="text-gray-800 dark:text-gray-200">Procesando...</span>
+                        </div>
+                    </div>
+                )}
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                        {selectedEvent?.id ? 'Edita el evento para actualizar sus datos' : 'Crea un nuevo evento para la agenda'}
-                    </p>
+                {/* Cabecera */}
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
+                            {selectedEvent?.id ? 'Editar Evento' : 'Crear Nuevo Evento'}
+                        </h5>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                            {selectedEvent?.id ? 'Edita el evento para actualizar sus datos' : 'Crea un nuevo evento para la agenda'}
+                        </p>
+                    </div>
+
+                    {isLoading && (
+                        <div className="flex items-center text-primary">
+                            <IconFA icon="spinner" className="animate-spin mr-2" />
+                            <span className="text-sm">Procesando...</span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-8">
@@ -500,6 +600,7 @@ export function EventModal({
                                 variant="outline"
                                 onClick={handleClose}
                                 type="button"
+                                disabled={isLoading}
                             >
                                 Cancelar
                             </Button>
@@ -511,9 +612,9 @@ export function EventModal({
                                     onClick={handleDeleteEvent}
                                     disabled={isLoading}
                                     className="text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600"
-                                    startIcon={<IconFA icon="trash-alt" />}
+                                    startIcon={isLoading ? <IconFA icon="spinner" className="animate-spin" /> : <IconFA icon="trash-alt" />}
                                 >
-                                    Eliminar
+                                    {isLoading ? 'Eliminando...' : 'Eliminar'}
                                 </Button>
                             )}
 
@@ -521,7 +622,7 @@ export function EventModal({
                                 variant="primary"
                                 type="submit"
                                 disabled={isLoading}
-                                startIcon={isLoading ? <IconFA icon="spinner" className="animate-spin" /> : <IconFA icon="save" />}
+                                startIcon={isLoading ? <IconFA icon="spinner" className="animate-spin text-white" /> : <IconFA icon="save" />}
                             >
                                 {isLoading ? 'Guardando...' : 'Guardar evento'}
                             </Button>

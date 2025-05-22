@@ -20,6 +20,31 @@ export interface CalendarEvent extends EventInput {
     id: string;
 
     /**
+     * Descripción del evento
+     */
+    description: string;
+
+    /**
+     * ID del usuario que creó el evento
+     */
+    created_by: string;
+
+    /**
+     * ID de la escuela a la que está dirigido el evento
+     */
+    school_id: string;
+
+    /**
+     * ID del año escolar al que está dirigido el evento
+     */
+    school_year_id: string;
+
+    /**
+     * ID del tipo de evento
+     */
+    event_type_id: string;
+
+    /**
      * Propiedades extendidas específicas de la aplicación
      */
     extendedProps: {

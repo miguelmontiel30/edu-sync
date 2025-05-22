@@ -157,28 +157,53 @@ export function useCalendar({
 
     // Manejar clic en evento
     const handleEventClick = (clickInfo: EventClickArg) => {
-        const event = clickInfo.event;
-        setSelectedEvent(event as unknown as CalendarEvent);
-        setEventTitle(event.title);
+        const fcEvent = clickInfo.event;
+        console.log('Evento clickeado (objeto FullCalendar):', fcEvent);
+
+        // Extraer datos del evento de FullCalendar a nuestro formato
+        const extractedEvent: CalendarEvent = {
+            id: fcEvent.id || Date.now().toString(),
+            title: fcEvent.title || '',
+            description: fcEvent.extendedProps?.description || '',
+            created_by: fcEvent.extendedProps?.created_by || '',
+            school_id: fcEvent.extendedProps?.school_id || '',
+            school_year_id: fcEvent.extendedProps?.school_year_id || '',
+            event_type_id: fcEvent.extendedProps?.event_type_id || '',
+            start: fcEvent.startStr || '',
+            end: fcEvent.endStr || '',
+            allDay: fcEvent.allDay || false,
+            extendedProps: {
+                ...fcEvent.extendedProps,
+                calendar: fcEvent.extendedProps?.calendar || getRandomColor(),
+                roles: fcEvent.extendedProps?.roles || [],
+                // Asegurarnos de preservar el ID de la base de datos
+                event_id: fcEvent.extendedProps?.event_id || null,
+            },
+        };
+
+        console.log('Evento extraído para el modal:', extractedEvent);
+
+        setSelectedEvent(extractedEvent);
+        setEventTitle(extractedEvent.title || '');
 
         let startDate = '';
         let endDate = '';
 
-        if (event.start) {
-            startDate = normalizeDate(event.start.toISOString());
+        if (fcEvent.start) {
+            startDate = normalizeDate(fcEvent.start.toISOString());
         }
 
-        if (event.end) {
-            endDate = normalizeDate(event.end.toISOString());
-        } else if (event.start) {
+        if (fcEvent.end) {
+            endDate = normalizeDate(fcEvent.end.toISOString());
+        } else if (fcEvent.start) {
             endDate = startDate;
         }
 
         setEventStartDate(startDate);
         setEventEndDate(endDate);
-        setEventLevel(event.extendedProps?.calendar || getRandomColor());
+        setEventLevel(fcEvent.extendedProps?.calendar || getRandomColor());
 
-        const eventRoles = event.extendedProps?.roles || [];
+        const eventRoles = fcEvent.extendedProps?.roles || [];
         const typedRoles = Array.isArray(eventRoles)
             ? eventRoles.map(role => (typeof role === 'string' ? {role_id: '0', name: role} : role))
             : [];
@@ -196,18 +221,30 @@ export function useCalendar({
         const finalEventLevel = eventLevel || DEFAULT_COLOR;
 
         if (selectedEvent) {
+            // Preservar descripción y tipo de evento si existen
+            const description =
+                selectedEvent.description || selectedEvent.extendedProps?.description || '';
+            const eventTypeId =
+                selectedEvent.event_type_id || selectedEvent.extendedProps?.event_type_id;
+
             const updatedEvent: CalendarEvent = {
                 ...selectedEvent,
                 title: eventTitle,
                 start: eventStartDate,
                 end: eventEndDate || eventStartDate,
                 allDay: true,
+                description,
+                event_type_id: eventTypeId,
                 extendedProps: {
                     ...selectedEvent.extendedProps,
                     calendar: finalEventLevel,
                     roles: selectedRoles,
+                    description,
+                    event_type_id: eventTypeId,
                 },
             };
+
+            console.log('Evento actualizado en useCalendar:', updatedEvent);
 
             setCalendarEvents(prevEvents =>
                 prevEvents.map(event => (event.id === selectedEvent.id ? updatedEvent : event)),
@@ -218,14 +255,23 @@ export function useCalendar({
             const newEvent: CalendarEvent = {
                 id: Date.now().toString(),
                 title: eventTitle,
+                description: '',
+                created_by: '',
+                school_id: '',
+                school_year_id: '',
+                event_type_id: '1',
                 start: eventStartDate,
                 end: eventEndDate || eventStartDate,
                 allDay: true,
                 extendedProps: {
                     calendar: finalEventLevel,
                     roles: selectedRoles,
+                    description: '',
+                    event_type_id: 1,
                 },
             };
+
+            console.log('Nuevo evento en useCalendar:', newEvent);
 
             setCalendarEvents(prevEvents => [...prevEvents, newEvent]);
             onEventAdd?.(newEvent);
@@ -237,11 +283,24 @@ export function useCalendar({
     // Manejar eliminación de evento
     const handleDeleteEvent = () => {
         if (selectedEvent) {
+            console.log('Eliminando evento con ID:', selectedEvent.id);
+            console.log('Datos completos del evento a eliminar:', selectedEvent);
+
+            // Primero, actualizamos el estado local
             setCalendarEvents(prevEvents =>
                 prevEvents.filter(event => event.id !== selectedEvent.id),
             );
-            onEventDelete?.(selectedEvent.id);
+
+            // Luego, llamamos al callback con el ID del evento para actualizar la BD
+            if (onEventDelete) {
+                onEventDelete(selectedEvent.id);
+            } else {
+                console.error('No se pudo eliminar el evento: callback no disponible');
+            }
+
             handleCloseModal();
+        } else {
+            console.error('No hay evento seleccionado para eliminar');
         }
     };
 
