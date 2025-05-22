@@ -15,7 +15,6 @@ export function loadAllSchoolYearData(
     return schoolYearRepository.getAllCyclesBySchoolId(schoolId);
 }
 
-// Mantenemos estas funciones por compatibilidad, pero ahora utilizan el repositorio
 export async function loadSchoolYearsBySchoolId(schoolId: number): Promise<SchoolCycle[]> {
     const {active} = await schoolYearRepository.getAllCyclesBySchoolId(schoolId);
     return active;

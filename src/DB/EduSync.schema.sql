@@ -521,6 +521,54 @@ COMMENT ON COLUMN student_tutors.is_primary IS 'Indica si es el tutor principal'
 
 COMMENT ON COLUMN student_tutors.can_pickup IS 'Indica si puede recoger al estudiante';
 
+-- Tabla para tipos de eventos
+CREATE TABLE
+    IF NOT EXISTS event_types (
+        event_type_id SERIAL PRIMARY KEY,
+        school_id INTEGER REFERENCES schools (school_id),
+        name VARCHAR(100) NOT NULL,
+        color VARCHAR(50),
+        icon VARCHAR(50),
+        delete_flag BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW (),
+        updated_at TIMESTAMPTZ DEFAULT NOW (),
+        deleted_at TIMESTAMPTZ
+    );
+
+-- Tabla principal de eventos
+CREATE TABLE
+    IF NOT EXISTS events (
+        event_id SERIAL PRIMARY KEY,
+        school_id INTEGER REFERENCES schools (school_id),
+        event_type_id INTEGER REFERENCES event_types (event_type_id),
+        school_year_id INTEGER REFERENCES school_years (school_year_id),
+        title VARCHAR(150) NOT NULL,
+        description TEXT,
+        start_time TIMESTAMPTZ NOT NULL,
+        end_time TIMESTAMPTZ,
+        all_day BOOLEAN DEFAULT FALSE,
+        status_id INTEGER REFERENCES status (status_id) NOT NULL,
+        created_by INTEGER REFERENCES users (user_id),
+        delete_flag BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW (),
+        updated_at TIMESTAMPTZ DEFAULT NOW (),
+        deleted_at TIMESTAMPTZ
+    );
+
+-- Tabla para destinatarios de eventos
+CREATE TABLE
+    IF NOT EXISTS event_recipients (
+        event_recipient_id SERIAL PRIMARY KEY,
+        event_id INTEGER REFERENCES events (event_id) ON DELETE CASCADE,
+        role_id INTEGER REFERENCES roles (role_id),
+        recipient_id INTEGER,
+        delete_flag BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMPTZ DEFAULT NOW (),
+        updated_at TIMESTAMPTZ DEFAULT NOW (),
+        deleted_at TIMESTAMPTZ,
+        UNIQUE (event_id, role_id, recipient_id)
+    );
+
 -- =============================================
 -- Tablas de Configuración
 -- =============================================
@@ -614,6 +662,24 @@ CREATE INDEX IF NOT EXISTS idx_user_addresses_user_id ON user_addresses (user_id
 
 CREATE INDEX IF NOT EXISTS idx_addresses_postal_code ON addresses (postal_code);
 
+-- Índices para eventos
+CREATE INDEX IF NOT EXISTS idx_events_school ON events (school_id);
+
+CREATE INDEX IF NOT EXISTS idx_events_dates ON events (start_time, end_time);
+
+CREATE INDEX IF NOT EXISTS idx_events_status ON events (status_id);
+
+CREATE INDEX IF NOT EXISTS idx_event_recipients_event ON event_recipients (event_id);
+
+CREATE INDEX IF NOT EXISTS idx_events_school_year ON events (school_year_id);
+
+CREATE INDEX IF NOT EXISTS idx_event_recipients_role ON event_recipients (role_id);
+
+CREATE INDEX IF NOT EXISTS idx_event_recipients_recipient ON event_recipients (recipient_id, recipient_type)
+WHERE
+    recipient_id IS NOT NULL
+    AND recipient_type IS NOT NULL;
+
 -- =============================================
 -- Seguridad y Permisos
 -- =============================================
@@ -655,6 +721,12 @@ ALTER TABLE grades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_addresses ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE status ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE event_types ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE event_recipients ENABLE ROW LEVEL SECURITY;
 
 -- Eliminar políticas existentes
 DROP POLICY IF EXISTS "Acceso total a user_addresses" ON user_addresses;
@@ -748,14 +820,24 @@ CREATE POLICY "Acceso total a estados" ON status FOR ALL USING (true)
 WITH
     CHECK (true);
 
+CREATE POLICY "Acceso total a tipos de eventos" ON event_types FOR ALL USING (true)
+WITH
+    CHECK (true);
+
+CREATE POLICY "Acceso total a eventos" ON events FOR ALL USING (true)
+WITH
+    CHECK (true);
+
+CREATE POLICY "Acceso total a destinatarios de eventos" ON event_recipients FOR ALL USING (true)
+WITH
+    CHECK (true);
+
 -- Otorgar permisos
 GRANT USAGE,
-SELECT
-    ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+UPDATE ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 
 GRANT USAGE,
-SELECT
-    ON ALL SEQUENCES IN SCHEMA public TO anon;
+UPDATE ON ALL SEQUENCES IN SCHEMA public TO anon;
 
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
 

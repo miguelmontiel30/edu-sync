@@ -1,0 +1,249 @@
+.custom-calendar {
+    /* Estilos generales del calendario */
+    --fc-border-color: theme('colors.gray.200');
+    --fc-button-bg-color: theme('colors.brand.500');
+    --fc-button-border-color: theme('colors.brand.500');
+    --fc-button-hover-bg-color: theme('colors.brand.600');
+    --fc-button-hover-border-color: theme('colors.brand.600');
+    --fc-button-active-bg-color: theme('colors.brand.700');
+    --fc-button-active-border-color: theme('colors.brand.700');
+}
+
+.dark .custom-calendar {
+    --fc-border-color: theme('colors.gray.700');
+    --fc-page-bg-color: transparent;
+    --fc-today-bg-color: theme('colors.gray.800/50');
+}
+
+/* Estilos para los días del calendario */
+.custom-calendar .fc-daygrid-day {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: theme('fontFamily.outfit');
+    color: theme('colors.gray.700');
+}
+
+.dark .custom-calendar .fc-daygrid-day {
+    color: theme('colors.gray.200');
+}
+
+.custom-calendar .fc-daygrid-day:hover {
+    background-color: theme('colors.brand.50');
+}
+
+.dark .custom-calendar .fc-daygrid-day:hover {
+    background-color: theme('colors.gray.800');
+}
+
+/* Estilos para los encabezados */
+.custom-calendar .fc-col-header-cell {
+    color: theme('colors.gray.700');
+    font-weight: 600;
+}
+
+.dark .custom-calendar .fc-col-header-cell {
+    color: theme('colors.gray.200');
+}
+
+/* Estilos para los eventos */
+.custom-calendar .fc-event {
+    cursor: pointer;
+    border: none !important;
+    margin: 2px 0;
+    overflow: visible;
+    border-radius: 6px;
+    height: auto !important;
+    min-height: 28px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .custom-calendar .fc-event {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.custom-calendar .fc-daygrid-event-harness {
+    margin-top: 3px;
+    margin-bottom: 3px;
+    height: auto !important;
+}
+
+/* Asegurar que los eventos tengan altura adecuada y contenido visible */
+.custom-calendar .fc-daygrid-day-events {
+    min-height: 2.5rem;
+    padding: 0 3px;
+    height: auto !important;
+}
+
+.custom-calendar .fc-daygrid-event {
+    white-space: normal !important;
+    overflow: visible !important;
+    height: auto !important;
+}
+
+.custom-calendar .fc-event-main {
+    white-space: normal !important;
+    overflow: visible !important;
+}
+
+/* Ajustar el diseño de la celda del día para acomodar eventos más altos */
+.custom-calendar .fc-daygrid-day-frame {
+    min-height: 5rem;
+    height: auto !important;
+}
+
+/* Colores de los eventos */
+.fc-bg-primary {
+    background-color: theme('colors.blue.100');
+    color: theme('colors.blue.700');
+    border-left: 3px solid theme('colors.blue.500');
+}
+
+.dark .fc-bg-primary {
+    background-color: theme('colors.blue.900/30');
+    color: theme('colors.blue.300');
+    border-left-color: theme('colors.blue.500');
+}
+
+.fc-bg-success {
+    background-color: theme('colors.green.100');
+    color: theme('colors.green.700');
+    border-left: 3px solid theme('colors.green.500');
+}
+
+.dark .fc-bg-success {
+    background-color: theme('colors.green.900/30');
+    color: theme('colors.green.300');
+    border-left-color: theme('colors.green.500');
+}
+
+.fc-bg-warning {
+    background-color: theme('colors.amber.100');
+    color: theme('colors.amber.700');
+    border-left: 3px solid theme('colors.amber.500');
+}
+
+.dark .fc-bg-warning {
+    background-color: theme('colors.amber.900/30');
+    color: theme('colors.amber.300');
+    border-left-color: theme('colors.amber.500');
+}
+
+.fc-bg-danger {
+    background-color: theme('colors.red.100');
+    color: theme('colors.red.700');
+    border-left: 3px solid theme('colors.red.500');
+}
+
+.dark .fc-bg-danger {
+    background-color: theme('colors.red.900/30');
+    color: theme('colors.red.300');
+    border-left-color: theme('colors.red.500');
+}
+
+.fc-bg-purple {
+    background-color: theme('colors.purple.100');
+    color: theme('colors.purple.700');
+    border-left: 3px solid theme('colors.purple.500');
+}
+
+.dark .fc-bg-purple {
+    background-color: theme('colors.purple.900/30');
+    color: theme('colors.purple.300');
+    border-left-color: theme('colors.purple.500');
+}
+
+.fc-bg-indigo {
+    background-color: theme('colors.indigo.100');
+    color: theme('colors.indigo.700');
+    border-left: 3px solid theme('colors.indigo.500');
+}
+
+.dark .fc-bg-indigo {
+    background-color: theme('colors.indigo.900/30');
+    color: theme('colors.indigo.300');
+    border-left-color: theme('colors.indigo.500');
+}
+
+.fc-bg-cyan {
+    background-color: theme('colors.cyan.100');
+    color: theme('colors.cyan.700');
+    border-left: 3px solid theme('colors.cyan.500');
+}
+
+.dark .fc-bg-cyan {
+    background-color: theme('colors.cyan.900/30');
+    color: theme('colors.cyan.300');
+    border-left-color: theme('colors.cyan.500');
+}
+
+.fc-bg-pink {
+    background-color: theme('colors.pink.100');
+    color: theme('colors.pink.700');
+    border-left: 3px solid theme('colors.pink.500');
+}
+
+.dark .fc-bg-pink {
+    background-color: theme('colors.pink.900/30');
+    color: theme('colors.pink.300');
+    border-left-color: theme('colors.pink.500');
+}
+
+.fc-bg-teal {
+    background-color: theme('colors.teal.100');
+    color: theme('colors.teal.700');
+    border-left: 3px solid theme('colors.teal.500');
+}
+
+.dark .fc-bg-teal {
+    background-color: theme('colors.teal.900/30');
+    color: theme('colors.teal.300');
+    border-left-color: theme('colors.teal.500');
+}
+
+.fc-bg-orange {
+    background-color: theme('colors.orange.100');
+    color: theme('colors.orange.700');
+    border-left: 3px solid theme('colors.orange.500');
+}
+
+.dark .fc-bg-orange {
+    background-color: theme('colors.orange.900/30');
+    color: theme('colors.orange.300');
+    border-left-color: theme('colors.orange.500');
+}
+
+/* Hover effect para todos los eventos */
+.custom-calendar .fc-event:hover {
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.dark .custom-calendar .fc-event:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Ajustes para el tema oscuro */
+.dark .custom-calendar .fc-toolbar-title,
+.dark .custom-calendar .fc-button-primary {
+    color: theme('colors.gray.200');
+}
+
+.dark .custom-calendar .fc-day {
+    background-color: transparent;
+}
+
+.dark .custom-calendar .fc-scrollgrid {
+    border-color: theme('colors.gray.700');
+}
+
+.dark .custom-calendar .fc-highlight {
+    background-color: theme('colors.gray.700/50');
+}
