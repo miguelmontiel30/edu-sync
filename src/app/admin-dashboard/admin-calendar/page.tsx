@@ -1,7 +1,7 @@
 "use client";
 
 // React
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 // Components
 import { Calendar, CalendarEvent } from "@/components/core/calendar";
