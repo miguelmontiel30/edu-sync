@@ -14,7 +14,6 @@ import {
     transformRolesData,
     prepareEventRecipients,
     handleRepositoryError,
-    checkRepositoryResponse,
 } from './utils';
 import {CalendarData, DatabaseEvent, EventData, EventRecipient, RepositoryResponse} from './types';
 

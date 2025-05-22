@@ -52,7 +52,7 @@ interface UseCalendarProps {
     onEventAdd?: (event: CalendarEvent) => void;
     onEventUpdate?: (event: CalendarEvent) => void;
     onEventDelete?: (eventId: string) => void;
-    availableRoles?: {role_id: string; name: string}[];
+    _availableRoles?: {role_id: string; name: string}[];
 }
 
 export function useCalendar({
@@ -60,7 +60,7 @@ export function useCalendar({
     onEventAdd,
     onEventUpdate,
     onEventDelete,
-    availableRoles = [],
+    _availableRoles = [],
 }: UseCalendarProps) {
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
     const [eventTitle, setEventTitle] = useState('');

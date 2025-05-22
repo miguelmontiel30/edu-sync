@@ -16,7 +16,7 @@ import IconFA from "@/components/ui/IconFA";
 import { renderEventContent } from "./renderEventContent";
 
 // Types
-import { CalendarEvent, Role } from "./types";
+import { CalendarEvent } from "./types";
 
 // Styles
 import "./calendar.css";
@@ -76,7 +76,7 @@ export function Calendar({
     onEventAdd,
     onEventUpdate,
     onEventDelete,
-    availableRoles
+    _availableRoles: availableRoles
   });
 
   return (
