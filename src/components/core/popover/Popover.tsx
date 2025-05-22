@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, ReactNode } from 'react';
+import { useState, useRef, useEffect, ReactNode } from 'react';
 import IconFA from '@/components/ui/IconFA';
 
 type PopoverPosition = 'top' | 'right' | 'bottom' | 'left';

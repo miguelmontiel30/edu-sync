@@ -1,7 +1,7 @@
 "use client";
 
 import { Popover } from './Popover';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 interface PopoverWithLinkProps {
     children: ReactNode;
