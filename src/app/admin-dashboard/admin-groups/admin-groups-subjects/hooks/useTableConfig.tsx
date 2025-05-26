@@ -4,15 +4,16 @@ import { useMemo } from 'react';
 // Components
 import IconFA from '@/components/ui/IconFA';
 import Badge from '@/components/core/badge/Badge';
-
-// Types
-import { Group } from '@/app/admin-dashboard/admin-groups/module-utils/types';
-import { GroupSubjectAssignment, TeacherInfo, DeletedGroupSubject } from '../module-utils/types';
-import { Column } from '@/components/core/table/module-utils/types';
+import ProfileAvatar from '@/components/core/avatar/ProfileAvatar';
 import { ActionButton } from '@/app/admin-dashboard/core/Tables/ItemsList';
 import { DeletedItemsListConfig } from '@/app/admin-dashboard/core/Tables/DeletedItemsList';
 
-// Utilidades
+// Types
+import { Column } from '@/components/core/table/module-utils/types';
+import { Group } from '@/app/admin-dashboard/admin-groups/module-utils/types';
+import { GroupSubjectAssignment, TeacherInfo, DeletedGroupSubject } from '../module-utils/types';
+
+// Utils
 import { formatDate } from '@/utils/dates';
 
 interface TableConfigProps {
@@ -53,27 +54,9 @@ export const useTableConfig = ({
             render: (item: GroupSubjectAssignment) => {
                 const teacher: TeacherInfo | null = item.teacherData;
                 if (teacher) {
-                    // Obtener la primera letra del nombre
-                    const firstLetter = teacher.first_name.charAt(0).toUpperCase();
-
-                    // Generar un color pastel basado en el nombre para que sea consistente
-                    const hash = teacher.first_name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                    const hue = hash % 360;
-                    const pastelColor = `hsl(${hue}, 70%, 85%)`;
-                    const textColor = `hsl(${hue}, 70%, 30%)`;
-
                     return (
                         <div className="flex items-center justify-center">
-
-                            <div
-                                className="h-8 w-8 rounded-full flex items-center justify-center mr-2"
-                                style={{ backgroundColor: pastelColor }}
-                            >
-                                <span className="text-sm font-semibold" style={{ color: textColor }}>
-                                    {firstLetter}
-                                </span>
-                            </div>
-
+                            <ProfileAvatar size="sm" name={`${teacher.first_name} ${teacher.father_last_name}`} showBorder={false} />
 
                             <span className="text-sm font-outfit ml-2">
                                 {`${teacher.first_name} ${teacher.father_last_name} ${teacher.mother_last_name || ''}`}

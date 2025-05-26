@@ -14,19 +14,7 @@ import SelectWithCategories from '@/components/core/select/SelectWithCategories'
 // Utils
 import { GroupSubjectAssignment } from '../module-utils/types';
 import { Group } from '@/app/admin-dashboard/admin-groups/module-utils/types';
-
-// Funciones auxiliares para generar colores
-const generatePastelColor = (name: string): string => {
-    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const hue = hash % 360;
-    return `hsl(${hue}, 70%, 85%)`;
-};
-
-const generateTextColor = (name: string): string => {
-    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const hue = hash % 360;
-    return `hsl(${hue}, 70%, 30%)`;
-};
+import ProfileAvatar from '@/components/core/avatar/ProfileAvatar';
 
 interface AssignTeacherModalProps {
     isOpen: boolean;
@@ -190,19 +178,13 @@ export default function AssignTeacherModal({
                                         <TableCell isHeader>Profesor Actual</TableCell>
                                         <TableCell>
                                             <div className="flex items-center">
-                                                <div
-                                                    className="h-8 w-8 rounded-full flex items-center justify-center mr-2"
-                                                    style={{
-                                                        backgroundColor: generatePastelColor(selectedAssignment.teacherData.first_name),
-                                                        color: generateTextColor(selectedAssignment.teacherData.first_name)
-                                                    }}
-                                                >
-                                                    <span className="text-sm font-semibold">
-                                                        {selectedAssignment.teacherData.first_name.charAt(0).toUpperCase()}
+                                                <div className="flex items-center justify-center">
+                                                    <ProfileAvatar size="sm" name={`${selectedAssignment.teacherData.first_name} ${selectedAssignment.teacherData.father_last_name}`} showBorder={false} />
+
+                                                    <span className="text-sm font-outfit ml-2">
+                                                        {`${selectedAssignment.teacherData.first_name} ${selectedAssignment.teacherData.father_last_name} ${selectedAssignment.teacherData.mother_last_name || ''}`}
                                                     </span>
                                                 </div>
-
-                                                {`${selectedAssignment.teacherData.first_name} ${selectedAssignment.teacherData.father_last_name} ${selectedAssignment.teacherData.mother_last_name || ''}`}
                                             </div>
                                         </TableCell>
                                     </TableRow>
