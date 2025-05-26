@@ -82,7 +82,7 @@ const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
                     className={`flex items-center justify-center w-full h-full ${borderClass}`}
                     style={{ backgroundColor: colors.background }}
                 >
-                    <span style={{ color: colors.text }} className="font-semibold">
+                    <span style={{ color: colors.text }} className="font-medium">
                         {initials}
                     </span>
                 </div>
