@@ -110,7 +110,10 @@ export default function ItemsList<T extends BaseItem>({
             header: 'Acciones',
             sortable: false,
             render: (item: T) => (
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <div
+                    className="flex flex-col sm:flex-row gap-2 justify-center"
+                    onClick={(e) => e.stopPropagation()} // Detiene la propagación en el contenedor
+                >
                     {actionButtons.map((button) => (
                         <Button
                             key={`${item[idField]}-${button.label}`}
