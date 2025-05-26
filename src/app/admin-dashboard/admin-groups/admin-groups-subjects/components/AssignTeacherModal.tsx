@@ -179,7 +179,7 @@ export default function AssignTeacherModal({
                                         <TableCell>
                                             <div className="flex items-center">
                                                 <div className="flex items-center justify-center">
-                                                    <ProfileAvatar size="sm" name={`${selectedAssignment.teacherData.first_name} ${selectedAssignment.teacherData.father_last_name}`} showBorder={false} />
+                                                    <ProfileAvatar size="sm" name={`${selectedAssignment.teacherData.first_name} ${selectedAssignment.teacherData.father_last_name}`} />
 
                                                     <span className="text-sm font-outfit ml-2">
                                                         {`${selectedAssignment.teacherData.first_name} ${selectedAssignment.teacherData.father_last_name} ${selectedAssignment.teacherData.mother_last_name || ''}`}

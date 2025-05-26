@@ -161,7 +161,7 @@ export default function AssignGroupStudentsModal({
                                                 </TableCell>
                                                 <TableCell className="px-5 py-4 text-center sm:px-6">
                                                     <div className="flex items-center justify-center">
-                                                        <ProfileAvatar size="sm" name={`${student.first_name} ${student.father_last_name}`} showBorder={false} />
+                                                        <ProfileAvatar size="sm" name={`${student.first_name} ${student.father_last_name}`} />
 
                                                         <span className="text-sm font-outfit ml-2">
                                                             {`${student.first_name} ${student.father_last_name} ${student.mother_last_name || ''}`}

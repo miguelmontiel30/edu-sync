@@ -56,7 +56,7 @@ export const useTableConfig = ({
                 if (teacher) {
                     return (
                         <div className="flex items-center justify-center">
-                            <ProfileAvatar size="sm" name={`${teacher.first_name} ${teacher.father_last_name}`} showBorder={false} />
+                            <ProfileAvatar size="sm" name={`${teacher.first_name} ${teacher.father_last_name}`} />
 
                             <span className="text-sm font-outfit ml-2">
                                 {`${teacher.first_name} ${teacher.father_last_name} ${teacher.mother_last_name || ''}`}

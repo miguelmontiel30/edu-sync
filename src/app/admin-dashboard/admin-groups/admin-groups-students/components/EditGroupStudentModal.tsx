@@ -110,7 +110,7 @@ export default function EditGroupStudentModal({
                                     <TableCell isHeader className="w-1/3">Nombre Completo</TableCell>
                                     <TableCell>
                                         <div className="flex items-center justify-center">
-                                            <ProfileAvatar size="sm" name={`${studentData.student.first_name} ${studentData.student.father_last_name}`} showBorder={false} />
+                                            <ProfileAvatar size="sm" name={`${studentData.student.first_name} ${studentData.student.father_last_name}`} />
 
                                             <span className="text-sm font-outfit ml-2">
                                                 {`${studentData.student.first_name} ${studentData.student.father_last_name} ${studentData.student.mother_last_name || ''}`}

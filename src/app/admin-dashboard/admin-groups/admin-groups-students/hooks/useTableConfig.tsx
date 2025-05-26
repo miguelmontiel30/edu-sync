@@ -69,7 +69,7 @@ export function useTableConfig({
             sortable: true,
             render: (student: Student) => (
                 <div className="flex items-center justify-center">
-                    <ProfileAvatar size="sm" name={`${student.first_name} ${student.father_last_name}`} showBorder={false} />
+                    <ProfileAvatar size="sm" name={`${student.first_name} ${student.father_last_name}`} />
 
                     <span className="text-sm font-outfit ml-2">
                         {`${student.first_name} ${student.father_last_name} ${student.mother_last_name || ''}`}
