@@ -15,7 +15,7 @@ import { DeletedItemsListConfig } from '../../../core/Tables/DeletedItemsList';
 import { getStudentStatusColorById } from '../module-utils/utils';
 import { Group } from '@/app/admin-dashboard/admin-groups/module-utils/types';
 import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';
-import { formatDate, getGenderIconColor } from '@/app/admin-dashboard/admin-students/module-utils/utils';
+import { formatDate } from '@/app/admin-dashboard/admin-students/module-utils/utils';
 
 // Extendemos la interfaz Group para incluir estudiantes asignados
 interface GroupWithStudents extends Group {
