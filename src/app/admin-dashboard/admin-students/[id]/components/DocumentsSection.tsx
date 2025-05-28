@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Document, DocumentStatus, DocumentType } from '../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 import { IconFA } from '@/components/ui';
@@ -171,7 +171,7 @@ const DocumentUploadCard: React.FC<{
     );
 };
 
-const DocumentsSection: React.FC<DocumentsSectionProps> = ({ documents, onUpload, onReview }) => {
+const DocumentsSection: React.FC<DocumentsSectionProps> = ({ documents, onUpload }) => {
     // Crear un Map para acceder fácilmente a los documentos por tipo
     const documentsMap = new Map<DocumentType, Document>();
     documents.forEach(doc => {

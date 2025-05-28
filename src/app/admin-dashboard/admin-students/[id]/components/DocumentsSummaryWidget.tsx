@@ -1,7 +1,6 @@
-import React from 'react';
-import { Document, DocumentStatus } from '../module-utils/types';
+import { Document } from '../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
-import { IconFA, NotificationBadge } from '@/components/ui';
+import { IconFA } from '@/components/ui';
 
 interface DocumentsSummaryWidgetProps {
     documents: Document[];

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { EmergencyContact, MedicalInfo } from '../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 import { IconFA } from '@/components/ui';
@@ -78,6 +78,7 @@ const HealthEmergencySection: React.FC<HealthEmergencySectionProps> = ({
                         <h3 className="font-medium text-gray-800 dark:text-white">Información Médica</h3>
                         {!isEditingMedical ? (
                             <button
+                                type="button"
                                 onClick={() => setIsEditingMedical(true)}
                                 className="text-primary-500 hover:text-primary-600 text-sm flex items-center"
                             >
@@ -86,12 +87,14 @@ const HealthEmergencySection: React.FC<HealthEmergencySectionProps> = ({
                         ) : (
                             <div className="flex space-x-2">
                                 <button
+                                    type="button"
                                     onClick={() => setIsEditingMedical(false)}
                                     className="text-gray-500 hover:text-gray-600 text-sm flex items-center"
                                 >
                                     <IconFA icon="times" className="mr-1" /> Cancelar
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={handleSaveMedicalInfo}
                                     className="text-primary-500 hover:text-primary-600 text-sm flex items-center"
                                 >
@@ -224,6 +227,7 @@ const HealthEmergencySection: React.FC<HealthEmergencySectionProps> = ({
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="font-medium text-gray-800 dark:text-white">Contactos de Emergencia</h3>
                         <button
+                            type="button"
                             onClick={onAddContact}
                             className="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded-md text-sm flex items-center"
                         >
@@ -247,12 +251,14 @@ const HealthEmergencySection: React.FC<HealthEmergencySectionProps> = ({
 
                                     <div className="flex space-x-2 mt-3">
                                         <button
+                                            type="button"
                                             onClick={() => onCallContact(contact.phone)}
                                             className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm flex items-center"
                                         >
                                             <IconFA icon="phone" className="mr-1" /> Llamar
                                         </button>
                                         <button
+                                            type="button"
                                             onClick={() => onSendSMS(contact.phone)}
                                             className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm flex items-center"
                                         >
@@ -267,6 +273,7 @@ const HealthEmergencySection: React.FC<HealthEmergencySectionProps> = ({
                             <IconFA icon="user-plus" className="text-gray-400 mb-2" size="xl" />
                             <p className="text-gray-500 dark:text-gray-400">No hay contactos de emergencia</p>
                             <button
+                                type="button"
                                 onClick={onAddContact}
                                 className="mt-3 bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded-md text-sm"
                             >

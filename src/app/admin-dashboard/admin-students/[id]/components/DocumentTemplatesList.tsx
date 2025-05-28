@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DocumentTemplate, DocumentTemplateType } from '../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 import { IconFA } from '@/components/ui';
@@ -77,7 +77,7 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
             const documentUrl = await onGenerateDocument(selectedTemplate.id, params);
 
             // Abrir el documento en una nueva pestaña
-            window.open(documentUrl, '_blank');
+            globalThis.open(documentUrl, '_blank');
 
             // Cerrar modal
             setIsModalOpen(false);
@@ -118,7 +118,7 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
                                                 </p>
                                             )}
                                         </div>
-                                        <button className="bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 p-2 rounded-full hover:bg-primary-100 dark:hover:bg-primary-800/30 transition-colors">
+                                        <button type="button" className="bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 p-2 rounded-full hover:bg-primary-100 dark:hover:bg-primary-800/30 transition-colors">
                                             <IconFA icon="download" />
                                         </button>
                                     </div>
@@ -152,6 +152,7 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="font-medium text-lg">Generar: {selectedTemplate.name}</h3>
                             <button
+                                type="button"
                                 onClick={() => setIsModalOpen(false)}
                                 className="text-gray-400 hover:text-gray-500"
                             >
@@ -177,12 +178,14 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
 
                         <div className="mt-6 flex justify-end space-x-3">
                             <button
+                                type="button"
                                 onClick={() => setIsModalOpen(false)}
                                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                             >
                                 Cancelar
                             </button>
                             <button
+                                type="button"
                                 onClick={handleGenerateDocument}
                                 className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md flex items-center"
                                 disabled={isGenerating}

@@ -1,4 +1,3 @@
-import React from 'react';
 import { AcademicGoal } from '../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 
@@ -65,7 +64,7 @@ const AcademicGoalsWidget: React.FC<AcademicGoalsWidgetProps> = ({ goals }) => {
 
                 {/* Botón para añadir nueva meta */}
                 <div className="pt-2 text-center">
-                    <button className="text-primary-500 hover:text-primary-600 text-sm font-medium">
+                    <button type="button" className="text-primary-500 hover:text-primary-600 text-sm font-medium">
                         + Establecer nueva meta
                     </button>
                 </div>

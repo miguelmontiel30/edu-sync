@@ -1,4 +1,3 @@
-import React from 'react';
 import { Task, TaskPriority, TaskStatus } from '../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 import { IconFA } from '@/components/ui';

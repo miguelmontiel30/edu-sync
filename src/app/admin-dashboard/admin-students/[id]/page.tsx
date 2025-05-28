@@ -12,7 +12,6 @@ import useStudentModals from './hooks/useStudentModals';
 import IconFA from '@/components/ui/IconFA';
 import Button from '@/components/core/button/Button';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import MetricsChartsWrapper from '@/components/core/metrics/MetricsChartsWrapper';
 import { TabsList, TabsRoot, TabsTrigger, TabsContent } from '@/components/core/tabs';
 import { NotificationBadge } from '@/components/ui';
 
@@ -40,17 +39,15 @@ import DocumentTemplatesList from './components/DocumentTemplatesList';
 // Types
 import {
   AttendanceData,
-  AttendanceType,
-  Task,
-  AcademicGoal,
   Document,
   DocumentType,
-  DocumentStatus,
   EmergencyContact,
   MedicalInfo,
   Message,
   MessageType,
-  DocumentTemplate
+  DocumentTemplate,
+  Task,
+  AcademicGoal
 } from './module-utils/types';
 
 export default function StudentProfilePage() {
@@ -66,7 +63,6 @@ export default function StudentProfilePage() {
     payments,
     grades,
     attendance,
-    badges,
     groups,
     loadingState,
     loadStudentData
@@ -83,7 +79,7 @@ export default function StudentProfilePage() {
   } = useStudentActions(studentId, { loadStudentData });
 
   // Hook para gestión de pestañas
-  const { activeTab, tabs, changeTab } = useStudentProfileTabs();
+  const { tabs, changeTab } = useStudentProfileTabs();
 
   // Hook para gestión de modales
   const {
@@ -179,28 +175,28 @@ export default function StudentProfilePage() {
   };
 
   // Manejo de documentos
-  const handleUploadDocument = async (type: DocumentType, file: File) => {
+  const handleUploadDocument = (type: DocumentType, file: File) => {
     console.log('Subiendo documento:', type, file.name);
     // En implementación real: llamar a API para subir documento
     return Promise.resolve();
   };
 
   // Manejo de información médica
-  const handleUpdateMedicalInfo = async (info: Partial<MedicalInfo>) => {
+  const handleUpdateMedicalInfo = (info: Partial<MedicalInfo>) => {
     console.log('Actualizando información médica:', info);
     // En implementación real: llamar a API para actualizar info médica
     return Promise.resolve();
   };
 
   // Manejo de comunicaciones
-  const handleSendMessage = async (message: { title: string; content: string; type: MessageType }) => {
+  const handleSendMessage = (message: { title: string; content: string; type: MessageType }) => {
     console.log('Enviando mensaje:', message);
     // En implementación real: llamar a API para enviar mensaje
     return Promise.resolve();
   };
 
   // Manejo de documentos generados
-  const handleGenerateDocument = async (templateId: string, params: Record<string, string>) => {
+  const handleGenerateDocument = (templateId: string, params: Record<string, string>) => {
     console.log('Generando documento:', templateId, params);
     // En implementación real: llamar a API para generar documento
     return Promise.resolve('/docs/generated-document.pdf');
@@ -437,7 +433,7 @@ export default function StudentProfilePage() {
               {/* Tareas pendientes */}
               <TasksWidget
                 tasks={mockData.tasks}
-                onMarkComplete={(id) => Promise.resolve()}
+                onMarkComplete={(_id) => Promise.resolve()}
               />
 
               {/* Progreso de metas */}
@@ -517,7 +513,7 @@ export default function StudentProfilePage() {
               <DocumentsSection
                 documents={mockData.documents}
                 onUpload={handleUploadDocument}
-                onReview={(id, status, comments) => Promise.resolve()}
+                onReview={(_id, _status, _comments) => Promise.resolve()}
               />
             </div>
           </div>
@@ -540,7 +536,7 @@ export default function StudentProfilePage() {
           <CommunicationsSection
             messages={mockData.messages}
             onSendMessage={handleSendMessage}
-            onMarkAsRead={(id) => Promise.resolve()}
+            onMarkAsRead={(_id) => Promise.resolve()}
           />
         </TabsContent>
 

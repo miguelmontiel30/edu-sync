@@ -1,6 +1,3 @@
-import IconFA from './IconFA';
-import NotificationBadge from './NotificationBadge';
-
 export * from './modal';
 export {default as IconFA} from './IconFA';
 export {default as Collapse} from './Collapse';

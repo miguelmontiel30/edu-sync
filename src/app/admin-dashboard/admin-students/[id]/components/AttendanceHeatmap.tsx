@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { AttendanceType, HeatmapProps } from '@/app/admin-dashboard/admin-students/[id]/module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 
@@ -24,7 +24,7 @@ const AttendanceHeatmap: React.FC<HeatmapProps> = ({ year, data }) => {
 
     const getFirstMondayOfGrid = (targetYear: number): Date => {
         const jan1 = new Date(targetYear, 0, 1);
-        let dayOfWeek = jan1.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+        const dayOfWeek = jan1.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
         const daysToSubtract = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
 
         const firstGridDate = new Date(jan1);
@@ -111,8 +111,8 @@ const AttendanceHeatmap: React.FC<HeatmapProps> = ({ year, data }) => {
         setTooltip({
             show: true,
             content: `${cell.date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}: ${getTypeLabel(cell.type)}`,
-            x: window.scrollX + rect.left + rect.width / 2,
-            y: window.scrollY + rect.top,
+            x: globalThis.scrollX + rect.left + rect.width / 2,
+            y: globalThis.scrollY + rect.top,
         });
     };
 

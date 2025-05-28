@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Message, MessageType } from '../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 import { IconFA, NotificationBadge } from '@/components/ui';
@@ -105,6 +105,7 @@ const CommunicationsSection: React.FC<CommunicationsSectionProps> = ({
                     <div className="flex justify-between items-center mb-4 border-b border-gray-200 dark:border-gray-700 pb-3">
                         <div className="flex space-x-4">
                             <button
+                                type="button"
                                 className={`pb-3 px-1 font-medium text-sm ${activeTab === 'recibidos'
                                     ? 'text-primary-500 border-b-2 border-primary-500 -mb-[13px]'
                                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}`}
@@ -116,6 +117,7 @@ const CommunicationsSection: React.FC<CommunicationsSectionProps> = ({
                                 )}
                             </button>
                             <button
+                                type="button"
                                 className={`pb-3 px-1 font-medium text-sm ${activeTab === 'enviados'
                                     ? 'text-primary-500 border-b-2 border-primary-500 -mb-[13px]'
                                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}`}
@@ -126,6 +128,7 @@ const CommunicationsSection: React.FC<CommunicationsSectionProps> = ({
                         </div>
 
                         <button
+                            type="button"
                             className="bg-primary-500 hover:bg-primary-600 text-white px-3 py-1.5 rounded-md text-sm flex items-center"
                             onClick={() => setIsComposing(true)}
                         >
@@ -141,6 +144,7 @@ const CommunicationsSection: React.FC<CommunicationsSectionProps> = ({
                             <div className="flex mb-3 overflow-x-auto pb-2 -mr-3 pr-3">
                                 {messageTypes.map(type => (
                                     <button
+                                        type="button"
                                         key={type.key}
                                         className="flex items-center mr-2 px-2.5 py-1 text-xs font-medium rounded-full whitespace-nowrap bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
                                     >
@@ -156,8 +160,8 @@ const CommunicationsSection: React.FC<CommunicationsSectionProps> = ({
                                     <div
                                         key={message.id}
                                         className={`p-3 rounded-md cursor-pointer transition-colors ${selectedMessage?.id === message.id
-                                                ? 'bg-primary-50 dark:bg-primary-900/20'
-                                                : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                                            ? 'bg-primary-50 dark:bg-primary-900/20'
+                                            : 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
                                             } ${message.status === 'no-leido' ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}
                                         onClick={() => handleSelectMessage(message)}
                                     >
@@ -289,6 +293,7 @@ const CommunicationsSection: React.FC<CommunicationsSectionProps> = ({
                                 <div className="h-full flex flex-col">
                                     <div className="mb-4">
                                         <button
+                                            type="button"
                                             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 mb-3 md:hidden flex items-center"
                                             onClick={() => setSelectedMessage(null)}
                                         >
@@ -342,6 +347,7 @@ const CommunicationsSection: React.FC<CommunicationsSectionProps> = ({
 
                                     <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
                                         <button
+                                            type="button"
                                             className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md flex items-center"
                                             onClick={() => {
                                                 setIsComposing(true);
@@ -391,6 +397,7 @@ const CommunicationsSection: React.FC<CommunicationsSectionProps> = ({
                                             {formatDate(notification.createdAt)}
                                         </span>
                                         <button
+                                            type="button"
                                             className="text-primary-500 hover:text-primary-600 text-sm"
                                             onClick={() => handleSelectMessage(notification)}
                                         >
