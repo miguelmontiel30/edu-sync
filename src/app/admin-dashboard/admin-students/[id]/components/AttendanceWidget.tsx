@@ -15,7 +15,7 @@ const AttendanceWidget: React.FC<AttendanceWidgetProps> = ({ attendance }) => {
     const absentDays = attendance.filter(a => a.status === 'absent').length;
 
     return (
-        <ComponentCard title="Asistencia" desc="Registro de asistencia reciente" className="mt-6">
+        <ComponentCard title="Asistencia" desc="Registro de asistencia reciente">
             <div className="p-2 flex flex-col items-center">
                 {/* Attendance Rate */}
                 <div className="w-32 h-32 rounded-full mb-6">

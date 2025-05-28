@@ -27,9 +27,8 @@ import TutorsSection from './components/TutorsSection';
 import StudentFormModal from '../components/StudentFormModal';
 import AttendanceHeatmap from './components/AttendanceHeatmap';
 
-// Nuevos componentes
+// Sections
 import TasksWidget from './components/TasksWidget';
-import AcademicGoalsWidget from './components/AcademicGoalsWidget';
 import DocumentsSection from './components/DocumentsSection';
 import DocumentsSummaryWidget from './components/DocumentsSummaryWidget';
 import HealthEmergencySection from './components/HealthEmergencySection';
@@ -435,9 +434,6 @@ export default function StudentProfilePage() {
                 tasks={mockData.tasks}
                 onMarkComplete={(_id) => Promise.resolve()}
               />
-
-              {/* Progreso de metas */}
-              <AcademicGoalsWidget goals={mockData.goals} />
             </div>
 
             {/* Columna derecha */}

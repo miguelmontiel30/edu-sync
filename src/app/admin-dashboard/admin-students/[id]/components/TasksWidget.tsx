@@ -69,7 +69,7 @@ const TasksWidget: React.FC<TasksWidgetProps> = ({ tasks, onMarkComplete }) => {
 
     return (
         <ComponentCard title="Tareas Pendientes" desc="Actividades y proyectos por entregar">
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="divide-y divide-gray-200 dark:divide-gray-700 p-2">
                 {sortedTasks.length > 0 ? (
                     sortedTasks.map(task => (
                         <div key={task.id} className="py-3 flex items-center justify-between">
