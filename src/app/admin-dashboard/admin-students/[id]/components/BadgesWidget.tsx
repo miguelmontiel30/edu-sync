@@ -1,5 +1,6 @@
 import { useState } from "react";
 import IconFA from "@/components/ui/IconFA";
+import Image from "next/image";
 
 interface BadgeTooltipProps {
     show: boolean;
@@ -34,7 +35,7 @@ export const BadgeTooltip: React.FC<BadgeTooltipProps> = ({ show, description, e
 interface Badge {
     id: string;
     title: string;
-    icon: string;
+    imagePath: string;
     color: 'primary' | 'success' | 'warning' | 'error' | 'info';
     description: string;
     earned: boolean;
@@ -90,22 +91,15 @@ export const StudentBadge: React.FC<StudentBadgeProps> = ({ badge }) => {
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
             >
-                {/* Badge Icon Container */}
-                <div
-                    className={`
-                        w-12 h-12 rounded-full flex items-center justify-center mb-2
-                        transition-all duration-300 shadow-sm
-                        ${badge.earned
-                            ? `bg-gradient-to-br ${colors.bg} ${colors.icon}`
-                            : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                        }
-                    `}
-                >
-                    {badge.icon.startsWith('fa-') ? (
-                        <IconFA icon={badge.icon.replace('fa-', '')} />
-                    ) : (
-                        badge.icon
-                    )}
+                {/* Badge Image Container */}
+                <div className="w-16 h-16 mb-2 relative">
+                    <Image
+                        src={badge.imagePath}
+                        alt={badge.title}
+                        fill
+                        sizes="64px"
+                        className={`object-contain transition-all duration-300 ${!badge.earned && 'grayscale opacity-50'}`}
+                    />
                 </div>
 
                 {/* Badge Title */}
@@ -146,7 +140,7 @@ const badges: Badge[] = [
     {
         id: 'punctuality',
         title: 'Puntualidad',
-        icon: 'fa-bullseye',
+        imagePath: '/images/badges/Puntualidad.png',
         color: 'error',
         description: 'Has llegado a tiempo 10 días seguidos',
         earned: true
@@ -154,7 +148,7 @@ const badges: Badge[] = [
     {
         id: 'attendance',
         title: 'Asistencia',
-        icon: 'fa-calendar-check',
+        imagePath: '/images/badges/Asistencia.png',
         color: 'primary',
         description: '95% de asistencia este mes',
         earned: true
@@ -162,7 +156,7 @@ const badges: Badge[] = [
     {
         id: 'excellence',
         title: 'Excelencia Académica',
-        icon: 'fa-trophy',
+        imagePath: '/images/badges/ExcelenciaAcademica.png',
         color: 'warning',
         description: 'Promedio superior a 9.0',
         earned: true
@@ -170,7 +164,7 @@ const badges: Badge[] = [
     {
         id: 'behavior',
         title: 'Buen Comportamiento',
-        icon: 'fa-thumbs-up',
+        imagePath: '/images/badges/Comportamiento.png',
         color: 'success',
         description: 'Sin reportes negativos en 2 meses',
         earned: true
@@ -178,7 +172,7 @@ const badges: Badge[] = [
     {
         id: 'improvement',
         title: 'Mejora Continua',
-        icon: 'fa-chart-line',
+        imagePath: '/images/badges/MejoraContinua.png',
         color: 'info',
         description: 'Mejoró en 3 materias consecutivas',
         earned: false
@@ -186,7 +180,7 @@ const badges: Badge[] = [
     {
         id: 'participation',
         title: 'Participación',
-        icon: 'fa-comments',
+        imagePath: '/images/badges/Participacion.png',
         color: 'warning',
         description: 'Participó activamente en 15 clases',
         earned: true
