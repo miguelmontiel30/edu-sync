@@ -1,0 +1,120 @@
+# .cursorRules.yml
+
+# 1. Tecnologías y contexto
+technologies:
+    - typescript
+    - nodejs
+    - nextjs-app-router
+    - react
+    - shadcn-ui
+    - radix-ui
+    - tailwindcss
+
+# 2. Estructura de módulos
+fileStructure:
+    module:
+        components: '*/components/*.tsx'
+        hooks: '*/hooks/*.{ts,tsx}'
+        module-utils:
+            queries: '*/module-utils/queries.ts'
+            repository: '*/module-utils/repository.ts'
+            services: '*/module-utils/services.ts'
+            types: '*/module-utils/types.ts'
+            utils: '*/module-utils/utils.ts'
+        page: '*/page.tsx'
+
+# 3. Convenciones para llamadas a DB
+dbConventions:
+    location: 'Siempre en module-utils/queries.ts'
+    pattern: 'use supabaseClient.from(...)'
+    baseQuery: 'Usar baseStudentQuery() para selects con relaciones'
+    errorHandling: 'Manejo de errores con try/catch y throw'
+
+# 4. Nombres y nomenclatura
+naming:
+    directories: 'kebab-case'
+    files:
+        components: 'PascalCase.tsx'
+        hooks: 'camelCase.tsx'
+        utils: 'camelCase.ts'
+    variables: 'camelCase'
+    constants: 'UPPER_SNAKE_CASE'
+    types: 'PascalCase'
+    exports: 'prefer named exports'
+
+# 5. TypeScript y estilo
+typescript:
+    enforce:
+        - 'Usar interfaces en lugar de enums'
+        - "Funciones puras con 'function' keyword"
+        - 'Evitar lógica de negocio fuera de repository'
+        - 'Hooks en hooks/, componentes en components/'
+    patterns:
+        functional: true
+        declarative: true
+
+# 6. Formato y sintaxis
+formatting:
+    conditionals: 'Uso conciso sin llaves cuando sea single statement'
+    jsx: 'Declarativo, sin expresiones complejas inline'
+    lineLength: 100
+
+# 7. UI y componentes Core
+uiComponents:
+    imports:
+        Input: '@/components/form/input/InputField'
+        Label: '@/components/form/Label'
+        Select: '@/components/form/Select'
+        Button: '@/components/core/button/Button'
+        Badge: '@/components/core/badge/Badge'
+        Table:
+            - '@/components/core/table/Table'
+            - '@/components/core/table/TableHeader'
+            - '@/components/core/table/TableBody'
+            - '@/components/core/table/TableRow'
+            - '@/components/core/table/TableCell'
+        Modal: '@/components/ui/modal'
+    usage:
+        Button:
+            props:
+                variant: 'required'
+                disabled: 'when isLoading'
+        Table:
+            requireHeader: true
+        IconFA:
+            import: "import IconFA from '@/components/ui/IconFA';"
+            avoid: '<i> tags'
+
+# 8. Optimización de rendimiento
+performance:
+    react:
+        - minimizeUseClient: true
+        - useRSC: true
+        - dynamicImports: 'para módulos no críticos'
+    images:
+        - format: 'WebP'
+        - lazyLoad: true
+        - sizeAttributes: true
+
+# 9. Gestión de estado en URL
+stateManagement:
+    nuqs: "usar 'nuqs' para parámetros de búsqueda en URL"
+
+# 10. Supabase
+supabase:
+    clientPath: 'src/services/config/supabaseClient.ts'
+    errorHandling: 'try/catch en cada operación'
+    transactions: 'usar cuando modifques varias tablas'
+
+# 11. Creación de nuevos módulos y formularios
+moduleGeneration:
+    newModules:
+        dataSource:
+            - 'Obtener esquemas y metadatos directamente del servidor MCP configurado con Supabase'
+            - 'Analizar archivos de esquema de la base de datos (schema.sql) para inferir tipos y relaciones'
+    types:
+        centralize: 'Centralizar todos los tipos e interfaces del módulo en module-utils/types.ts'
+    repository:
+        futureProof: 'Usar patrón Repository como adaptador para facilitar:
+            • Migración a un backend propio (Express u otro)
+            • Coexistencia de múltiples instancias de repositorio (Supabase + Express) sin cambios en la capa de servicio/hooks'

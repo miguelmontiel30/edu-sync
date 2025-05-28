@@ -122,7 +122,7 @@ const othersItems: NavItem[] = [
     {
         icon: <IconFA icon="calendar" style="duotone" size="xl" />,
         name: 'Calendario',
-        path: '/calendar',
+        path: '/admin-dashboard/admin-calendar',
     },
     {
         icon: <IconFA icon="id-card" style="duotone" size="xl" />,
