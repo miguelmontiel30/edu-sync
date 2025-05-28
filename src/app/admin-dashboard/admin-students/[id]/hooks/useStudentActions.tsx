@@ -49,17 +49,17 @@ const useStudentActions = (studentId: string, refreshData: any) => {
     };
 
     // Editar direcciones del estudiante
-    const handleEditAddresses = async (addressData: any) => {
+    const handleEditAddresses = (_addressData: any) => {
         if (!studentId) return { success: false, error: 'ID de estudiante no válido' };
 
         setIsSaving(true);
         setError(null);
 
         try {
-            const numericStudentId = parseInt(studentId);
+            // const numericStudentId = parseInt(studentId);
 
             // Si es dirección actual, actualizar las demás a no actuales
-            if (addressData.is_current) {
+            if (_addressData.is_current) {
                 // Esta lógica debería manejarse en el backend idealmente
             }
 
@@ -85,14 +85,14 @@ const useStudentActions = (studentId: string, refreshData: any) => {
     };
 
     // Agregar tutor al estudiante
-    const handleAddTutor = async (tutorData: any) => {
+    const handleAddTutor = (_tutorData: any) => {
         if (!studentId) return { success: false, error: 'ID de estudiante no válido' };
 
         setIsSaving(true);
         setError(null);
 
         try {
-            const numericStudentId = parseInt(studentId);
+            // const numericStudentId = parseInt(studentId);
 
             // const { error } = await addTutor({
             //     ...tutorData,

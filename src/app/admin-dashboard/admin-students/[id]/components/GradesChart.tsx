@@ -1,10 +1,20 @@
-import React, { useMemo } from 'react';
+// React
+import { useMemo } from 'react';
+
+// Next
 import dynamic from 'next/dynamic';
+
+// ApexCharts
 import { ApexOptions } from 'apexcharts';
-import IconFA from '@/components/ui/IconFA';
+
+// Components
 import ComponentCard from '@/components/common/ComponentCard';
-import { Grade } from '../module-utils/types';
+
+// Context
 import { useTheme } from '@/context/ThemeContext';
+
+// Types
+import { Grade } from '../module-utils/types';
 
 // Importación dinámica para evitar errores de SSR
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -173,7 +183,7 @@ function generateFictitiousSeries() {
 }
 
 // Genera series a partir de calificaciones reales (no implementado completamente)
-function generateSeriesFromGrades(grades: Grade[]) {
+function generateSeriesFromGrades(_grades: Grade[]) {
     // Nota: Esta es una implementación básica que deberías adaptar
     // a tu estructura real de datos de calificaciones
 
