@@ -1,23 +1,17 @@
-import React from 'react';
-import Button from '@/components/core/button/Button';
+// Components
 import IconFA from '@/components/ui/IconFA';
-import { Student, Tutor } from '../module-utils/types';
 import { ProfileAvatar } from '@/components/core/avatar';
 import ComponentCard from '@/components/common/ComponentCard';
 
-interface ProfileHeaderProps {
-    student: Student;
-    tutors: Tutor[];
-    onAddTutor: (options: any) => void;
-    onViewTutorDetails: (tutorId: string) => void;
-}
+// Types
+import { Student } from '../module-utils/types';
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({
-    student,
-    tutors = [],
-    onAddTutor,
-    onViewTutorDetails
-}) => {
+/**
+ * Componente para mostrar el encabezado del perfil del estudiante
+ * @param {Student} student - Estudiante a mostrar
+ * @returns {JSX.Element} Componente de encabezado del perfil del estudiante
+ */
+const ProfileHeader: React.FC<{ student: Student }> = ({ student }) => {
     return (
         <>
             <ComponentCard className='p-5'>
@@ -49,55 +43,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                             <IconFA icon="calendar" className="text-gray-400" />
                             <span>{student.birth_date ? new Date(student.birth_date).toLocaleDateString('es-MX') : 'No disponible'}</span>
                         </div>
-                    </div>
-                </div>
-            </ComponentCard>
-
-            {/* Sección de Tutores */}
-            <ComponentCard title="Tutores" desc="Lista de tutores del estudiante" className='mt-6'>
-                <div className="flex flex-col gap-4">
-                    <div className="flex justify-end items-center">
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            startIcon={<IconFA icon="plus" />}
-                            onClick={() => onAddTutor({})}
-                        >
-                            Añadir
-                        </Button>
-                    </div>
-
-                    {/* Lista de tutores */}
-                    <div className="flex flex-col gap-3">
-                        {tutors.length > 0 ? (
-                            tutors.map((tutor) => (
-                                <div
-                                    key={tutor.id}
-                                    className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                                    onClick={() => onViewTutorDetails(tutor.id)}
-                                >
-                                    <ProfileAvatar
-                                        imageUrl={tutor.avatar_url}
-                                        name={tutor.full_name}
-                                        size="sm"
-                                    />
-                                    <div className="flex-1 min-w-0">
-                                        <p className="font-medium text-gray-900 dark:text-white truncate">
-                                            {tutor.full_name}
-                                        </p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                                            {tutor.relationship}
-                                        </p>
-                                    </div>
-                                    <IconFA icon="chevron-right" className="text-gray-400" />
-                                </div>
-                            ))
-                        ) : (
-                            <div className="text-center py-4 text-gray-500 dark:text-gray-400">
-                                <p>No hay tutores registrados</p>
-                                <p className="text-sm">Añade un tutor para el estudiante</p>
-                            </div>
-                        )}
                     </div>
                 </div>
             </ComponentCard>

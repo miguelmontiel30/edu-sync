@@ -15,7 +15,10 @@ const AddressesSection: React.FC<AddressesSectionProps> = ({ addresses, onEdit }
     <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <div className="px-6 py-5 flex justify-between items-center">
             <div>
-                <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Direcciones</h3>
+                <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
+                    <IconFA icon="map-location-dot" style='solid' className="mr-2" />
+                    Direcciones
+                </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Direcciones registradas del estudiante</p>
             </div>
             <Button

@@ -12,7 +12,10 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ student, onEd
     <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <div className="flex justify-between items-center p-6">
             <div>
-                <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Información Personal</h3>
+                <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
+                    <IconFA icon="address-card" className="mr-2" />
+                    Información Personal
+                </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Datos personales del estudiante</p>
             </div>
             <Button
