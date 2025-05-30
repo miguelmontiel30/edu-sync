@@ -106,6 +106,12 @@ const othersItems: NavItem[] = [
         icon: <IconFA icon="chart-mixed-up-circle-dollar" style="duotone" size="xl" />,
         subItems: [
             {
+                name: 'Dashboard Financiero',
+                path: '/admin-dashboard/admin-finance',
+                pro: false,
+                icon: 'chart-line',
+            },
+            {
                 name: 'Blank Page',
                 path: '/blank',
                 pro: false,
