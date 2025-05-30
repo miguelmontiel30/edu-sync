@@ -14,6 +14,7 @@ interface Tab {
 export default function useStudentProfileTabs() {
     // Estado para almacenar la pestaña activa
     const [activeTab, setActiveTab] = useState<string>('profile');
+    const [academicTab, setAcademicTab] = useState<string>('pending-tasks');
 
     // Definir las pestañas disponibles
     const tabs: Tab[] = [
@@ -26,14 +27,30 @@ export default function useStudentProfileTabs() {
         {id: 'downloads', label: 'Descargas', icon: 'download'},
     ];
 
+    // Definir las pestañas disponibles
+    const academicTabs: Tab[] = [
+        {id: 'pending-tasks', label: 'Tareas Pendientes', icon: 'tasks'},
+        {id: 'grades', label: 'Calificaciones', icon: 'chart-user'},
+        {id: 'attendance', label: 'Asistencia', icon: 'calendar-check'},
+        {id: 'group-history', label: 'Historial de Grupos', icon: 'rectangle-history-circle-user'},
+    ];
+
     // Función para cambiar la pestaña activa
     const changeTab = (tabId: string) => {
         setActiveTab(tabId);
+    };
+
+    // Función para cambiar la pestaña académica activa
+    const changeAcademicTab = (tabId: string) => {
+        setAcademicTab(tabId);
     };
 
     return {
         activeTab,
         changeTab,
         tabs,
+        academicTabs,
+        academicTab,
+        changeAcademicTab,
     };
 }
