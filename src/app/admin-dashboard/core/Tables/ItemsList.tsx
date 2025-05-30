@@ -48,6 +48,7 @@ export interface ItemsListProps<T extends BaseItem> {
     readonly actionButtons?: ActionButton[];
     readonly isLoading: boolean;
     readonly onAddNew?: () => void;
+    readonly onRowClick?: (item: T) => void;
     readonly config: ItemsListConfig<T>;
 }
 
@@ -57,6 +58,7 @@ export default function ItemsList<T extends BaseItem>({
     actionButtons = [],
     isLoading,
     onAddNew,
+    onRowClick,
     config
 }: ItemsListProps<T>) {
     const {
@@ -108,7 +110,10 @@ export default function ItemsList<T extends BaseItem>({
             header: 'Acciones',
             sortable: false,
             render: (item: T) => (
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <div
+                    className="flex flex-col sm:flex-row gap-2 justify-center"
+                    onClick={(e) => e.stopPropagation()} // Detiene la propagación en el contenedor
+                >
                     {actionButtons.map((button) => (
                         <Button
                             key={`${item[idField]}-${button.label}`}
@@ -153,6 +158,7 @@ export default function ItemsList<T extends BaseItem>({
                 itemsPerPage={itemsPerPage}
                 onSearch={handleSearch}
                 onSort={handleSort}
+                onRowClick={onRowClick}
             />
         </ComponentCard>
     );

@@ -28,7 +28,8 @@ export default function DataTable<T>({
     emptyStateComponent,
     loadingComponent,
     onSearch,
-    onSort
+    onSort,
+    onRowClick
 }: DataTableProps<T>) {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortField, setSortField] = useState<string | null>(defaultSortField || null);
@@ -194,7 +195,11 @@ export default function DataTable<T>({
                         <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                             {displayData.length > 0 ? (
                                 displayData.map((item) => (
-                                    <TableRow key={keyExtractor(item)}>
+                                    <TableRow 
+                                        key={keyExtractor(item)}
+                                        onClick={onRowClick ? () => onRowClick(item) : undefined}
+                                        className={onRowClick ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50' : ''}
+                                    >
                                         {columns.map((column) => (
                                             <TableCell
                                                 key={`${keyExtractor(item)}_${column.key.toString()}`}
