@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { EmergencyContact, MedicalInfo } from '../module-utils/types';
+import { EmergencyContact, MedicalInfo } from '../../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 import { IconFA } from '@/components/ui';
 

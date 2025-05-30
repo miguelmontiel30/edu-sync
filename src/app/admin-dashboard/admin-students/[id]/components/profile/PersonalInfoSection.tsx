@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '@/components/core/button/Button';
 import IconFA from '@/components/ui/IconFA';
-import { Student } from '../module-utils/types';
+import { Student } from '../../module-utils/types';
 
 interface PersonalInfoSectionProps {
     student: Student;

@@ -4,7 +4,7 @@ import { ProfileAvatar } from '@/components/core/avatar';
 import ComponentCard from '@/components/common/ComponentCard';
 
 // Types
-import { Student } from '../module-utils/types';
+import { Student } from '../../module-utils/types';
 
 /**
  * Componente para mostrar el encabezado del perfil del estudiante

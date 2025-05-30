@@ -284,3 +284,28 @@ export interface DocumentTemplate {
     description?: string;
     availableParams: string[];
 }
+
+// Agrego la nueva interfaz DetailedTask
+export interface DetailedTask {
+    id: string;
+    title: string;
+    subject: string;
+    description: string;
+    assignedDate: string;
+    dueDate: string;
+    status: 'pendiente' | 'en-progreso' | 'completada' | 'vencida';
+    type: 'academica' | 'material';
+    materials: string[];
+    teacherNotes?: string;
+    assignedBy: string;
+    priority: string;
+}
+
+/**
+ * Definición de tabs para la navegación
+ */
+export interface Tab {
+    id: string;
+    label: string;
+    icon?: string;
+}

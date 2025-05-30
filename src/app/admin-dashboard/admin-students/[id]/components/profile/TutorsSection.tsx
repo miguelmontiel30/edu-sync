@@ -2,11 +2,11 @@ import React from 'react';
 import IconFA from '@/components/ui/IconFA';
 import Button from '@/components/core/button/Button';
 import { ProfileAvatar } from '@/components/core/avatar';
-import { Tutor } from '../module-utils/types';
+import { Tutor } from '../../module-utils/types';
 
 interface TutorsSectionProps {
     tutors: Tutor[];
-    onAddTutor: () => void;
+    onAddTutor: (data?: any) => void;
     onViewTutorDetails: (tutorId: string) => void;
 }
 

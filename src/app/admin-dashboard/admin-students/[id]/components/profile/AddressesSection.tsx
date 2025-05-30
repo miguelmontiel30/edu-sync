@@ -1,14 +1,12 @@
-// Components
-import IconFA from '@/components/ui/IconFA';
-import Badge from '@/components/core/badge/Badge';
+import React from 'react';
 import Button from '@/components/core/button/Button';
-
-// Types
-import { Address } from '../module-utils/types';
+import IconFA from '@/components/ui/IconFA';
+import { Address } from '../../module-utils/types';
+import Badge from '@/components/core/badge/Badge';
 
 interface AddressesSectionProps {
     addresses: Address[];
-    onEdit: () => void;
+    onEdit: (data?: any) => void;
 }
 
 const AddressesSection: React.FC<AddressesSectionProps> = ({ addresses, onEdit }) => (
