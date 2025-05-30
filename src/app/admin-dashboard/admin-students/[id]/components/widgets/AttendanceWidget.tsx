@@ -1,7 +1,7 @@
 import React from 'react';
 import ComponentCard from '@/components/common/ComponentCard';
-import { calculateAttendanceRate, getColorByPercentage } from '../module-utils/utils';
-import { Attendance } from '../module-utils/types';
+import { calculateAttendanceRate, getColorByPercentage } from '../../module-utils/utils';
+import { Attendance } from '../../module-utils/types';
 
 interface AttendanceWidgetProps {
     attendance: Attendance[];
