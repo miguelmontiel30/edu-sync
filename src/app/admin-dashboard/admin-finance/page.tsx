@@ -17,7 +17,6 @@ import FinancialHealthMetrics from './components/FinancialHealthMetrics';
 import TransactionsTable from './components/TransactionsTable';
 import UpcomingPaymentsTable from './components/UpcomingPaymentsTable';
 import TopDebtorsTable from './components/TopDebtorsTable';
-import AlertsPanel from './components/AlertsPanel';
 
 // Hooks
 import { 
@@ -62,6 +61,7 @@ export default function FinanceDashboardPage() {
                 <QuickActions />
             </div>
 
+
             {/* KPI Cards */}
             <div className="mb-6">
                 <MetricsGroup
@@ -69,6 +69,7 @@ export default function FinanceDashboardPage() {
                     isLoading={isLoading}
                 />
             </div>
+
 
             {/* Gráficos */}
             <div className="mb-6">
@@ -108,10 +109,7 @@ export default function FinanceDashboardPage() {
                 />
             </div>
 
-            {/* Panel de Alertas */}
-            <div className="mb-6">
-                <AlertsPanel />
-            </div>
+            
         </div>
     );
 } 

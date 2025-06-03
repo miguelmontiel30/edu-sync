@@ -111,18 +111,7 @@ const othersItems: NavItem[] = [
                 pro: false,
                 icon: 'chart-line',
             },
-            {
-                name: 'Blank Page',
-                path: '/blank',
-                pro: false,
-                icon: 'file',
-            },
-            {
-                name: '404 Error',
-                path: '/error-404',
-                pro: false,
-                icon: 'triangle-exclamation',
-            },
+            
         ],
     },
     {
