@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dropdown } from '../ui/dropdown/Dropdown';
 import { DropdownItem } from '../ui/dropdown/DropdownItem';
 import ProfileAvatar from '../ui/ProfileAvatar';
@@ -26,6 +26,25 @@ interface NotificationData {
 export default function NotificationDropdown() {
     const [isOpen, setIsOpen] = useState(false);
     const [notifying, setNotifying] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Mover la función handleResize fuera del useEffect
+    const handleResize = () => {
+        setIsMobile(window.innerWidth < 768);
+    };
+
+    useEffect(() => {
+        // Verificar al montar
+        handleResize();
+        
+        // Agregar el event listener
+        window.addEventListener('resize', handleResize);
+        
+        // Limpiar el event listener al desmontar
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []); // Dependencias vacías para que solo se ejecute al montar/desmontar
 
     function toggleDropdown() {
         setIsOpen(!isOpen);
@@ -182,47 +201,48 @@ export default function NotificationDropdown() {
     const renderNotificationContent = (notification: NotificationData) => {
         if (notification.userRole && notification.userName) {
             return (
-                <span className="block">
-                    <span className="mb-1.5 block space-x-1 text-theme-sm text-gray-500 dark:text-gray-400">
-                        <span className="font-medium text-gray-800 dark:text-white/90">
-                            {notification.userName}
+                <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-800 dark:text-white/90 font-medium mb-1 break-words">
+                        <span className="font-semibold">{notification.userName}</span>
+                        {' '}{notification.message}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                        <span className="capitalize">
+                            {notification.userRole === 'student' ? 'Estudiante' : 
+                             notification.userRole === 'teacher' ? 'Profesor' : 'Administrador'}
                         </span>
-                        <span>{notification.message}</span>
-                    </span>
-                    <span className="flex items-center gap-2 text-theme-xs text-gray-500 dark:text-gray-400">
-                        <span className="capitalize">{notification.userRole === 'student' ? 'Estudiante' : notification.userRole === 'teacher' ? 'Profesor' : 'Administrador'}</span>
-                        <span className="h-1 w-1 rounded-full bg-gray-400"></span>
+                        <span className="h-1 w-1 rounded-full bg-gray-400 hidden sm:block"></span>
                         <span>{notification.timestamp}</span>
                         {!notification.isRead && (
                             <>
-                                <span className="h-1 w-1 rounded-full bg-gray-400"></span>
+                                <span className="h-1 w-1 rounded-full bg-gray-400 hidden sm:block"></span>
                                 <span className="text-info-500 font-medium">Nuevo</span>
                             </>
                         )}
-                    </span>
-                </span>
+                    </div>
+                </div>
             );
         } else {
             return (
-                <span className="block">
-                    <span className="mb-1.5 block text-theme-sm text-gray-800 dark:text-white/90 font-medium">
+                <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-800 dark:text-white/90 font-medium mb-1 break-words">
                         {notification.title}
-                    </span>
-                    <span className="mb-2 block text-theme-sm text-gray-500 dark:text-gray-400">
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 break-words">
                         {notification.message}
-                    </span>
-                    <span className="flex items-center gap-2 text-theme-xs text-gray-500 dark:text-gray-400">
+                    </p>
+                    <div className="flex flex-wrap items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                         <span>Sistema</span>
-                        <span className="h-1 w-1 rounded-full bg-gray-400"></span>
+                        <span className="h-1 w-1 rounded-full bg-gray-400 hidden sm:block"></span>
                         <span>{notification.timestamp}</span>
                         {!notification.isRead && (
                             <>
-                                <span className="h-1 w-1 rounded-full bg-gray-400"></span>
+                                <span className="h-1 w-1 rounded-full bg-gray-400 hidden sm:block"></span>
                                 <span className="text-info-500 font-medium">Nuevo</span>
                             </>
                         )}
-                    </span>
-                </span>
+                    </div>
+                </div>
             );
         }
     };
@@ -233,88 +253,121 @@ export default function NotificationDropdown() {
         <div className="relative">
             <button
                 type="button"
-                className="dropdown-toggle relative flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                className="dropdown-toggle relative flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
                 onClick={handleClick}
+                aria-label="Abrir notificaciones"
             >
                 {unreadCount > 0 && (
-                    <span className="absolute -right-1 -top-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white">
+                    <span className="absolute -right-1 -top-1 z-10 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white">
                         {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
+                    </span>
                 )}
-                <IconFA icon="bell" style="duotone" size="lg" />
+                <IconFA icon="bell" style="duotone" size={isMobile ? "sm" : "lg"} />
             </button>
             
             <Dropdown
                 isOpen={isOpen}
                 onClose={closeDropdown}
-                className="absolute -right-[240px] mt-[17px] flex h-[480px] w-[350px] flex-col rounded-2xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark sm:w-[361px] lg:right-0"
+                mobileFullScreen={true}
+                className="notifications-dropdown"
             >
-                <div className="mb-3 flex items-center justify-between border-b border-gray-100 pb-3 dark:border-gray-700">
-                    <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                        Notificaciones
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-gray-100 p-4 dark:border-gray-700">
+                    <div className="flex items-center gap-2">
+                        <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                            Notificaciones
+                        </h5>
                         {unreadCount > 0 && (
-                            <span className="ml-2 inline-flex items-center rounded-full bg-error-100 px-2.5 py-0.5 text-xs font-medium text-error-800 dark:bg-error-900/20 dark:text-error-400">
-                                {unreadCount} nuevas
+                            <span className="inline-flex items-center rounded-full bg-error-100 px-2 py-0.5 text-xs font-medium text-error-800 dark:bg-error-900/20 dark:text-error-400">
+                                {unreadCount} nueva{unreadCount !== 1 ? 's' : ''}
                             </span>
                         )}
-                    </h5>
+                    </div>
                     <button
                         type="button"
-                        onClick={toggleDropdown}
-                        className="dropdown-toggle text-gray-500 transition hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        onClick={closeDropdown}
+                        className="p-1 text-gray-500 transition hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        aria-label="Cerrar notificaciones"
                     >
-                        <IconFA icon="times" style="duotone" />
+                        <IconFA icon="times" style="duotone" size="sm" />
                     </button>
                 </div>
                 
-                <ul className="custom-scrollbar flex h-auto flex-col overflow-y-auto">
-                    {notifications.map((notification) => (
-                        <li key={notification.id}>
-                        <DropdownItem
-                            onItemClick={closeDropdown}
-                                className={`flex gap-3 rounded-lg border-b border-gray-100 p-3 px-4.5 py-3 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-white/5 ${!notification.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
-                            >
-                                {/* Avatar o Icono */}
-                                <div className="flex-shrink-0">
-                                    {notification.userRole && notification.userName ? (
-                                        <ProfileAvatar 
-                                            size="sm" 
-                                            name={notification.userName}
-                                            showStatus={true}
-                                            status="online"
-                                        />
-                                    ) : (
-                                        <div className={`flex h-10 w-10 items-center justify-center rounded-full ${getNotificationBgColor(notification.type, notification.priority)}`}>
-                                            <IconFA 
-                                                icon={getNotificationIcon(notification.type)} 
-                                                style="duotone" 
-                                                className={getNotificationIconColor(notification.type, notification.priority)}
-                                            />
+                {/* Lista de notificaciones */}
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                    {notifications.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                            <IconFA icon="bell-slash" className="h-8 w-8 text-gray-400 mb-2" />
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                                No hay notificaciones
+                            </p>
+                        </div>
+                    ) : (
+                        <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+                            {notifications.map((notification) => (
+                                <li key={notification.id}>
+                                    <DropdownItem
+                                        onItemClick={closeDropdown}
+                                        className={`flex gap-3 p-3 sm:p-4 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors ${
+                                            !notification.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''
+                                        }`}
+                                    >
+                                        {/* Avatar o Icono */}
+                                        <div className="flex-shrink-0">
+                                            {notification.userRole && notification.userName ? (
+                                                <ProfileAvatar 
+                                                    size="sm" 
+                                                    name={notification.userName}
+                                                    showStatus={true}
+                                                    status="online"
+                                                />
+                                            ) : (
+                                                <div className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full ${getNotificationBgColor(notification.type, notification.priority)}`}>
+                                                    <IconFA 
+                                                        icon={getNotificationIcon(notification.type)} 
+                                                        style="duotone" 
+                                                        size="sm"
+                                                        className={getNotificationIconColor(notification.type, notification.priority)}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
 
-                                {/* Contenido de la notificación */}
-                                {renderNotificationContent(notification)}
-                        </DropdownItem>
-                    </li>
-                    ))}
-                </ul>
+                                        {/* Contenido de la notificación */}
+                                        {renderNotificationContent(notification)}
+
+                                        {/* Indicador de no leída */}
+                                        {!notification.isRead && (
+                                            <div className="flex-shrink-0 self-start pt-2">
+                                                <div className="h-2 w-2 rounded-full bg-info-500"></div>
+                                            </div>
+                                        )}
+                                    </DropdownItem>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
                 
-                <div className="mt-3 flex gap-2">
-                <Link
-                        href="/notifications"
-                        className="flex-1 block rounded-lg border border-gray-300 bg-white px-4 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
-                >
-                        Ver Todas
-                </Link>
-                    <button
-                        type="button"
-                        className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
-                    >
-                        <IconFA icon="check-double" style="duotone" className="mr-1" />
-                        Marcar como leídas
-                    </button>
+                {/* Footer con acciones */}
+                <div className="border-t border-gray-100 p-3 sm:p-4 dark:border-gray-700">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+                        <Link
+                            href="/notifications"
+                            onClick={closeDropdown}
+                            className="flex-1 block rounded-lg border border-gray-300 bg-white px-3 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+                        >
+                            Ver Todas
+                        </Link>
+                        <button
+                            type="button"
+                            className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+                        >
+                            <IconFA icon="check-double" style="duotone" size="sm" />
+                            <span className="hidden sm:inline">Marcar como leídas</span>
+                            <span className="sm:hidden">Marcar leídas</span>
+                        </button>
+                    </div>
                 </div>
             </Dropdown>
         </div>

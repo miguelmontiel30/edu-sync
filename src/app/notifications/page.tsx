@@ -251,13 +251,13 @@ export default function NotificationsPage() {
         const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
         if (diffInMinutes < 60) {
-            return `${diffInMinutes} minutos`;
+            return `${diffInMinutes} min`;
         } else if (diffInHours < 24) {
-            return `${diffInHours} hora${diffInHours !== 1 ? 's' : ''}`;
+            return `${diffInHours}h`;
         } else if (diffInDays === 1) {
             return 'Ayer';
         } else if (diffInDays < 7) {
-            return `${diffInDays} días`;
+            return `${diffInDays}d`;
         } else {
             return date.toLocaleDateString('es-ES', { 
                 day: 'numeric', 
@@ -369,108 +369,110 @@ export default function NotificationsPage() {
     };
 
     return (
-        <div>
+        <div className="space-y-4 sm:space-y-6">
             <PageBreadcrumb pageTitle="Centro de Notificaciones" />
 
             {/* Header con estadísticas */}
-            <div className="mb-6">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <IconFA icon="bell" className="h-6 w-6 text-gray-400" />
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Total</p>
-                                <p className="text-2xl font-semibold text-gray-900 dark:text-white">{stats.total}</p>
-                            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+                <div className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4 dark:border-gray-800 dark:bg-gray-900">
+                    <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                            <IconFA icon="bell" className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400" />
+                        </div>
+                        <div className="ml-2 sm:ml-3 min-w-0 flex-1">
+                            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total</p>
+                            <p className="text-lg sm:text-2xl font-semibold text-gray-900 dark:text-white">{stats.total}</p>
                         </div>
                     </div>
+                </div>
 
-                    <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <IconFA icon="envelope" className="h-6 w-6 text-info-500" />
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No leídas</p>
-                                <p className="text-2xl font-semibold text-info-600 dark:text-info-400">{stats.unread}</p>
-                            </div>
+                <div className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4 dark:border-gray-800 dark:bg-gray-900">
+                    <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                            <IconFA icon="envelope" className="h-5 w-5 sm:h-6 sm:w-6 text-info-500" />
+                        </div>
+                        <div className="ml-2 sm:ml-3 min-w-0 flex-1">
+                            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">No leídas</p>
+                            <p className="text-lg sm:text-2xl font-semibold text-info-600 dark:text-info-400">{stats.unread}</p>
                         </div>
                     </div>
+                </div>
 
-                    <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <IconFA icon="exclamation-triangle" className="h-6 w-6 text-error-500" />
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Urgentes</p>
-                                <p className="text-2xl font-semibold text-error-600 dark:text-error-400">{stats.high}</p>
-                            </div>
+                <div className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4 dark:border-gray-800 dark:bg-gray-900">
+                    <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                            <IconFA icon="exclamation-triangle" className="h-5 w-5 sm:h-6 sm:w-6 text-error-500" />
+                        </div>
+                        <div className="ml-2 sm:ml-3 min-w-0 flex-1">
+                            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Urgentes</p>
+                            <p className="text-lg sm:text-2xl font-semibold text-error-600 dark:text-error-400">{stats.high}</p>
                         </div>
                     </div>
+                </div>
 
-                    <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <IconFA icon="tasks" className="h-6 w-6 text-warning-500" />
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Acción requerida</p>
-                                <p className="text-2xl font-semibold text-warning-600 dark:text-warning-400">{stats.actionRequired}</p>
-                            </div>
+                <div className="rounded-lg border border-gray-200 bg-white p-3 sm:p-4 dark:border-gray-800 dark:bg-gray-900">
+                    <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                            <IconFA icon="tasks" className="h-5 w-5 sm:h-6 sm:w-6 text-warning-500" />
+                        </div>
+                        <div className="ml-2 sm:ml-3 min-w-0 flex-1">
+                            <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Acción req.</p>
+                            <p className="text-lg sm:text-2xl font-semibold text-warning-600 dark:text-warning-400">{stats.actionRequired}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Filtros y acciones */}
-            <ComponentCard className="mb-6">
-                <div className="flex flex-col space-y-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            <ComponentCard>
+                <div className="flex flex-col space-y-4 p-4 sm:p-6">
                     {/* Filtros */}
-                    <div className="flex flex-wrap gap-2">
-                        {filters.map((filter) => (
-                            <button
-                                key={filter.key}
-                                onClick={() => setActiveFilter(filter.key)}
-                                className={cn(
-                                    "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-                                    activeFilter === filter.key
-                                        ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400"
-                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                                )}
-                            >
-                                {filter.label}
-                                <span className={cn(
-                                    "ml-2 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold",
-                                    activeFilter === filter.key
-                                        ? "bg-indigo-200 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-200"
-                                        : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                                )}>
-                                    {filter.count}
-                                </span>
-                            </button>
-                        ))}
+                    <div className="overflow-x-auto pb-2">
+                        <div className="flex gap-2 min-w-max">
+                            {filters.map((filter) => (
+                                <button
+                                    key={filter.key}
+                                    onClick={() => setActiveFilter(filter.key)}
+                                    className={cn(
+                                        "inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap",
+                                        activeFilter === filter.key
+                                            ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400"
+                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                    )}
+                                >
+                                    {filter.label}
+                                    <span className={cn(
+                                        "ml-2 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold",
+                                        activeFilter === filter.key
+                                            ? "bg-indigo-200 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-200"
+                                            : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                                    )}>
+                                        {filter.count}
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Acciones */}
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                         <button
                             onClick={markAllAsRead}
-                            className="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                            className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                         >
                             <IconFA icon="check-double" className="mr-2 h-4 w-4" />
-                            Marcar todas como leídas
+                            <span className="hidden sm:inline">Marcar todas como leídas</span>
+                            <span className="sm:hidden">Marcar todas</span>
                         </button>
                         
                         {selectedNotifications.length > 0 && (
                             <button
                                 onClick={() => markAsRead(selectedNotifications)}
-                                className="inline-flex items-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                                className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors dark:bg-indigo-500 dark:hover:bg-indigo-600"
                             >
                                 <IconFA icon="check" className="mr-2 h-4 w-4" />
-                                Marcar seleccionadas ({selectedNotifications.length})
+                                <span className="hidden sm:inline">Marcar seleccionadas ({selectedNotifications.length})</span>
+                                <span className="sm:hidden">Marcar ({selectedNotifications.length})</span>
                             </button>
                         )}
                     </div>
@@ -479,10 +481,10 @@ export default function NotificationsPage() {
 
             {/* Lista de notificaciones */}
             <ComponentCard>
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                     {Object.keys(groupedNotifications).length === 0 ? (
-                        <div className="py-12 text-center">
-                            <IconFA icon="bell-slash" className="mx-auto h-12 w-12 text-gray-400" />
+                        <div className="py-8 sm:py-12 text-center">
+                            <IconFA icon="bell-slash" className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" />
                             <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No hay notificaciones</h3>
                             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                 No se encontraron notificaciones con los filtros aplicados.
@@ -505,12 +507,12 @@ export default function NotificationsPage() {
                                     </div>
 
                                     {/* Lista de notificaciones del día */}
-                                    <div className="mt-4 space-y-3">
+                                    <div className="mt-4 space-y-2 sm:space-y-3">
                                         {notifications.map((notification) => (
                                             <div
                                                 key={notification.id}
                                                 className={cn(
-                                                    "flex items-start space-x-4 rounded-lg border p-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50",
+                                                    "flex items-start space-x-3 sm:space-x-4 rounded-lg border p-3 sm:p-4 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50",
                                                     !notification.isRead 
                                                         ? "border-indigo-200 bg-indigo-50/50 dark:border-indigo-800/50 dark:bg-indigo-900/10" 
                                                         : "border-gray-200 dark:border-gray-700"
@@ -537,12 +539,13 @@ export default function NotificationsPage() {
                                                         />
                                                     ) : (
                                                         <div className={cn(
-                                                            "flex h-10 w-10 items-center justify-center rounded-full",
+                                                            "flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full",
                                                             getNotificationBgColor(notification.type, notification.priority)
                                                         )}>
                                                             <IconFA 
                                                                 icon={getNotificationIcon(notification.type)} 
                                                                 style="duotone" 
+                                                                size="sm"
                                                                 className={getNotificationIconColor(notification.type, notification.priority)}
                                                             />
                                                         </div>
@@ -552,8 +555,8 @@ export default function NotificationsPage() {
                                                 {/* Contenido */}
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-start justify-between">
-                                                        <div className="flex-1">
-                                                            <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-medium text-gray-900 dark:text-white break-words">
                                                                 {notification.userName ? (
                                                                     <>
                                                                         <span className="font-semibold">{notification.userName}</span>
@@ -565,28 +568,29 @@ export default function NotificationsPage() {
                                                             </p>
                                                             
                                                             {!notification.userName && (
-                                                                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                                                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 break-words">
                                                                     {notification.message}
                                                                 </p>
                                                             )}
 
                                                             {/* Metadata */}
                                                             {notification.metadata && (
-                                                                <div className="mt-2 flex flex-wrap gap-2">
+                                                                <div className="mt-2 flex flex-wrap gap-1 sm:gap-2">
                                                                     {notification.metadata.subject && (
-                                                                        <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                                                                        <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
                                                                             <IconFA icon="book" className="mr-1 h-3 w-3" />
-                                                                            {notification.metadata.subject}
+                                                                            <span className="hidden sm:inline">{notification.metadata.subject}</span>
+                                                                            <span className="sm:hidden">{notification.metadata.subject.split(' ')[0]}</span>
                                                                         </span>
                                                                     )}
                                                                     {notification.metadata.amount && (
-                                                                        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">
+                                                                        <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-400">
                                                                             <IconFA icon="dollar-sign" className="mr-1 h-3 w-3" />
                                                                             {notification.metadata.amount}
                                                                         </span>
                                                                     )}
                                                                     {notification.metadata.grade && (
-                                                                        <span className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
+                                                                        <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
                                                                             <IconFA icon="star" className="mr-1 h-3 w-3" />
                                                                             {notification.metadata.grade}
                                                                         </span>
@@ -595,31 +599,34 @@ export default function NotificationsPage() {
                                                             )}
 
                                                             {/* Footer */}
-                                                            <div className="mt-2 flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                                            <div className="mt-2 flex flex-wrap items-center gap-1 sm:gap-3 text-xs text-gray-500 dark:text-gray-400">
                                                                 <span className="capitalize">
                                                                     {notification.userRole === 'student' ? 'Estudiante' : 
                                                                      notification.userRole === 'teacher' ? 'Profesor' : 
-                                                                     notification.userRole === 'admin' ? 'Administrador' : 'Sistema'}
+                                                                     notification.userRole === 'admin' ? 'Admin' : 'Sistema'}
                                                                 </span>
-                                                                <span>•</span>
+                                                                <span className="hidden sm:inline">•</span>
                                                                 <span>{getRelativeTime(notification.timestamp)}</span>
                                                                 {!notification.isRead && (
                                                                     <>
-                                                                        <span>•</span>
+                                                                        <span className="hidden sm:inline">•</span>
                                                                         <span className="font-medium text-indigo-600 dark:text-indigo-400">Nueva</span>
                                                                     </>
                                                                 )}
                                                                 {notification.actionRequired && (
                                                                     <>
-                                                                        <span>•</span>
-                                                                        <span className="font-medium text-warning-600 dark:text-warning-400">Acción requerida</span>
+                                                                        <span className="hidden sm:inline">•</span>
+                                                                        <span className="font-medium text-warning-600 dark:text-warning-400">
+                                                                            <span className="hidden sm:inline">Acción requerida</span>
+                                                                            <span className="sm:hidden">Acción req.</span>
+                                                                        </span>
                                                                     </>
                                                                 )}
                                                             </div>
                                                         </div>
 
                                                         {/* Indicadores laterales */}
-                                                        <div className="flex flex-col items-end space-y-1">
+                                                        <div className="flex flex-col items-end space-y-1 ml-2">
                                                             {/* Prioridad */}
                                                             <div className={cn(
                                                                 "h-2 w-2 rounded-full",
