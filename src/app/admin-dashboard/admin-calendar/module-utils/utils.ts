@@ -78,7 +78,12 @@ export function processEvents(events: any[]): CalendarEvent[] {
         const processedEvent: CalendarEvent = {
             id: event.id?.toString() || event.event_id?.toString(),
             title: event.title,
-            allDay: true, // Siempre marcar como evento de todo el día
+            description: event.description || '',
+            created_by: (event.created_by || 0).toString(),
+            school_id: (event.school_id || 0).toString(),
+            school_year_id: (event.school_year_id || 0).toString(),
+            event_type_id: (event.event_type_id || 0).toString(),
+            allDay: true,
             extendedProps: {
                 ...event.extendedProps,
                 calendar: event.extendedProps?.calendar || 'primary',
@@ -198,7 +203,12 @@ export function mapDatabaseEventsToCalendarEvents(dbEvents: DatabaseEvent[]): Ca
                 title: event.title,
                 start: startDate, // Fecha de inicio corregida
                 end: endDate, // Fecha de fin corregida
-                allDay: true, // Marcar siempre como evento de todo el día para evitar problemas de zona horaria
+                description: event.description || '',
+                created_by: (event.created_by || 0).toString(),
+                school_id: (event.school_id || 0).toString(),
+                school_year_id: (event.school_year_id || 0).toString(),
+                event_type_id: (event.event_type_id || 0).toString(),
+                allDay: true,
                 extendedProps: {
                     calendar: calendarColor,
                     event_type_id: event.event_type_id,
@@ -216,6 +226,11 @@ export function mapDatabaseEventsToCalendarEvents(dbEvents: DatabaseEvent[]): Ca
                 id: event.event_id.toString(),
                 title: event.title || 'Evento sin título',
                 start: new Date().toISOString().split('T')[0] + 'T00:00:00Z', // Fecha actual como fallback, corregida
+                description: '',
+                created_by: '0',
+                school_id: '0',
+                school_year_id: '0',
+                event_type_id: '0',
                 allDay: true,
                 extendedProps: {
                     calendar: 'primary',
