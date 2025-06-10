@@ -9,7 +9,7 @@ interface FiltersBarProps {
     isLoading: boolean;
 }
 
-const FiltersBar: React.FC<FiltersBarProps> = ({ filters, onFilterChange, isLoading }) => {
+const FiltersBar: React.FC<FiltersBarProps> = ({ filters, onFilterChange, isLoading: _isLoading }) => {
     // Opciones para selectores
     const dateRangeOptions = [
         {

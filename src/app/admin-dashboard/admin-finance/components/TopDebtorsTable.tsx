@@ -41,10 +41,10 @@ const TopDebtorsTable: React.FC<TopDebtorsTableProps> = ({ debtors, isLoading })
             width: '120px',
             render: () => (
                 <div className="flex space-x-2">
-                    <button className="text-blue-500 hover:text-blue-700">
+                    <button type="button" className="text-blue-500 hover:text-blue-700">
                         <IconFA icon="envelope" style="duotone" />
                     </button>
-                    <button className="text-green-500 hover:text-green-700">
+                    <button type="button" className="text-green-500 hover:text-green-700">
                         <IconFA icon="phone" style="duotone" />
                     </button>
                 </div>
@@ -59,7 +59,7 @@ const TopDebtorsTable: React.FC<TopDebtorsTableProps> = ({ debtors, isLoading })
                 columns={debtorsColumns}
                 keyExtractor={(item) => item.id.toString()}
                 isLoading={isLoading}
-                searchable={true}
+                searchable
                 searchPlaceholder="Buscar deudores..."
             />
         </ComponentCard>

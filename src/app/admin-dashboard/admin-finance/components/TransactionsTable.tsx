@@ -62,10 +62,10 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactions, isL
             width: '100px',
             render: () => (
                 <div className="flex space-x-2">
-                    <button className="text-blue-500 hover:text-blue-700">
+                    <button type="button" className="text-blue-500 hover:text-blue-700">
                         <IconFA icon="eye" style="duotone" />
                     </button>
-                    <button className="text-green-500 hover:text-green-700">
+                    <button type="button" className="text-green-500 hover:text-green-700">
                         <IconFA icon="print" style="duotone" />
                     </button>
                 </div>
@@ -80,7 +80,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactions, isL
                 columns={transactionsColumns}
                 keyExtractor={(item) => item.id.toString()}
                 isLoading={isLoading}
-                searchable={true}
+                searchable
                 searchPlaceholder="Buscar transacciones..."
             />
         </ComponentCard>

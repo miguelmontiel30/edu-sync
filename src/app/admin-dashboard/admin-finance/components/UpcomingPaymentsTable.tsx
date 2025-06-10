@@ -54,10 +54,10 @@ const UpcomingPaymentsTable: React.FC<UpcomingPaymentsTableProps> = ({ payments,
             width: '120px',
             render: () => (
                 <div className="flex space-x-2">
-                    <button className="text-green-500 hover:text-green-700">
+                    <button type="button" className="text-green-500 hover:text-green-700">
                         <IconFA icon="check-circle" style="duotone" />
                     </button>
-                    <button className="text-blue-500 hover:text-blue-700">
+                    <button type="button" className="text-blue-500 hover:text-blue-700">
                         <IconFA icon="calendar-plus" style="duotone" />
                     </button>
                 </div>
@@ -72,7 +72,7 @@ const UpcomingPaymentsTable: React.FC<UpcomingPaymentsTableProps> = ({ payments,
                 columns={paymentsColumns}
                 keyExtractor={(item) => item.id.toString()}
                 isLoading={isLoading}
-                searchable={true}
+                searchable
                 searchPlaceholder="Buscar vencimientos..."
             />
         </ComponentCard>
