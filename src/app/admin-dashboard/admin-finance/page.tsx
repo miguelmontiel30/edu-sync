@@ -2,12 +2,12 @@
 
 // Components
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-import ComponentCard from '@/components/common/ComponentCard';
+// import ComponentCard from '@/components/common/ComponentCard'; // Removed unused import
 
 // Core
 import MetricsGroup from '../core/Metrics/MetricsGroup';
-import Button from '@/components/core/button/Button';
-import IconFA from '@/components/ui/IconFA';
+// import Button from '@/components/core/button/Button'; // Removed unused import
+// import IconFA from '@/components/ui/IconFA'; // Removed unused import
 
 // Module Components
 import FinancialCharts from './components/FinancialCharts';
