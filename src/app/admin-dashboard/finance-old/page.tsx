@@ -19,7 +19,7 @@ import SelectWithCategories from '@/components/core/select/SelectWithCategories'
 
 // Types
 import { ApexOptions } from 'apexcharts';
-import { Column, SortDirection } from '@/components/core/table/module-utils/types';
+import { Column } from '@/components/core/table/module-utils/types';
 
 // Importación dinámica para evitar errores de SSR
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -390,10 +390,10 @@ export default function FinanceDashboardPage() {
             width: '100px',
             render: () => (
                 <div className="flex space-x-2">
-                    <button className="text-blue-500 hover:text-blue-700">
+                    <button type="button" className="text-blue-500 hover:text-blue-700">
                         <IconFA icon="eye" style="duotone" />
                     </button>
-                    <button className="text-green-500 hover:text-green-700">
+                    <button type="button" className="text-green-500 hover:text-green-700">
                         <IconFA icon="print" style="duotone" />
                     </button>
                 </div>
@@ -430,10 +430,10 @@ export default function FinanceDashboardPage() {
             width: '120px',
             render: () => (
                 <div className="flex space-x-2">
-                    <button className="text-green-500 hover:text-green-700">
+                    <button type="button" className="text-green-500 hover:text-green-700">
                         <IconFA icon="check-circle" style="duotone" />
                     </button>
-                    <button className="text-blue-500 hover:text-blue-700">
+                    <button type="button" className="text-blue-500 hover:text-blue-700">
                         <IconFA icon="calendar-plus" style="duotone" />
                     </button>
                 </div>
@@ -462,10 +462,10 @@ export default function FinanceDashboardPage() {
             width: '120px',
             render: () => (
                 <div className="flex space-x-2">
-                    <button className="text-blue-500 hover:text-blue-700">
+                    <button type="button" className="text-blue-500 hover:text-blue-700">
                         <IconFA icon="envelope" style="duotone" />
                     </button>
-                    <button className="text-green-500 hover:text-green-700">
+                    <button type="button" className="text-green-500 hover:text-green-700">
                         <IconFA icon="phone" style="duotone" />
                     </button>
                 </div>
@@ -690,7 +690,7 @@ export default function FinanceDashboardPage() {
                         columns={transactionsColumns}
                         keyExtractor={(item) => item.id.toString()}
                         isLoading={isLoading}
-                        searchable={true}
+                        searchable
                         searchPlaceholder="Buscar transacciones..."
                     />
                 </ComponentCard>
@@ -703,7 +703,7 @@ export default function FinanceDashboardPage() {
                         columns={upcomingPaymentsColumns}
                         keyExtractor={(item) => item.id.toString()}
                         isLoading={isLoading}
-                        searchable={true}
+                        searchable
                         searchPlaceholder="Buscar vencimientos..."
                     />
                 </ComponentCard>
@@ -714,7 +714,7 @@ export default function FinanceDashboardPage() {
                         columns={topDebtorsColumns}
                         keyExtractor={(item) => item.id.toString()}
                         isLoading={isLoading}
-                        searchable={true}
+                        searchable
                         searchPlaceholder="Buscar deudores..."
                     />
                 </ComponentCard>

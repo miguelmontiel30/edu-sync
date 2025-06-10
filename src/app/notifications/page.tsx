@@ -431,6 +431,7 @@ export default function NotificationsPage() {
                         <div className="flex gap-2 min-w-max">
                             {filters.map((filter) => (
                                 <button
+                                    type="button"
                                     key={filter.key}
                                     onClick={() => setActiveFilter(filter.key)}
                                     className={cn(
@@ -457,6 +458,7 @@ export default function NotificationsPage() {
                     {/* Acciones */}
                     <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                         <button
+                            type="button"
                             onClick={markAllAsRead}
                             className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                         >
@@ -467,6 +469,7 @@ export default function NotificationsPage() {
                         
                         {selectedNotifications.length > 0 && (
                             <button
+                                type="button"
                                 onClick={() => markAsRead(selectedNotifications)}
                                 className="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors dark:bg-indigo-500 dark:hover:bg-indigo-600"
                             >
@@ -534,7 +537,7 @@ export default function NotificationsPage() {
                                                         <ProfileAvatar 
                                                             size="sm" 
                                                             name={notification.userName}
-                                                            showStatus={true}
+                                                            showStatus
                                                             status="online"
                                                         />
                                                     ) : (
