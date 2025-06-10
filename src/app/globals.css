@@ -9,6 +9,14 @@
   }
 }
 
+/* Flexbox layout fixes for dropdown */
+.dropdown-flex-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
 /* Safe area for mobile */
 .pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
