@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import ComponentCard from '@/components/common/ComponentCard';
 import Button from '@/components/core/button/Button';
 import IconFA from '@/components/ui/IconFA';
