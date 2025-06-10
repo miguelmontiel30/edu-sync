@@ -111,7 +111,12 @@ const othersItems: NavItem[] = [
                 pro: false,
                 icon: 'chart-line',
             },
-            
+            {
+                name: 'Gestión de Pagos',
+                path: '/admin-dashboard/admin-finance/admin-payments',
+                pro: false,
+                icon: 'money-bill',
+            },
         ],
     },
     {

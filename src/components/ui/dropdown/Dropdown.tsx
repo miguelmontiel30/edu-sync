@@ -22,13 +22,13 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(globalThis.innerWidth < 768);
     };
 
     // Verificar al montar
     handleResize();
     
-    window.addEventListener('resize', handleResize);
+    globalThis.addEventListener('resize', handleResize);
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -57,7 +57,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
     }
     
     return () => {
-      window.removeEventListener('resize', handleResize);
+      globalThis.removeEventListener('resize', handleResize);
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscapeKey);
       
@@ -84,10 +84,10 @@ export const Dropdown: React.FC<DropdownProps> = ({
         className={`
           ${isMobile ? 
             mobileFullScreen ?
-              'fixed inset-x-4 bottom-4 top-20 max-h-[calc(100vh-6rem)]' :
+              'fixed inset-x-4 bottom-4 top-20 h-[calc(100vh-6rem)]' :
               'fixed left-4 right-4 top-16 max-h-[calc(100vh-5rem)]'
             : 
-            'absolute right-0 mt-2 max-h-96'
+            'absolute right-0 mt-2 h-96 max-h-96'
           }
           z-50 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl
           dark:border-gray-800 dark:bg-gray-900
@@ -95,7 +95,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
           ${className}
         `}
       >
-        {/* Contenido con scroll personalizado */}
+        {/* Contenido con estructura flex que permite scroll interno */}
         <div className={`h-full flex flex-col ${isMobile ? 'pb-safe' : ''}`}>
           {children}
         </div>

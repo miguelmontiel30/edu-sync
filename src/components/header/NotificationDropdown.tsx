@@ -25,12 +25,12 @@ interface NotificationData {
 
 export default function NotificationDropdown() {
     const [isOpen, setIsOpen] = useState(false);
-    const [notifying, setNotifying] = useState(true);
+    const [_notifying, setNotifying] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
 
     // Mover la función handleResize fuera del useEffect
     const handleResize = () => {
-        setIsMobile(window.innerWidth < 768);
+        setIsMobile(globalThis.innerWidth < 768);
     };
 
     useEffect(() => {
@@ -38,11 +38,11 @@ export default function NotificationDropdown() {
         handleResize();
         
         // Agregar el event listener
-        window.addEventListener('resize', handleResize);
+        globalThis.addEventListener('resize', handleResize);
         
         // Limpiar el event listener al desmontar
         return () => {
-            window.removeEventListener('resize', handleResize);
+            globalThis.removeEventListener('resize', handleResize);
         };
     }, []); // Dependencias vacías para que solo se ejecute al montar/desmontar
 
@@ -204,7 +204,7 @@ export default function NotificationDropdown() {
                 <div className="flex-1 min-w-0">
                     <p className="text-sm text-gray-800 dark:text-white/90 font-medium mb-1 break-words">
                         <span className="font-semibold">{notification.userName}</span>
-                        {' '}{notification.message}
+                         {notification.message}
                     </p>
                     <div className="flex flex-wrap items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                         <span className="capitalize">
@@ -268,11 +268,11 @@ export default function NotificationDropdown() {
             <Dropdown
                 isOpen={isOpen}
                 onClose={closeDropdown}
-                mobileFullScreen={true}
+                mobileFullScreen
                 className="notifications-dropdown"
             >
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-gray-100 p-4 dark:border-gray-700">
+                <div className="flex-shrink-0 flex items-center justify-between border-b border-gray-100 p-4 dark:border-gray-700">
                     <div className="flex items-center gap-2">
                         <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                             Notificaciones
@@ -293,8 +293,8 @@ export default function NotificationDropdown() {
                     </button>
                 </div>
                 
-                {/* Lista de notificaciones */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                {/* Lista de notificaciones con scroll */}
+                <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
                     {notifications.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
                             <IconFA icon="bell-slash" className="h-8 w-8 text-gray-400 mb-2" />
@@ -318,7 +318,7 @@ export default function NotificationDropdown() {
                                                 <ProfileAvatar 
                                                     size="sm" 
                                                     name={notification.userName}
-                                                    showStatus={true}
+                                                    showStatus
                                                     status="online"
                                                 />
                                             ) : (
@@ -350,7 +350,7 @@ export default function NotificationDropdown() {
                 </div>
                 
                 {/* Footer con acciones */}
-                <div className="border-t border-gray-100 p-3 sm:p-4 dark:border-gray-700">
+                <div className="flex-shrink-0 border-t border-gray-100 p-3 sm:p-4 dark:border-gray-700">
                     <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
                         <Link
                             href="/notifications"
