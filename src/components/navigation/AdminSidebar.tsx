@@ -106,16 +106,16 @@ const othersItems: NavItem[] = [
         icon: <IconFA icon="chart-mixed-up-circle-dollar" style="duotone" size="xl" />,
         subItems: [
             {
-                name: 'Dashboard Financiero',
-                path: '/admin-dashboard/admin-finance',
+                name: 'Blank Page',
+                path: '/blank',
                 pro: false,
-                icon: 'chart-line',
+                icon: 'file',
             },
             {
-                name: 'Gestión de Pagos',
-                path: '/admin-dashboard/admin-finance/admin-payments',
+                name: '404 Error',
+                path: '/error-404',
                 pro: false,
-                icon: 'money-bill',
+                icon: 'triangle-exclamation',
             },
         ],
     },
