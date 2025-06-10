@@ -14,7 +14,7 @@ export function useFinancialData() {
 
     // Cargar datos basados en filtros
     useEffect(() => {
-        const loadData = async () => {
+        const loadData = () => {
             setIsLoading(true);
             
             // Simular carga de datos
