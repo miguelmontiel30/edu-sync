@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import IconFA from '@/components/ui/IconFA';
 import Button from '@/components/core/button/Button';
-import { NotificationBadge } from '@/components/ui';
+import NotificationBadge from '@/components/ui/NotificationBadge';
 import { DetailedTask } from '../../module-utils/types';
 
 interface PendingTasksListProps {

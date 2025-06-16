@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TabsList, TabsRoot, TabsTrigger, TabsContent } from '@/components/core/tabs';
-import { NotificationBadge } from '@/components/ui';
+import NotificationBadge from '@/components/ui/NotificationBadge';
 import IconFA from '@/components/ui/IconFA';
 import TasksWidget from '../components/widgets/PendingTasksWidget';
 import AttendanceWidget from '../components/widgets/AttendanceWidget';

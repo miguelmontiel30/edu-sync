@@ -13,7 +13,7 @@ import IconFA from '@/components/ui/IconFA';
 import Button from '@/components/core/button/Button';
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import { TabsList, TabsRoot, TabsTrigger, TabsContent } from '@/components/core/tabs';
-import { NotificationBadge } from '@/components/ui';
+import NotificationBadge from '@/components/ui/NotificationBadge';
 
 // Tab Components
 import ProfileTab from './tabs/ProfileTab';

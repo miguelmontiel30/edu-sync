@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Message, MessageType } from '../module-utils/types';
+import { Message, MessageType } from '../../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
-import { IconFA, NotificationBadge } from '@/components/ui';
+import IconFA from '@/components/ui/IconFA';
+import NotificationBadge from '@/components/ui/NotificationBadge';
 
 interface CommunicationsSectionProps {
     messages: Message[];
