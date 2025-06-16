@@ -39,7 +39,8 @@ export function mapEventColor(color: string | number): string {
             if (g > r && g > b) return 'success'; // Verde predominante
             if (b > r && b > g) return 'primary'; // Azul predominante
             if (r > 200 && g > 150 && b < 100) return 'warning'; // Tonos amarillos/naranjas
-        } catch (_e) {
+        } catch (e) {
+            console.error('Error:', e);
             console.error('Error al procesar color:', color);
         }
     }
@@ -72,6 +73,7 @@ function correctUTCDate(dateStr: string): string {
 /**
  * Procesa los eventos para asegurar que todas las fechas sean interpretadas correctamente
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function processEvents(events: any[]): CalendarEvent[] {
     return events.map(event => {
         // Asegurarnos de que todas las fechas sean interpretadas correctamente
@@ -245,6 +247,7 @@ export function mapDatabaseEventsToCalendarEvents(dbEvents: DatabaseEvent[]): Ca
 /**
  * Convierte los tipos de eventos de la base de datos al formato requerido por el componente Calendar
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function mapDatabaseEventTypes(dbEventTypes: any[]): EventType[] {
     return dbEventTypes.map(type => ({
         event_type_id: type.event_type_id,
@@ -276,6 +279,7 @@ export function translateRolesToSpanish(roles: Role[]): Array<{ role_id: string;
 /**
  * Transforma los datos de roles de la base de datos al formato esperado
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function transformRolesData(roles: any[]): Role[] {
     return roles.map(role => ({
         id: parseInt(role.role_id),
@@ -299,6 +303,7 @@ export function prepareEventRecipients(
 /**
  * Maneja errores en las respuestas del repositorio
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function handleRepositoryError(error: any): RepositoryResponse {
     return { success: false, error };
 }

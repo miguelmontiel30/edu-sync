@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Utils
 import { formatTeacherData } from './utils';
 // Queries

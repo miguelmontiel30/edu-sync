@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Group } from '@/app/admin-dashboard/admin-groups/module-utils/types';
 import { Category, GroupSubjectAssignment, TeacherWithSubjects, TeacherInfo } from './types';
 

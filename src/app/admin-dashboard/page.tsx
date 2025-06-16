@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import ChartTab from '@/components/common/ChartTab';
 import ComponentCard from '@/components/common/ComponentCard';

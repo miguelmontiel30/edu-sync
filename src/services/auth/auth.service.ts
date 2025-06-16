@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Config
 import { supabaseClient } from '@/services/config/supabaseClient';
 import { User } from '@supabase/supabase-js';
@@ -79,7 +80,7 @@ export async function login(email: string, password: string) {
         }
 
         // Obtener permisos en una sola consulta adicional
-        const roleIds = userRoles.map((role: any) => role.role_id);
+        const roleIds = userRoles.map((role: { role_id: string }) => role.role_id);
         let userPermissions: string[] = [];
 
         if (roleIds.length > 0) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from 'react';
 import { Student, StudentGroup, StudentMetrics } from '../module-utils/types';
 import { studentRepository } from '../module-utils/repository';

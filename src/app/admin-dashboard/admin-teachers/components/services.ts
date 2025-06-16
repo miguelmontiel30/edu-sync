@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabaseClient } from '@/services/config/supabaseClient';
 import { Teacher, TeacherForm } from './types';
 

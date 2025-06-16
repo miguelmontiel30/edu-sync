@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Supabase client
 import { supabaseClient } from '@/services/config/supabaseClient';
 

@@ -60,6 +60,7 @@ interface EventModalProps {
     onRolesChange: (roles: Role[]) => void;
     onSave: () => void;
     availableRoles?: { role_id: string; name: string }[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     _eventTypes?: any[];
     schoolId?: number;
     schoolYearId?: number;
@@ -123,8 +124,6 @@ export function EventModal({
     // Inicializar datos cuando se abre el modal
     useEffect(() => {
         if (isOpen) {
-            console.log('Inicializando datos del modal con evento:', selectedEvent);
-
             // Datos básicos
             setTitle(eventTitle);
             setStartDate(eventStartDate);
@@ -139,11 +138,6 @@ export function EventModal({
                 // Buscar tipo de evento tanto en el nivel principal como en extendedProps
                 const typeId =
                     selectedEvent.event_type_id || selectedEvent.extendedProps?.event_type_id;
-
-                console.log('Cargando datos existentes:', {
-                    descripcion: eventDescription,
-                    tipoEvento: typeId,
-                });
 
                 setDescription(eventDescription);
                 setEventTypeId(typeId !== undefined ? Number(typeId) : undefined);
@@ -292,12 +286,6 @@ export function EventModal({
                 created_by: userId,
             };
 
-            console.log('Datos del evento a guardar:', {
-                ...eventData,
-                selectedRoles,
-                eventoActual: selectedEvent,
-            });
-
             let savedEvent;
 
             // Actualizar o crear evento
@@ -343,8 +331,6 @@ export function EventModal({
         setIsLoading(true);
         setError('');
 
-        console.log('Solicitud de eliminación para evento:', selectedEvent);
-
         // Extraer el ID del evento de FullCalendar (puede venir en diferentes formatos)
         let eventDbId = null;
 
@@ -356,20 +342,16 @@ export function EventModal({
             eventDbId = selectedEvent._def.extendedProps.event_id;
         } else if (typeof selectedEvent === 'object' && selectedEvent !== null) {
             // Buscar en todas las propiedades anidadas posibles
-            console.log('Buscando ID en el objeto evento:', selectedEvent);
-
             // Si es un objeto nativo de FullCalendar
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const fcEvent = selectedEvent as any;
             if (fcEvent._def?.extendedProps?.event_id) {
                 eventDbId = fcEvent._def.extendedProps.event_id;
             }
         }
 
-        console.log('ID de base de datos encontrado:', eventDbId);
-
         if (eventDbId && onDelete) {
             try {
-                console.log('Eliminando evento con ID en DB:', eventDbId);
                 await deleteEvent(eventDbId);
 
                 // Llamar a onDelete para actualizar la UI
@@ -387,7 +369,6 @@ export function EventModal({
             );
             // Si no tenemos ID de BD pero sí onDelete, intentemos eliminarlo solo de la UI
             if (onDelete) {
-                console.log('Eliminando solo de la UI sin ID de base de datos');
                 onDelete();
                 handleClose();
             } else {

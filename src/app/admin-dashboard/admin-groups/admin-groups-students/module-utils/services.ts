@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Repositorio
 import { groupStudentsRepository } from './repository';
 

@@ -33,6 +33,7 @@ export function useCalendarPage() {
     } = useAdminCalendar();
 
     // Manejador para cuando se selecciona una fecha en el calendario
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleDateSelect = (info: any) => {
         const startDate = info.startStr.split('T')[0];
         const endDate = info.endStr ? info.endStr.split('T')[0] : startDate;
@@ -50,10 +51,9 @@ export function useCalendarPage() {
     };
 
     // Manejador para cuando se hace click en un evento existente
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleEventClick = (info: any) => {
         const fcEvent = info.event;
-
-        console.log('Evento seleccionado:', fcEvent);
 
         // Extraer datos relevantes del evento de FullCalendar
         const extractedEvent: CalendarEvent = {

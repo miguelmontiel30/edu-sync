@@ -71,6 +71,7 @@ export function getEventById(eventId: number) {
 /**
  * Guardar un nuevo evento
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function saveEvent(eventData: any) {
     return supabaseClient.from('events').insert(eventData).select().single();
 }
@@ -78,6 +79,7 @@ export function saveEvent(eventData: any) {
 /**
  * Actualizar un evento existente
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function updateEvent(eventId: number, eventData: any) {
     return supabaseClient
         .from('events')
@@ -97,6 +99,7 @@ export function deleteEvent(eventId: number) {
 /**
  * Guardar destinatarios de eventos
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function saveEventRecipients(recipients: any[]) {
     return supabaseClient.from('event_recipients').insert(recipients);
 }

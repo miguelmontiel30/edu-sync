@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Student, StudentGroup, StudentFilterOptions, StudentMetrics } from './types';
 
 /**

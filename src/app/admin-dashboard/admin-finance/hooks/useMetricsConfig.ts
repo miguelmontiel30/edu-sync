@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from 'react';
 import { MetricConfig } from '@/app/admin-dashboard/core/Metrics/types';
 

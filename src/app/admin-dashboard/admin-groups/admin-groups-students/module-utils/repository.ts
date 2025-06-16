@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Types
 import { STUDENT_GROUP_STATUS } from './types';
 import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';

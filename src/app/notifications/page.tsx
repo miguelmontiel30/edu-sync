@@ -401,9 +401,8 @@ export default function NotificationsPage() {
         );
     };
 
-    const markAsRead = (ids: string[]) => {
-        // Aquí implementarías la lógica para marcar como leídas
-        console.log('Marking as read:', ids);
+    const markAsRead = (_ids: string[]) => {
+        // TODO: Implementar la lógica para marcar como leídas
     };
 
     const markAllAsRead = () => {

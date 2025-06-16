@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useMemo } from 'react';
 import { DateSelectArg, EventClickArg } from '@fullcalendar/core';
 import { CalendarEvent, Role } from '@/components/core/calendar/types';
@@ -158,7 +159,6 @@ export function useCalendar({
     // Manejar clic en evento
     const handleEventClick = (clickInfo: EventClickArg) => {
         const fcEvent = clickInfo.event;
-        console.log('Evento clickeado (objeto FullCalendar):', fcEvent);
 
         // Extraer datos del evento de FullCalendar a nuestro formato
         const extractedEvent: CalendarEvent = {
@@ -180,8 +180,6 @@ export function useCalendar({
                 event_id: fcEvent.extendedProps?.event_id || null,
             },
         };
-
-        console.log('Evento extraído para el modal:', extractedEvent);
 
         setSelectedEvent(extractedEvent);
         setEventTitle(extractedEvent.title || '');
@@ -246,8 +244,6 @@ export function useCalendar({
                 },
             };
 
-            console.log('Evento actualizado en useCalendar:', updatedEvent);
-
             setCalendarEvents(prevEvents =>
                 prevEvents.map(event => (event.id === selectedEvent.id ? updatedEvent : event)),
             );
@@ -273,8 +269,6 @@ export function useCalendar({
                 },
             };
 
-            console.log('Nuevo evento en useCalendar:', newEvent);
-
             setCalendarEvents(prevEvents => [...prevEvents, newEvent]);
             onEventAdd?.(newEvent);
         }
@@ -285,9 +279,6 @@ export function useCalendar({
     // Manejar eliminación de evento
     const handleDeleteEvent = () => {
         if (selectedEvent) {
-            console.log('Eliminando evento con ID:', selectedEvent.id);
-            console.log('Datos completos del evento a eliminar:', selectedEvent);
-
             // Primero, actualizamos el estado local
             setCalendarEvents(prevEvents =>
                 prevEvents.filter(event => event.id !== selectedEvent.id),

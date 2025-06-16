@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Supabase Client
 import { supabaseClient } from '@/services/config/supabaseClient';
 
@@ -27,7 +28,7 @@ export interface IGroupRepository {
  */
 export class SupabaseGroupRepository implements IGroupRepository {
     // Mapas de estados para conversión de IDs a nombres legibles
-    private statusMap: { [key: string]: string } = {
+    private readonly statusMap: { [key: string]: string } = {
         [GROUP_STATUS.ACTIVE]: 'Activo',
         [GROUP_STATUS.INACTIVE]: 'Inactivo',
         [GROUP_STATUS.COMPLETED]: 'Finalizado',
@@ -92,7 +93,6 @@ export class SupabaseGroupRepository implements IGroupRepository {
             if (!data) return { active: [], deleted: [] };
 
             // Procesar y filtrar los datos en memoria
-            // @ts-ignore - Ignoramos el error de tipos aquí ya que sabemos que la estructura es correcta
             const formattedGroups = this.mapDatabaseToGroups(data);
 
             return {

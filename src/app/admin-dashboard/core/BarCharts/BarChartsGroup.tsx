@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Next
 import dynamic from 'next/dynamic';
 

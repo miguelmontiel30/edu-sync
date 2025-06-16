@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // React
 import { useEffect, useState, useCallback } from 'react';
 

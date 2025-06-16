@@ -134,22 +134,24 @@ const LoginPage: React.FC = () => {
                     router.push('/student-dashboard/dashboard');
                 }
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Login failed:', error);
 
             // Manejar mensajes de error específicos
             let errorMessage = 'Error de autenticación. Verifica tus credenciales.';
 
-            if (error?.message) {
-                if (error.message.includes('Contraseña incorrecta')) {
+            if (typeof error === 'object' && error !== null && 'message' in error) {
+                const errorMsg = (error as { message: string }).message;
+
+                if (errorMsg.includes('Contraseña incorrecta')) {
                     errorMessage = 'La contraseña ingresada es incorrecta';
-                } else if (error.message.includes('no registrado')) {
+                } else if (errorMsg.includes('no registrado')) {
                     errorMessage = 'El correo electrónico no está registrado en el sistema';
-                } else if (error.message.includes('Error al obtener datos del usuario')) {
+                } else if (errorMsg.includes('Error al obtener datos del usuario')) {
                     errorMessage =
                         'Tu usuario existe pero no se pudieron obtener tus datos. Contacta al administrador.';
                 } else {
-                    errorMessage = error.message;
+                    errorMessage = errorMsg;
                 }
             }
 

@@ -49,7 +49,7 @@ export default function ProtectedRoute({
 
                 // Marcar que ya verificamos
                 setAuthVerified(true);
-            } catch (error) {
+            } catch (error: unknown) {
                 console.error('Error verificando autenticación:', error);
                 setConnectionError(true);
                 setAuthVerified(true);

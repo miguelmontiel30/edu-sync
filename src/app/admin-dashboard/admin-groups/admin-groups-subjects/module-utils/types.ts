@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Tipos base desde la base de datos
 
 // Estado para relaciones grupo-profesor
