@@ -1,26 +1,26 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // React
-import {useMemo} from 'react';
+import { useMemo } from 'react';
 
 // Next
 import dynamic from 'next/dynamic';
 
 // ApexCharts
-import {ApexOptions} from 'apexcharts';
+import { ApexOptions } from 'apexcharts';
 
 // Components
 import ComponentCard from '@/components/common/ComponentCard';
 
 // Context
-import {useTheme} from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
 
-// Types
-import {Grade} from '@/app/admin-dashboard/admin-students/[id]/module-utils/types';
+// import {Grade} from '@/app/admin-dashboard/admin-students/[id]/module-utils/types';
 
 // Importación dinámica para evitar errores de SSR
-const ReactApexChart = dynamic(() => import('react-apexcharts'), {ssr: false});
+const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 interface GradesChartProps {
-    grades?: Grade[];
+    grades?: any[];
 }
 
 // Datos ficticios mensuales para evaluaciones
@@ -41,16 +41,16 @@ const MONTHLY_PERIODS = [
 
 // Datos ficticios de materias para mostrar en la gráfica
 const FICTITIOUS_SUBJECTS = [
-    {name: 'Matemáticas', color: '#3b82f6'}, // Azul
-    {name: 'Español', color: '#22c55e'}, // Verde
-    {name: 'Ciencias', color: '#f59e0b'}, // Amarillo
-    {name: 'Historia', color: '#ef4444'}, // Rojo
-    {name: 'Inglés', color: '#8b5cf6'}, // Púrpura
-    {name: 'Educación Física', color: '#06b6d4'}, // Cyan
-    {name: 'Artes', color: '#ec4899'}, // Rosa
-    {name: 'Música', color: '#14b8a6'}, // Turquesa
-    {name: 'Geografía', color: '#f97316'}, // Naranja
-    {name: 'Computación', color: '#64748b'}, // Gris azulado
+    { name: 'Matemáticas', color: '#3b82f6' }, // Azul
+    { name: 'Español', color: '#22c55e' }, // Verde
+    { name: 'Ciencias', color: '#f59e0b' }, // Amarillo
+    { name: 'Historia', color: '#ef4444' }, // Rojo
+    { name: 'Inglés', color: '#8b5cf6' }, // Púrpura
+    { name: 'Educación Física', color: '#06b6d4' }, // Cyan
+    { name: 'Artes', color: '#ec4899' }, // Rosa
+    { name: 'Música', color: '#14b8a6' }, // Turquesa
+    { name: 'Geografía', color: '#f97316' }, // Naranja
+    { name: 'Computación', color: '#64748b' }, // Gris azulado
 ];
 
 // Genera un número aleatorio entre min y max
@@ -58,9 +58,9 @@ const getRandomScore = (min = 6, max = 10) => {
     return parseFloat((Math.random() * (max - min) + min).toFixed(1));
 };
 
-const GradesChart: React.FC<GradesChartProps> = ({grades}) => {
+const GradesChart: React.FC<GradesChartProps> = ({ grades }) => {
     // Acceder al tema actual
-    const {isDarkMode} = useTheme();
+    const { isDarkMode } = useTheme();
 
     // Opciones para la gráfica ajustadas según el tema
     const chartOptions: ApexOptions = useMemo(
@@ -192,7 +192,7 @@ function generateFictitiousSeries() {
 }
 
 // Genera series a partir de calificaciones reales (no implementado completamente)
-function generateSeriesFromGrades(_grades: Grade[]) {
+function generateSeriesFromGrades(_grades: any[]) {
     // Nota: Esta es una implementación básica que deberías adaptar
     // a tu estructura real de datos de calificaciones
 
