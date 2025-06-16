@@ -1,0 +1,25 @@
+name: Verificar origen de PR
+
+on:
+    pull_request:
+        branches: ['main']
+        types: [opened, reopened, synchronized]
+
+jobs:
+    verify-branch:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Verificar PR desde dev
+              run: |
+                  if [[ "${{ github.head_ref }}" != "dev" ]]; then
+                    echo "❌ Error: Los PRs a main solo pueden venir desde la rama dev."
+                    echo "🔍 Tu PR viene desde: ${{ github.head_ref }}"
+                    echo "📋 Pasos para corregir:"
+                    echo "1. Cierra este PR"
+                    echo "2. Crea tu PR dirigido a la rama dev"
+                    echo "3. Una vez aprobado en dev, podrás hacer merge a main"
+                    exit 1
+                  else
+                    echo "✅ PR válido desde dev a main."
+                    echo "🎉 El PR puede continuar con el proceso de revisión."
+                  fi
