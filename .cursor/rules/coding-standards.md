@@ -115,8 +115,14 @@ módulo/
         import Select from '@/components/form/Select';
         import Button from '@/components/core/button/Button';
         import Badge from '@/components/core/badge/Badge';
-        import {Table, TableHeader, TableBody, TableRow, TableCell} from '@/components/core/table';
-        import {Modal} from '@/components/ui/modal';
+        import {
+            Table,
+            TableHeader,
+            TableBody,
+            TableRow,
+            TableCell,
+        } from '@/components/core/table';
+        import { Modal } from '@/components/ui/modal';
         ```
     - Para cada componente form:
         - Usa `Label` siempre con atributo htmlFor para accesibilidad
@@ -202,11 +208,11 @@ módulo/
 
     ```typescript
     // Ejemplo de consulta básica
-    const {data, error} = await supabaseClient
+    const { data, error } = await supabaseClient
         .from('tabla')
         .select('campo1, campo2, relacion(campo_relacion)')
         .eq('campo_filtro', valor)
-        .order('campo_orden', {ascending: true})
+        .order('campo_orden', { ascending: true })
         .limit(10);
 
     if (error) {
