@@ -7,7 +7,7 @@ import {
     DatabaseSchoolYear,
     CycleData,
 } from './types';
-import {calculateAverageGrade as calculateGradeFromService} from './services';
+import { calculateAverageGrade as calculateGradeFromService } from './services';
 
 // Función para ordenar los ciclos
 export const sortCycles = (
@@ -112,7 +112,7 @@ export const validateCycleData = (
     cycleData: CycleData,
     currentCycles: SchoolCycle[] = [],
     selectedCycleId?: number,
-): {isValid: boolean; errorMessage?: string} => {
+): { isValid: boolean; errorMessage?: string } => {
     // Validar campos requeridos
     if (!cycleData.name || !cycleData.startDate || !cycleData.endDate || !cycleData.status) {
         return {
@@ -146,7 +146,7 @@ export const validateCycleData = (
         }
     }
 
-    return {isValid: true};
+    return { isValid: true };
 };
 
 // Función auxiliar para extraer ids de grupos y estudiantes
@@ -164,7 +164,7 @@ export function extractGroupAndStudentData(groups: DatabaseGroup[]) {
         });
     });
 
-    return {groupIds, studentIds};
+    return { groupIds, studentIds };
 }
 
 // Función auxiliar para calcular la calificación promedio
@@ -174,10 +174,10 @@ export const calculateAverageGrade = calculateGradeFromService;
 // Función para formatear los datos del ciclo
 export async function formatCycleData(cycle: DatabaseSchoolYear): Promise<SchoolCycle> {
     // Extraer datos de grupos y estudiantes
-    const {groupIds, studentIds} =
+    const { groupIds, studentIds } =
         cycle.groups && cycle.groups.length > 0
             ? extractGroupAndStudentData(cycle.groups)
-            : {groupIds: [], studentIds: new Set<number>()};
+            : { groupIds: [], studentIds: new Set<number>() };
 
     // Calcular promedio de calificaciones
     const averageGrade = await calculateAverageGrade(groupIds);

@@ -1,5 +1,5 @@
-import {useState, useEffect} from 'react';
-import statusService, {Status} from '../services/status/statusService';
+import { useState, useEffect } from 'react';
+import statusService, { Status } from '../services/status/statusService';
 
 type StatusCategory =
     | 'school_year'
@@ -61,7 +61,7 @@ export function useStatusData(category: StatusCategory) {
         fetchData();
     }, [category]);
 
-    return {statuses, isLoading, error};
+    return { statuses, isLoading, error };
 }
 
 /**
@@ -70,7 +70,7 @@ export function useStatusData(category: StatusCategory) {
  * @returns Mapa de códigos a objetos Status, estado de carga y error si existe
  */
 export function useStatusMap(category: StatusCategory) {
-    const {statuses, isLoading, error} = useStatusData(category);
+    const { statuses, isLoading, error } = useStatusData(category);
     const [statusMap, setStatusMap] = useState<Record<string, Status>>({});
 
     useEffect(() => {
@@ -84,7 +84,7 @@ export function useStatusMap(category: StatusCategory) {
         }
     }, [statuses]);
 
-    return {statusMap, isLoading, error};
+    return { statusMap, isLoading, error };
 }
 
 /**
@@ -93,8 +93,8 @@ export function useStatusMap(category: StatusCategory) {
  * @returns Array de opciones { value, label }, estado de carga y error si existe
  */
 export function useStatusOptions(category: StatusCategory) {
-    const {statuses, isLoading, error} = useStatusData(category);
-    const [options, setOptions] = useState<Array<{value: string; label: string}>>([]);
+    const { statuses, isLoading, error } = useStatusData(category);
+    const [options, setOptions] = useState<Array<{ value: string; label: string }>>([]);
 
     useEffect(() => {
         if (statuses.length > 0) {
@@ -107,7 +107,7 @@ export function useStatusOptions(category: StatusCategory) {
         }
     }, [statuses]);
 
-    return {options, isLoading, error};
+    return { options, isLoading, error };
 }
 
 export default useStatusData;

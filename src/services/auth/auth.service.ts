@@ -1,6 +1,6 @@
 // Config
-import {supabaseClient} from '@/services/config/supabaseClient';
-import {User} from '@supabase/supabase-js';
+import { supabaseClient } from '@/services/config/supabaseClient';
+import { User } from '@supabase/supabase-js';
 
 // Tipo personalizado que extiende User para nuestro caso
 export interface CustomUser extends Partial<User> {
@@ -25,7 +25,7 @@ export interface CustomUser extends Partial<User> {
 export async function login(email: string, password: string) {
     try {
         // Primero buscar el usuario sin relación con roles
-        const {data: userData, error: userError} = await supabaseClient
+        const { data: userData, error: userError } = await supabaseClient
             .from('users')
             .select('user_id, email, first_name, last_name, plain_password, school_id')
             .eq('email', email)
@@ -53,7 +53,7 @@ export async function login(email: string, password: string) {
         }
 
         // Obtener roles del usuario
-        const {data: userRoles, error: rolesError} = await supabaseClient
+        const { data: userRoles, error: rolesError } = await supabaseClient
             .from('user_roles')
             .select(
                 `
@@ -83,7 +83,7 @@ export async function login(email: string, password: string) {
         let userPermissions: string[] = [];
 
         if (roleIds.length > 0) {
-            const {data: permissionsData, error: permissionsError} = await supabaseClient
+            const { data: permissionsData, error: permissionsError } = await supabaseClient
                 .from('role_permissions')
                 .select(
                     `
@@ -147,7 +147,7 @@ export async function login(email: string, password: string) {
 
         if (!skipSupabaseAuth) {
             try {
-                const {data, error} = await supabaseClient.auth.signInWithPassword({
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email,
                     password,
                 });
@@ -205,7 +205,7 @@ export async function getUser() {
 
     // Solo si no está en localStorage, intentar obtener desde Supabase
     try {
-        const {data, error} = await supabaseClient.auth.getUser();
+        const { data, error } = await supabaseClient.auth.getUser();
         if (!error) {
             return data.user;
         }

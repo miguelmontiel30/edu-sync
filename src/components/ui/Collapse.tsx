@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import IconFA from "@/components/ui/IconFA";
+import { useState, useRef, useEffect } from 'react';
+import IconFA from '@/components/ui/IconFA';
 
 interface CollapseProps {
     title: string;
@@ -14,12 +14,12 @@ const Collapse: React.FC<CollapseProps> = ({
     title,
     children,
     defaultOpen = false,
-    className = "",
+    className = '',
 }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
     const contentRef = useRef<HTMLDivElement>(null);
     const [contentHeight, setContentHeight] = useState<number | undefined>(
-        defaultOpen ? undefined : 0
+        defaultOpen ? undefined : 0,
     );
 
     useEffect(() => {
@@ -33,17 +33,16 @@ const Collapse: React.FC<CollapseProps> = ({
     };
 
     return (
-        <div className={`border border-gray-200 rounded-lg dark:border-gray-700 ${className}`}>
+        <div className={`rounded-lg border border-gray-200 dark:border-gray-700 ${className}`}>
             <button
                 type="button"
                 className="flex w-full items-center justify-between p-4 text-left"
                 onClick={toggleCollapse}
             >
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{title}</span>
-                <IconFA
-                    icon={isOpen ? "chevron-up" : "chevron-down"}
-                    className="text-gray-500"
-                />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {title}
+                </span>
+                <IconFA icon={isOpen ? 'chevron-up' : 'chevron-down'} className="text-gray-500" />
             </button>
             <div
                 ref={contentRef}
@@ -56,4 +55,4 @@ const Collapse: React.FC<CollapseProps> = ({
     );
 };
 
-export default Collapse; 
+export default Collapse;

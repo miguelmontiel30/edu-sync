@@ -1,5 +1,5 @@
 // Supabase Client
-import {createClient} from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -34,7 +34,7 @@ let connectionChecked = false;
  */
 export async function checkSupabaseConnection(verbose = false): Promise<boolean> {
     try {
-        const {data, error} = await supabaseClient.auth.getSession();
+        const { data, error } = await supabaseClient.auth.getSession();
 
         if (error) {
             console.error('Error verificando conexión a Supabase:', error);

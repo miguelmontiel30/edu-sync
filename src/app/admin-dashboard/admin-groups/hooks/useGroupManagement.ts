@@ -1,5 +1,5 @@
 // React
-import {useState, useEffect, useMemo} from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 // Types
 import {
@@ -14,20 +14,20 @@ import {
 } from '../module-utils/types';
 
 // Services
-import {loadAllGroupsData, saveGroup, deleteGroup, restoreGroup} from '../module-utils/services';
+import { loadAllGroupsData, saveGroup, deleteGroup, restoreGroup } from '../module-utils/services';
 
 // Importar el servicio de SchoolYear
-import {loadSchoolYearsBySchoolId} from '@/app/admin-dashboard/admin-school-year/module-utils/services';
+import { loadSchoolYearsBySchoolId } from '@/app/admin-dashboard/admin-school-year/module-utils/services';
 
 // Hooks
-import {useSession} from '@/hooks/useSession';
+import { useSession } from '@/hooks/useSession';
 
 export function useGroupManagement(): GroupManagementHook {
     // Estados para datos
     const [groups, setGroups] = useState<Group[]>([]);
     const [deletedGroups, setDeletedGroups] = useState<Group[]>([]);
     const [schoolYears, setSchoolYears] = useState<
-        Array<{id: number; name: string; status: string}>
+        Array<{ id: number; name: string; status: string }>
     >([]);
 
     // Estados para UI
@@ -50,7 +50,7 @@ export function useGroupManagement(): GroupManagementHook {
     });
 
     // Obtener datos de sesión
-    const {session} = useSession();
+    const { session } = useSession();
 
     // Cargar datos iniciales
     useEffect(() => {
@@ -62,14 +62,14 @@ export function useGroupManagement(): GroupManagementHook {
 
     // Función para cargar grupos
     async function loadGroups() {
-        setLoadingState(prev => ({...prev, groups: true, metrics: true, deleted: true}));
+        setLoadingState(prev => ({ ...prev, groups: true, metrics: true, deleted: true }));
         try {
             if (!session?.school_id) {
                 throw new Error('No se encontró el ID de la escuela en la sesión');
             }
 
             // Cargar todos los grupos en una sola llamada
-            const {active, deleted} = await loadAllGroupsData(session.school_id);
+            const { active, deleted } = await loadAllGroupsData(session.school_id);
 
             // Actualizar los estados
             setGroups(active);
@@ -155,7 +155,7 @@ export function useGroupManagement(): GroupManagementHook {
     async function confirmDelete() {
         if (!groupToDelete) return;
 
-        setLoadingState(prev => ({...prev, processing: true}));
+        setLoadingState(prev => ({ ...prev, processing: true }));
         try {
             // Eliminar el grupo
             await deleteGroup(groupToDelete.id);
@@ -173,13 +173,13 @@ export function useGroupManagement(): GroupManagementHook {
                 message: 'No se pudo eliminar el grupo. Por favor intenta nuevamente.',
             });
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     }
 
     // Guardar grupo (nuevo o editar)
     async function handleSaveGroup(groupData: GroupFormData) {
-        setLoadingState(prev => ({...prev, processing: true}));
+        setLoadingState(prev => ({ ...prev, processing: true }));
         try {
             // Validar que todos los campos estén completados
             if (!groupData.grade || !groupData.group || !groupData.schoolYearId) {
@@ -204,13 +204,13 @@ export function useGroupManagement(): GroupManagementHook {
                 message: 'No se pudo guardar el grupo. Por favor intenta nuevamente.',
             });
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     }
 
     // Restaurar grupo eliminado
     async function handleRestore(id: number) {
-        setLoadingState(prev => ({...prev, processing: true}));
+        setLoadingState(prev => ({ ...prev, processing: true }));
         try {
             // Restaurar el grupo
             await restoreGroup(id);
@@ -224,7 +224,7 @@ export function useGroupManagement(): GroupManagementHook {
                 message: 'No se pudo restaurar el grupo. Por favor intenta nuevamente.',
             });
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     }
 

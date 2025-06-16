@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {supabaseClient} from '@/services/config/supabaseClient';
+import { useEffect, useState } from 'react';
+import { supabaseClient } from '@/services/config/supabaseClient';
 
 interface Role {
     role_id: number;
@@ -15,7 +15,7 @@ export function useRoles() {
     useEffect(() => {
         async function loadRoles() {
             try {
-                const {data, error} = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('roles')
                     .select('role_id, name, description')
                     .eq('delete_flag', false)
@@ -34,5 +34,5 @@ export function useRoles() {
         loadRoles();
     }, []);
 
-    return {roles, isLoading, error};
+    return { roles, isLoading, error };
 }

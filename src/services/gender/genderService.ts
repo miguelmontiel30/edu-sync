@@ -1,5 +1,5 @@
 // Services
-import {supabaseClient} from '../config/supabaseClient';
+import { supabaseClient } from '../config/supabaseClient';
 
 // Cache
 import cacheService from '../cache/cacheService';
@@ -36,7 +36,7 @@ class GenderService {
         }
 
         // Si no hay caché, obtener desde Supabase
-        const {data, error} = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('genders')
             .select('*')
             .eq('delete_flag', false);

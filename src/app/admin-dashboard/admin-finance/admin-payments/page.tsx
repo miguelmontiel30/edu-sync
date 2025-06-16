@@ -26,7 +26,7 @@ export default function PaymentsManagementPage() {
         isLoading,
         handleGroupChange,
         filters,
-        handleFilterChange
+        handleFilterChange,
     } = usePaymentsData();
 
     const handleGeneratePayment = () => {
@@ -39,7 +39,7 @@ export default function PaymentsManagementPage() {
 
             {/* Barra de filtros */}
             <div className="mb-6">
-                <FiltersBar 
+                <FiltersBar
                     filters={filters}
                     onFilterChange={handleFilterChange}
                     isLoading={isLoading}
@@ -48,10 +48,7 @@ export default function PaymentsManagementPage() {
 
             {/* Botón para generar pagos */}
             <div className="mb-6 flex justify-end">
-                <Button 
-                    variant="primary" 
-                    onClick={handleGeneratePayment}
-                >
+                <Button variant="primary" onClick={handleGeneratePayment}>
                     <IconFA icon="plus" className="mr-2" />
                     Generar pago
                 </Button>
@@ -59,11 +56,8 @@ export default function PaymentsManagementPage() {
 
             {/* Selector de grupo */}
             <div className="mb-6">
-                <ComponentCard 
-                    title="Seleccionar Grupo"
-                    className="shadow-md p-4"
-                >
-                    <GroupSelector 
+                <ComponentCard title="Seleccionar Grupo" className="p-4 shadow-md">
+                    <GroupSelector
                         selectedGroup={selectedGroup}
                         onGroupChange={handleGroupChange}
                         isLoading={isLoading}
@@ -75,7 +69,7 @@ export default function PaymentsManagementPage() {
                 <>
                     {/* Tabla de pagos realizados */}
                     <div className="mb-6">
-                        <PaymentsMadeTable 
+                        <PaymentsMadeTable
                             payments={paymentsData.paymentsMade}
                             groupId={selectedGroup}
                             isLoading={isLoading}
@@ -84,7 +78,7 @@ export default function PaymentsManagementPage() {
 
                     {/* Tabla de pagos adeudados */}
                     <div className="mb-6">
-                        <PaymentsOwedTable 
+                        <PaymentsOwedTable
                             paymentsOwed={paymentsData.paymentsOwed}
                             groupId={selectedGroup}
                             isLoading={isLoading}
@@ -94,4 +88,4 @@ export default function PaymentsManagementPage() {
             )}
         </div>
     );
-} 
+}

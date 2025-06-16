@@ -1,17 +1,17 @@
 // Supabase Client
-import {supabaseClient} from '@/services/config/supabaseClient';
+import { supabaseClient } from '@/services/config/supabaseClient';
 
 // Types
-import {CycleData, SchoolCycle, CYCLE_STATUS} from './types';
+import { CycleData, SchoolCycle, CYCLE_STATUS } from './types';
 
 // Utils
-import {formatCycleData} from './utils';
+import { formatCycleData } from './utils';
 
 // Definición de la interfaz del repositorio
 export interface ISchoolYearRepository {
     getAllCyclesBySchoolId(
         schoolId: number,
-    ): Promise<{active: SchoolCycle[]; deleted: SchoolCycle[]}>;
+    ): Promise<{ active: SchoolCycle[]; deleted: SchoolCycle[] }>;
     getCurrentSchoolId(userId?: string): Promise<number>;
     saveCycle(cycle: CycleData, cycleId?: number, userId?: string): Promise<void>;
     deleteCycle(id: number): Promise<void>;
@@ -48,14 +48,14 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
      */
     async getAllCyclesBySchoolId(
         schoolId: number,
-    ): Promise<{active: SchoolCycle[]; deleted: SchoolCycle[]}> {
+    ): Promise<{ active: SchoolCycle[]; deleted: SchoolCycle[] }> {
         try {
-            const {data, error} = await this.baseQuery()
+            const { data, error } = await this.baseQuery()
                 .eq('school_id', schoolId)
-                .order('created_at', {ascending: false});
+                .order('created_at', { ascending: false });
 
             if (error) throw error;
-            if (!data) return {active: [], deleted: []};
+            if (!data) return { active: [], deleted: [] };
 
             // Procesamos todos los ciclos en paralelo
             const formattedCycles = await Promise.all(data.map(formatCycleData));
@@ -82,7 +82,7 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
 
             // Si no se proporcionó un userId, intentamos obtenerlo de la sesión
             if (!userIdToUse) {
-                const {data: sessionData} = await supabaseClient.auth.getSession();
+                const { data: sessionData } = await supabaseClient.auth.getSession();
 
                 if (!sessionData?.session?.user) {
                     throw new Error('No hay una sesión activa o usuario válido');
@@ -92,7 +92,7 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
             }
 
             // Obtener el ID de la escuela del usuario
-            const {data: userData, error: userError} = await supabaseClient
+            const { data: userData, error: userError } = await supabaseClient
                 .from('users')
                 .select('school_id')
                 .eq('user_id', userIdToUse)
@@ -121,7 +121,7 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
 
             if (cycleId) {
                 // Actualizar ciclo existente
-                const {error} = await supabaseClient
+                const { error } = await supabaseClient
                     .from('school_years')
                     .update({
                         name: cycle.name,
@@ -135,7 +135,7 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
                 if (error) throw error;
             } else {
                 // Crear nuevo ciclo
-                const {error} = await supabaseClient
+                const { error } = await supabaseClient
                     .from('school_years')
                     .insert([
                         {
@@ -162,7 +162,7 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
      */
     async deleteCycle(id: number): Promise<void> {
         try {
-            const {error} = await supabaseClient
+            const { error } = await supabaseClient
                 .from('school_years')
                 .update({
                     delete_flag: true,
@@ -184,7 +184,7 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
      */
     async restoreCycle(id: number): Promise<void> {
         try {
-            const {error} = await supabaseClient
+            const { error } = await supabaseClient
                 .from('school_years')
                 .update({
                     delete_flag: false,
@@ -204,13 +204,13 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
      * @param groupIds - Array de IDs de grupos
      * @returns Objeto con el total de calificaciones y cantidad
      */
-    async getGroupGrades(groupIds: number[]): Promise<{totalGrade: number; gradesCount: number}> {
+    async getGroupGrades(groupIds: number[]): Promise<{ totalGrade: number; gradesCount: number }> {
         try {
             if (groupIds.length === 0) {
-                return {totalGrade: 0, gradesCount: 0};
+                return { totalGrade: 0, gradesCount: 0 };
             }
 
-            const {data: gradesData, error: gradesError} = await supabaseClient
+            const { data: gradesData, error: gradesError } = await supabaseClient
                 .from('group_subjects')
                 .select(
                     `
@@ -230,7 +230,7 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
             }
 
             if (!gradesData) {
-                return {totalGrade: 0, gradesCount: 0};
+                return { totalGrade: 0, gradesCount: 0 };
             }
 
             // Procesar los datos para calcular el promedio
@@ -252,7 +252,7 @@ export class SupabaseSchoolYearRepository implements ISchoolYearRepository {
                 });
             });
 
-            return {totalGrade, gradesCount};
+            return { totalGrade, gradesCount };
         } catch (error) {
             console.error('Error al obtener calificaciones de grupos:', error);
             throw error;

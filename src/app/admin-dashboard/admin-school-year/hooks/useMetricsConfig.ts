@@ -1,6 +1,6 @@
-import {useMemo} from 'react';
-import {SchoolCycle, CYCLE_STATUS} from '../module-utils/types';
-import {MetricConfig} from '../../core/Metrics/types';
+import { useMemo } from 'react';
+import { SchoolCycle, CYCLE_STATUS } from '../module-utils/types';
+import { MetricConfig } from '../../core/Metrics/types';
 
 interface ChartConfig {
     title: string;

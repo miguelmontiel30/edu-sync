@@ -26,7 +26,7 @@ interface ThemeContextType {
 
 const defaultContext: ThemeContextType = {
     isDarkMode: false,
-    toggleTheme: () => { },
+    toggleTheme: () => {},
 };
 
 /**
@@ -108,7 +108,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
      * - Cambia el estado 'theme' de 'light' a 'dark' o viceversa.
      */
     const toggleTheme = () => {
-        setIsDarkMode((prev) => {
+        setIsDarkMode(prev => {
             const newValue = !prev;
 
             // Guardar preferencia

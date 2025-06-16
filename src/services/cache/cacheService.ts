@@ -3,7 +3,7 @@
  */
 type CacheData = {
     [key: string]: {
-        data: any;
+        data: unknown;
         timestamp: number;
         expiry: number;
     };
@@ -29,7 +29,7 @@ class CacheService {
      * @param data Datos a guardar
      * @param expiry Tiempo de expiración en ms (opcional, por defecto 5 min)
      */
-    public set(key: string, data: any, expiry: number = this.defaultExpiry): void {
+    public set(key: string, data: unknown, expiry: number = this.defaultExpiry): void {
         this.cache[key] = {
             data,
             timestamp: Date.now(),

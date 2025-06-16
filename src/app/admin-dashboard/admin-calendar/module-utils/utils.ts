@@ -1,5 +1,5 @@
-import {DatabaseEvent, EventType, Role, EventRecipient, RepositoryResponse} from './types';
-import {CalendarEvent} from '@/components/core/calendar/types';
+import { DatabaseEvent, EventType, Role, EventRecipient, RepositoryResponse } from './types';
+import { CalendarEvent } from '@/components/core/calendar/types';
 
 /**
  * Convierte el color del evento a una clase de color para el calendario
@@ -259,8 +259,8 @@ export function mapDatabaseEventTypes(dbEventTypes: any[]): EventType[] {
  * @param roles Array de roles con id y nombre en inglés
  * @returns Array de roles con nombres traducidos al español
  */
-export function translateRolesToSpanish(roles: Role[]): Array<{role_id: string; name: string}> {
-    const translations: {[key: string]: string} = {
+export function translateRolesToSpanish(roles: Role[]): Array<{ role_id: string; name: string }> {
+    const translations: { [key: string]: string } = {
         admin: 'Administrador',
         teacher: 'Profesor',
         student: 'Estudiante',
@@ -300,7 +300,7 @@ export function prepareEventRecipients(
  * Maneja errores en las respuestas del repositorio
  */
 export function handleRepositoryError(error: any): RepositoryResponse {
-    return {success: false, error};
+    return { success: false, error };
 }
 
 /**
@@ -308,7 +308,7 @@ export function handleRepositoryError(error: any): RepositoryResponse {
  */
 export function checkRepositoryResponse(response: RepositoryResponse): RepositoryResponse {
     if (!response.success) {
-        return {success: false, error: response.error};
+        return { success: false, error: response.error };
     }
     return response;
 }

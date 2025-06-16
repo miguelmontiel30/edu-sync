@@ -47,7 +47,7 @@ interface EditGroupStudentModalProps {
 const defaultStatusOptions = [
     { value: 'active', label: 'Activo' },
     { value: 'inactive', label: 'Inactivo' },
-    { value: 'graduated', label: 'Graduado' }
+    { value: 'graduated', label: 'Graduado' },
 ];
 
 export default function EditGroupStudentModal({
@@ -56,7 +56,7 @@ export default function EditGroupStudentModal({
     studentData,
     isSaving,
     onSave,
-    statusOptions = defaultStatusOptions
+    statusOptions = defaultStatusOptions,
 }: EditGroupStudentModalProps) {
     const [selectedStatus, setSelectedStatus] = useState<string>('');
 
@@ -84,18 +84,14 @@ export default function EditGroupStudentModal({
     if (!studentData) return null;
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            className="max-w-[600px] p-6 lg:p-10"
-        >
-            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+        <Modal isOpen={isOpen} onClose={onClose} className="max-w-[600px] p-6 lg:p-10">
+            <div className="custom-scrollbar flex flex-col overflow-y-auto px-2">
                 <div>
-                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
+                    <h5 className="modal-title mb-2 font-outfit text-theme-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
                         Editar Estado del Estudiante
                     </h5>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                    <p className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                         Modifica el estado del estudiante en el grupo.
                     </p>
                 </div>
@@ -106,9 +102,13 @@ export default function EditGroupStudentModal({
                         <Table className="min-w-full">
                             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                                 <TableRow>
-                                    <TableCell isHeader className="w-1/3">Nombre Completo</TableCell>
+                                    <TableCell isHeader className="w-1/3">
+                                        Nombre Completo
+                                    </TableCell>
                                     <TableCell>
-                                        {studentData.student.first_name} {studentData.student.father_last_name} {studentData.student.mother_last_name}
+                                        {studentData.student.first_name}{' '}
+                                        {studentData.student.father_last_name}{' '}
+                                        {studentData.student.mother_last_name}
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
@@ -118,11 +118,20 @@ export default function EditGroupStudentModal({
                                 <TableRow>
                                     <TableCell isHeader>Estado Actual</TableCell>
                                     <TableCell>
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            ${studentData.status.id === 'active' || studentData.status.id === '11' ? 'bg-green-100 text-green-800' :
-                                                studentData.status.id === 'inactive' || studentData.status.id === '12' ? 'bg-red-100 text-red-800' :
-                                                    studentData.status.id === 'graduated' || studentData.status.id === '13' ? 'bg-blue-100 text-blue-800' :
-                                                        'bg-yellow-100 text-yellow-800'}`}>
+                                        <span
+                                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                                                studentData.status.id === 'active' ||
+                                                studentData.status.id === '11'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : studentData.status.id === 'inactive' ||
+                                                        studentData.status.id === '12'
+                                                      ? 'bg-red-100 text-red-800'
+                                                      : studentData.status.id === 'graduated' ||
+                                                          studentData.status.id === '13'
+                                                        ? 'bg-blue-100 text-blue-800'
+                                                        : 'bg-yellow-100 text-yellow-800'
+                                            }`}
+                                        >
                                             {studentData.status.name}
                                         </span>
                                     </TableCell>
@@ -133,19 +142,19 @@ export default function EditGroupStudentModal({
 
                     {/* Selector de nuevo estado */}
                     <div className="mb-6">
-                        <Label htmlFor="status-select" className="font-outfit mb-2">
+                        <Label htmlFor="status-select" className="mb-2 font-outfit">
                             Nuevo Estado
                         </Label>
                         <Select
                             options={statusOptions}
                             defaultValue={selectedStatus}
-                            onChange={(value) => setSelectedStatus(value)}
+                            onChange={value => setSelectedStatus(value)}
                             placeholder="Selecciona un estado"
                         />
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+                <div className="modal-footer mt-6 flex items-center gap-3 sm:justify-end">
                     <Button
                         onClick={onClose}
                         variant="outline"
@@ -170,4 +179,4 @@ export default function EditGroupStudentModal({
             </div>
         </Modal>
     );
-} 
+}

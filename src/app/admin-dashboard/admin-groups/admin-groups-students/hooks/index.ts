@@ -1,2 +1,2 @@
-export {useTableConfig} from './useTableConfig';
-export {useGroupStudentsManagement} from './useGroupStudentsManagement';
+export { useTableConfig } from './useTableConfig';
+export { useGroupStudentsManagement } from './useGroupStudentsManagement';

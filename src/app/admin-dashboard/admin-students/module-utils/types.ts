@@ -138,8 +138,8 @@ export interface StudentMetrics {
     inactive: number;
     male: number;
     female: number;
-    byGrade: {[key: string]: number};
-    byGroup: {[key: string]: number};
+    byGrade: { [key: string]: number };
+    byGroup: { [key: string]: number };
 }
 
 export interface AlertState {

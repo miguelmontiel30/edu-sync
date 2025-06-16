@@ -25,10 +25,16 @@ interface Permission {
     delete_flag: boolean;
 }
 
+// Estructura de los datos de permisos tal como los retorna Supabase
+interface PermissionInfo {
+    name: string;
+    description?: string | null;
+}
+
 interface RolePermission {
     role_id: number;
     permission_id: number;
-    permissions: any;
+    permissions: PermissionInfo[];
 }
 
 export default function RolesPermissions() {
@@ -136,7 +142,7 @@ export default function RolesPermissions() {
                         formattedData.push({
                             role_id: item.role_id,
                             permission_id: item.permission_id,
-                            permissions: item.permissions || {},
+                            permissions: item.permissions,
                         });
                     }
                 });

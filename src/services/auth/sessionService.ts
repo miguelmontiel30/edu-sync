@@ -1,5 +1,5 @@
 import cacheService from '../cache/cacheService';
-import {supabaseClient} from '../config/supabaseClient';
+import { supabaseClient } from '../config/supabaseClient';
 
 // Clave para almacenar la sesión en la caché
 const SESSION_CACHE_KEY = 'user_session';
@@ -133,7 +133,7 @@ class SessionService {
             lastRefreshTime = now;
 
             // Obtener datos actualizados del usuario desde la base de datos
-            const {data: userData, error: userError} = await supabaseClient
+            const { data: userData, error: userError } = await supabaseClient
                 .from('users')
                 .select('user_id, email, first_name, last_name, school_id, linked_type')
                 .eq('email', currentSession.email)
@@ -146,7 +146,7 @@ class SessionService {
             }
 
             // Obtener roles del usuario
-            const {data: userRoles, error: rolesError} = await supabaseClient
+            const { data: userRoles, error: rolesError } = await supabaseClient
                 .from('user_roles')
                 .select('role_id, roles:role_id(name)')
                 .eq('user_id', userData.user_id)

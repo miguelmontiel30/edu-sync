@@ -2,12 +2,9 @@
 
 // Components
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
-// import ComponentCard from '@/components/common/ComponentCard'; // Removed unused import
 
 // Core
 import MetricsGroup from '../core/Metrics/MetricsGroup';
-// import Button from '@/components/core/button/Button'; // Removed unused import
-// import IconFA from '@/components/ui/IconFA'; // Removed unused import
 
 // Module Components
 import FinancialCharts from './components/FinancialCharts';
@@ -19,29 +16,17 @@ import UpcomingPaymentsTable from './components/UpcomingPaymentsTable';
 import TopDebtorsTable from './components/TopDebtorsTable';
 
 // Hooks
-import { 
-    useFinancialData, 
-    useMetricsConfig,
-    useChartConfig
-} from './hooks';
+import { useFinancialData, useMetricsConfig, useChartConfig } from './hooks';
 
 export default function FinanceDashboardPage() {
-    const {
-        financialData,
-        filters,
-        isLoading,
-        handleFilterChange
-    } = useFinancialData();
+    const { financialData, filters, isLoading, handleFilterChange } = useFinancialData();
 
     // Configuración de métricas KPI
     const { metricsConfig } = useMetricsConfig(financialData);
 
     // Configuración de gráficos
-    const { 
-        cashFlowConfig, 
-        monthlyComparisonConfig, 
-        agingReceivablesConfig 
-    } = useChartConfig(financialData);
+    const { cashFlowConfig, monthlyComparisonConfig, agingReceivablesConfig } =
+        useChartConfig(financialData);
 
     return (
         <div className="mx-auto max-w-screen-2xl p-4 md:p-6">
@@ -49,7 +34,7 @@ export default function FinanceDashboardPage() {
 
             {/* Barra de filtros */}
             <div className="mb-6">
-                <FiltersBar 
+                <FiltersBar
                     filters={filters}
                     onFilterChange={handleFilterChange}
                     isLoading={isLoading}
@@ -61,19 +46,14 @@ export default function FinanceDashboardPage() {
                 <QuickActions />
             </div>
 
-
             {/* KPI Cards */}
             <div className="mb-6">
-                <MetricsGroup
-                    metricsConfig={metricsConfig}
-                    isLoading={isLoading}
-                />
+                <MetricsGroup metricsConfig={metricsConfig} isLoading={isLoading} />
             </div>
-
 
             {/* Gráficos */}
             <div className="mb-6">
-                <FinancialCharts 
+                <FinancialCharts
                     cashFlowConfig={cashFlowConfig}
                     monthlyComparisonConfig={monthlyComparisonConfig}
                     agingReceivablesConfig={agingReceivablesConfig}
@@ -83,33 +63,28 @@ export default function FinanceDashboardPage() {
 
             {/* Métricas de Salud Financiera */}
             <div className="mb-6">
-                <FinancialHealthMetrics 
+                <FinancialHealthMetrics
                     metrics={financialData.financialMetrics}
                     isLoading={isLoading}
                 />
             </div>
 
             {/* Tablas detalladas */}
-            <div className="grid grid-cols-1 gap-6 mb-6">
-                <TransactionsTable 
+            <div className="mb-6 grid grid-cols-1 gap-6">
+                <TransactionsTable
                     transactions={financialData.recentTransactions}
                     isLoading={isLoading}
                 />
             </div>
 
-            <div className="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-2">
-                <UpcomingPaymentsTable 
+            <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <UpcomingPaymentsTable
                     payments={financialData.upcomingPayments}
                     isLoading={isLoading}
                 />
 
-                <TopDebtorsTable 
-                    debtors={financialData.topDebtors}
-                    isLoading={isLoading}
-                />
+                <TopDebtorsTable debtors={financialData.topDebtors} isLoading={isLoading} />
             </div>
-
-            
         </div>
     );
-} 
+}

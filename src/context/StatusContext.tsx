@@ -32,16 +32,11 @@ export const StatusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const loadAllStatuses = async () => {
         setIsLoading(true);
         try {
-            const [
-                schoolYear,
-                group,
-                studentGroup,
-                evaluationPeriod
-            ] = await Promise.all([
+            const [schoolYear, group, studentGroup, evaluationPeriod] = await Promise.all([
                 statusService.getSchoolYearStatuses(),
                 statusService.getGroupStatuses(),
                 statusService.getStudentGroupStatuses(),
-                statusService.getEvaluationPeriodStatuses()
+                statusService.getEvaluationPeriodStatuses(),
             ]);
 
             setSchoolYearStatuses(schoolYear);
@@ -74,7 +69,7 @@ export const StatusProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 studentGroupStatuses,
                 evaluationPeriodStatuses,
                 isLoading,
-                refreshStatuses
+                refreshStatuses,
             }}
         >
             {children}
@@ -103,4 +98,4 @@ export const useEvaluationPeriodStatusByCode = (code: string) => {
     return evaluationPeriodStatuses.find(status => status.code === code);
 };
 
-export default StatusContext; 
+export default StatusContext;

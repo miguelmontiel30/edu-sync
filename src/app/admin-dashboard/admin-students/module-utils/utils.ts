@@ -1,4 +1,4 @@
-import {Student, StudentGroup, StudentFilterOptions, StudentMetrics} from './types';
+import { Student, StudentGroup, StudentFilterOptions, StudentMetrics } from './types';
 
 /**
  * Calcula la edad a partir de la fecha de nacimiento

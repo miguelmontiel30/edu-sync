@@ -1,3 +1,3 @@
 export * from './useFinancialData';
 export * from './useMetricsConfig';
-export * from './useChartConfig'; 
+export * from './useChartConfig';

@@ -1,5 +1,5 @@
-import {Group} from '@/app/admin-dashboard/admin-groups/module-utils/types';
-import {Category, GroupSubjectAssignment, TeacherWithSubjects, TeacherInfo} from './types';
+import { Group } from '@/app/admin-dashboard/admin-groups/module-utils/types';
+import { Category, GroupSubjectAssignment, TeacherWithSubjects, TeacherInfo } from './types';
 
 /**
  * Formatea los datos del profesor para usar en la UI

@@ -1,6 +1,6 @@
 // Types
-import {STUDENT_GROUP_STATUS} from './types';
-import {Student} from '@/app/admin-dashboard/admin-students/module-utils/types';
+import { STUDENT_GROUP_STATUS } from './types';
+import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';
 import statusService from '@/services/status/statusService';
 
 // Utils
@@ -42,13 +42,13 @@ export interface IGroupStudentsRepository {
     assignStudentsToGroup(
         groupId: number,
         studentIds: number[],
-    ): Promise<{success: boolean; error?: any}>;
-    removeStudentFromGroup(studentGroupId: number): Promise<{success: boolean; error?: any}>;
-    restoreStudentToGroup(studentGroupId: number): Promise<{success: boolean; error?: any}>;
+    ): Promise<{ success: boolean; error?: any }>;
+    removeStudentFromGroup(studentGroupId: number): Promise<{ success: boolean; error?: any }>;
+    restoreStudentToGroup(studentGroupId: number): Promise<{ success: boolean; error?: any }>;
     updateStudentGroupStatus(
         studentGroupId: number,
         statusId: number,
-    ): Promise<{success: boolean; error?: any}>;
+    ): Promise<{ success: boolean; error?: any }>;
     getStudentCountInGroup(groupId: number): Promise<number>;
     getAvailableStudentsForNewGroupAssignment(schoolId: number): Promise<Student[]>;
 }
@@ -71,7 +71,7 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
             const statusMap = createStatusMap(studentGroupStatuses);
 
             // 2. Obtener asignaciones de estudiantes al grupo
-            const {data: studentGroupEntries, error: studentGroupError} =
+            const { data: studentGroupEntries, error: studentGroupError } =
                 await getStudentGroupAssignments(groupId);
 
             if (studentGroupError) throw studentGroupError;
@@ -92,7 +92,7 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
             const studentGroupMap = createStudentGroupMap(activeStudentGroupEntries, statusMap);
 
             // 5. Obtener detalles de los estudiantes
-            const {data: studentsData, error: studentsError} = await getStudentsByIdsAndSchool(
+            const { data: studentsData, error: studentsError } = await getStudentsByIdsAndSchool(
                 studentIds,
                 schoolId,
             );
@@ -123,7 +123,7 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
             const statusMap = createStatusMap(studentGroupStatuses);
 
             // 2. Obtener asignaciones inactivas de estudiantes al grupo
-            const {data: studentGroupEntries, error: studentGroupError} =
+            const { data: studentGroupEntries, error: studentGroupError } =
                 await getInactiveStudentGroupAssignments(groupId);
 
             if (studentGroupError) throw studentGroupError;
@@ -134,7 +134,7 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
             const studentGroupMap = createStudentGroupMap(studentGroupEntries, statusMap);
 
             // 4. Obtener detalles de los estudiantes
-            const {data: studentsData, error: studentsError} = await getStudentsByIdsAndSchool(
+            const { data: studentsData, error: studentsError } = await getStudentsByIdsAndSchool(
                 studentIds,
                 schoolId,
             );
@@ -165,7 +165,7 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
             const statusMap = createStatusMap(studentGroupStatuses);
 
             // 2. Obtener asignaciones eliminadas de estudiantes al grupo
-            const {data: studentGroupEntries, error: studentGroupError} =
+            const { data: studentGroupEntries, error: studentGroupError } =
                 await getDeletedStudentGroupAssignments(groupId);
 
             if (studentGroupError) throw studentGroupError;
@@ -176,7 +176,7 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
             const studentGroupMap = createStudentGroupMap(studentGroupEntries, statusMap);
 
             // 4. Obtener detalles de los estudiantes
-            const {data: studentsData, error: studentsError} = await getStudentsByIdsAndSchool(
+            const { data: studentsData, error: studentsError } = await getStudentsByIdsAndSchool(
                 studentIds,
                 schoolId,
             );
@@ -203,10 +203,10 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
     async assignStudentsToGroup(
         groupId: number,
         studentIds: number[],
-    ): Promise<{success: boolean; error?: any}> {
+    ): Promise<{ success: boolean; error?: any }> {
         try {
             if (!studentIds || studentIds.length === 0) {
-                return {success: false, error: 'No se proporcionaron estudiantes para asignar'};
+                return { success: false, error: 'No se proporcionaron estudiantes para asignar' };
             }
 
             // Generar registros a insertar
@@ -217,17 +217,17 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
             );
 
             // Insertar registros
-            const {error} = await insertStudentGroupRecords(studentGroupRecords);
+            const { error } = await insertStudentGroupRecords(studentGroupRecords);
 
             if (error) {
                 console.error('Error al asignar estudiantes al grupo:', error);
-                return {success: false, error};
+                return { success: false, error };
             }
 
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al asignar estudiantes al grupo:', error);
-            return {success: false, error};
+            return { success: false, error };
         }
     }
 
@@ -236,20 +236,22 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
      * @param studentGroupId ID de la relación estudiante-grupo
      * @returns Resultado de la operación
      */
-    async removeStudentFromGroup(studentGroupId: number): Promise<{success: boolean; error?: any}> {
+    async removeStudentFromGroup(
+        studentGroupId: number,
+    ): Promise<{ success: boolean; error?: any }> {
         try {
-            const {isoDate} = getCurrentDateFormatted();
-            const {error} = await removeStudentFromGroupQuery(studentGroupId, isoDate);
+            const { isoDate } = getCurrentDateFormatted();
+            const { error } = await removeStudentFromGroupQuery(studentGroupId, isoDate);
 
             if (error) {
                 console.error('Error al eliminar estudiante del grupo:', error);
-                return {success: false, error};
+                return { success: false, error };
             }
 
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al eliminar estudiante del grupo:', error);
-            return {success: false, error};
+            return { success: false, error };
         }
     }
 
@@ -258,10 +260,12 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
      * @param studentGroupId ID de la relación estudiante-grupo
      * @returns Resultado de la operación
      */
-    async restoreStudentToGroup(studentGroupId: number): Promise<{success: boolean; error?: any}> {
+    async restoreStudentToGroup(
+        studentGroupId: number,
+    ): Promise<{ success: boolean; error?: any }> {
         try {
-            const {isoDate} = getCurrentDateFormatted();
-            const {error} = await restoreStudentFromGroupQuery(
+            const { isoDate } = getCurrentDateFormatted();
+            const { error } = await restoreStudentFromGroupQuery(
                 studentGroupId,
                 STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE,
                 isoDate,
@@ -269,13 +273,13 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
 
             if (error) {
                 console.error('Error al restaurar estudiante al grupo:', error);
-                return {success: false, error};
+                return { success: false, error };
             }
 
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al restaurar estudiante al grupo:', error);
-            return {success: false, error};
+            return { success: false, error };
         }
     }
 
@@ -288,20 +292,24 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
     async updateStudentGroupStatus(
         studentGroupId: number,
         statusId: number,
-    ): Promise<{success: boolean; error?: any}> {
+    ): Promise<{ success: boolean; error?: any }> {
         try {
-            const {isoDate} = getCurrentDateFormatted();
-            const {error} = await updateStudentGroupStatusQuery(studentGroupId, statusId, isoDate);
+            const { isoDate } = getCurrentDateFormatted();
+            const { error } = await updateStudentGroupStatusQuery(
+                studentGroupId,
+                statusId,
+                isoDate,
+            );
 
             if (error) {
                 console.error('Error al actualizar estado del estudiante en el grupo:', error);
-                return {success: false, error};
+                return { success: false, error };
             }
 
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al actualizar estado del estudiante en el grupo:', error);
-            return {success: false, error};
+            return { success: false, error };
         }
     }
 
@@ -312,7 +320,7 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
      */
     async getStudentCountInGroup(groupId: number): Promise<number> {
         try {
-            const {count, error} = await getStudentCountInGroupByStatus(
+            const { count, error } = await getStudentCountInGroupByStatus(
                 groupId,
                 STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE,
             );
@@ -333,7 +341,7 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
     async getAvailableStudentsForNewGroupAssignment(schoolId: number): Promise<Student[]> {
         try {
             // 1. Obtener IDs de estudiantes que ya están en un grupo activo
-            const {data: activeStudentGroups, error: activeStudentGroupError} =
+            const { data: activeStudentGroups, error: activeStudentGroupError } =
                 await getActiveStudentGroupAssignments(STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE);
 
             if (activeStudentGroupError) throw activeStudentGroupError;
@@ -343,14 +351,14 @@ export class GroupStudentsRepository implements IGroupStudentsRepository {
             let query = baseStudentQuery()
                 .eq('delete_flag', false)
                 .eq('school_id', schoolId)
-                .order('first_name', {ascending: true});
+                .order('first_name', { ascending: true });
 
             // Si hay estudiantes activamente asignados, excluirlos
             if (assignedStudentIds.length > 0) {
                 query = query.not('student_id', 'in', `(${assignedStudentIds.join(',')})`);
             }
 
-            const {data, error} = await query;
+            const { data, error } = await query;
 
             if (error) throw error;
             if (!data || data.length === 0) return [];

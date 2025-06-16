@@ -38,7 +38,7 @@ export default function GroupDashboard() {
         closeModal,
         setIsDeleteModalOpen,
         handleSaveGroup,
-        handleRestore
+        handleRestore,
     } = useGroupManagement();
 
     // Configuración de métricas y gráficos
@@ -50,7 +50,7 @@ export default function GroupDashboard() {
         groupActionButtons,
         groupListConfig,
         deletedGroupListConfig,
-        deleteConfirmModalConfig
+        deleteConfirmModalConfig,
     } = useTableConfig({ handleEdit, handleDelete });
 
     // Adaptar los grupos al formato ChartData para los gráficos
@@ -59,7 +59,7 @@ export default function GroupDashboard() {
         name: `${group.grade}° ${group.group}`,
         studentsNumber: group.studentsNumber,
         generalAverage: group.generalAverage,
-        status: group.status_id
+        status: group.status_id,
     }));
 
     return (
@@ -69,11 +69,7 @@ export default function GroupDashboard() {
 
             {/* Error Alert - Solo mostrar errores que no sean del formulario */}
             {errorAlert && !isModalOpen && (
-                <Alert
-                    title={errorAlert.title}
-                    message={errorAlert.message}
-                    variant="error"
-                />
+                <Alert title={errorAlert.title} message={errorAlert.message} variant="error" />
             )}
 
             {/* Metrics and Charts Wrapper */}

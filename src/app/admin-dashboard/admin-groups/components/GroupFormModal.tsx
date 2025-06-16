@@ -38,7 +38,7 @@ export default function GroupFormModal({
     selectedGroup,
     isSaving,
     schoolYears,
-    errorAlert
+    errorAlert,
 }: GroupFormModalProps) {
     // Obtener estados de grupos
     const { options: groupStatuses, isLoading: isLoadingGroupStatuses } = useStatusOptions('group');
@@ -48,7 +48,7 @@ export default function GroupFormModal({
         grade: '',
         group: '',
         schoolYearId: '',
-        statusId: GROUP_STATUS.ACTIVE
+        statusId: GROUP_STATUS.ACTIVE,
     });
 
     /**
@@ -81,7 +81,7 @@ export default function GroupFormModal({
             grade: '',
             group: '',
             schoolYearId: getInitialSchoolYear(),
-            statusId: GROUP_STATUS.ACTIVE
+            statusId: GROUP_STATUS.ACTIVE,
         });
     };
 
@@ -92,7 +92,7 @@ export default function GroupFormModal({
                 grade: selectedGroup.grade.toString(),
                 group: selectedGroup.group,
                 schoolYearId: selectedGroup.schoolYear.id.toString(),
-                statusId: selectedGroup.status_id.toString()
+                statusId: selectedGroup.status_id.toString(),
             });
         } else {
             resetForm();
@@ -120,7 +120,7 @@ export default function GroupFormModal({
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
     }
 
@@ -128,7 +128,7 @@ export default function GroupFormModal({
     function handleSelectChange(name: string, value: string) {
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
     }
 
@@ -166,8 +166,8 @@ export default function GroupFormModal({
                 label: 'Ciclos Activos',
                 options: activeYears.map(year => ({
                     value: year.id.toString(),
-                    label: year.name
-                }))
+                    label: year.name,
+                })),
             });
         }
 
@@ -180,8 +180,8 @@ export default function GroupFormModal({
                 label: 'Ciclos Inactivos',
                 options: inactiveYears.map(year => ({
                     value: year.id.toString(),
-                    label: year.name
-                }))
+                    label: year.name,
+                })),
             });
         }
 
@@ -194,8 +194,8 @@ export default function GroupFormModal({
                 label: 'Ciclos Finalizados',
                 options: completedYears.map(year => ({
                     value: year.id.toString(),
-                    label: year.name
-                }))
+                    label: year.name,
+                })),
             });
         }
 
@@ -203,30 +203,25 @@ export default function GroupFormModal({
     }
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={handleClose}
-            className="max-w-[700px] p-6 lg:p-10"
-        >
-            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+        <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] p-6 lg:p-10">
+            <div className="custom-scrollbar flex flex-col overflow-y-auto px-2">
                 <div>
-                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
-                        {selectedGroup ? "Editar grupo" : "Crear nuevo grupo"}
+                    <h5 className="modal-title mb-2 font-outfit text-theme-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
+                        {selectedGroup ? 'Editar grupo' : 'Crear nuevo grupo'}
                     </h5>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                    <p className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                         {selectedGroup
-                            ? "Modifica los detalles del grupo según sea necesario."
-                            : "Completa los campos para crear un nuevo grupo."
-                        }
+                            ? 'Modifica los detalles del grupo según sea necesario.'
+                            : 'Completa los campos para crear un nuevo grupo.'}
                     </p>
                 </div>
 
                 {/* Mostrar alerta de error si existe */}
                 {errorAlert && (
-                    <div className="p-4 mt-4 text-sm border rounded-md bg-red-50 border-red-200 text-red-600 relative error-alert">
+                    <div className="error-alert relative mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-600">
                         <button
                             type="button"
-                            className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                            className="absolute right-2 top-2 text-red-500 hover:text-red-700"
                             onClick={() => {
                                 // Este es un elemento para cerrar visualmente la alerta,
                                 // pero no elimina el error del estado
@@ -253,7 +248,7 @@ export default function GroupFormModal({
                         <div>
                             <Label htmlFor="grade" className="font-outfit">
                                 Grado
-                                <span className="text-red-500 ml-1">*</span>
+                                <span className="ml-1 text-red-500">*</span>
                             </Label>
                             <Input
                                 id="grade"
@@ -267,7 +262,7 @@ export default function GroupFormModal({
                         <div>
                             <Label htmlFor="group" className="font-outfit">
                                 Grupo
-                                <span className="text-red-500 ml-1">*</span>
+                                <span className="ml-1 text-red-500">*</span>
                             </Label>
                             <Input
                                 id="group"
@@ -283,39 +278,37 @@ export default function GroupFormModal({
                     <div className="mt-6">
                         <Label htmlFor="schoolYearId" className="font-outfit">
                             Ciclo Escolar
-                            <span className="text-red-500 ml-1">*</span>
+                            <span className="ml-1 text-red-500">*</span>
                         </Label>
 
                         <SelectWithCategories
                             options={getGroupedSchoolYears()}
                             placeholder="Seleccione un ciclo escolar"
-                            onChange={(value) => handleSelectChange('schoolYearId', value)}
+                            onChange={value => handleSelectChange('schoolYearId', value)}
                             defaultValue={getInitialSchoolYear()}
                             maxMenuHeight="max-h-96"
                         />
                     </div>
 
                     {isLoadingGroupStatuses ? (
-                        <div className="flex items-center justify-center h-[38px] bg-gray-50 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
+                        <div className="flex h-[38px] items-center justify-center rounded border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
                             <IconFA icon="spinner" spin className="text-gray-400" />
                         </div>
                     ) : (
                         <div className="mt-6">
-                            <Label className="font-outfit">
-                                Estado del Grupo
-                            </Label>
+                            <Label className="font-outfit">Estado del Grupo</Label>
 
                             <Select
                                 key={`status-${formData.statusId}`}
                                 options={groupStatuses}
                                 placeholder="Seleccione un estado"
-                                onChange={(value) => handleSelectChange('statusId', value)}
+                                onChange={value => handleSelectChange('statusId', value)}
                                 defaultValue={formData.statusId}
                             />
                         </div>
                     )}
 
-                    <div className="flex items-center gap-3 mt-8 modal-footer sm:justify-end">
+                    <div className="modal-footer mt-8 flex items-center gap-3 sm:justify-end">
                         <Button
                             type="button"
                             onClick={handleClose}
@@ -336,8 +329,9 @@ export default function GroupFormModal({
                             <span className="font-outfit">
                                 {isSaving
                                     ? 'Guardando...'
-                                    : (selectedGroup ? "Actualizar Grupo" : "Crear Grupo")
-                                }
+                                    : selectedGroup
+                                      ? 'Actualizar Grupo'
+                                      : 'Crear Grupo'}
                             </span>
                         </Button>
                     </div>
@@ -345,4 +339,4 @@ export default function GroupFormModal({
             </div>
         </Modal>
     );
-} 
+}

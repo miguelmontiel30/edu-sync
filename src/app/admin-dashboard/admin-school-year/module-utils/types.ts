@@ -103,7 +103,7 @@ export interface CycleManagementHook {
     openModal: () => void;
     closeModal: () => void;
     setIsDeleteModalOpen: (isOpen: boolean) => void;
-    handleSaveCycle: (cycleData: CycleData) => Promise<{success: boolean; errorMessage?: string}>;
+    handleSaveCycle: (cycleData: CycleData) => Promise<{ success: boolean; errorMessage?: string }>;
     handleRestore: (id: number) => Promise<void>;
     loadAllCycles: () => Promise<void>;
 }

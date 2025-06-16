@@ -1,4 +1,4 @@
-import {SchoolCycle, SortField, SortDirection, Teacher} from './types';
+import { SchoolCycle, SortField, SortDirection, Teacher } from './types';
 
 // Función para ordenar los ciclos
 export const sortCycles = (

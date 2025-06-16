@@ -1,4 +1,4 @@
-import {supabaseClient} from '../config/supabaseClient';
+import { supabaseClient } from '../config/supabaseClient';
 import cacheService from '../cache/cacheService';
 
 export interface Status {
@@ -44,7 +44,7 @@ class StatusService {
         }
 
         // Si no hay caché, obtener desde Supabase
-        const {data, error} = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('status')
             .select('*')
             .eq('category', category);

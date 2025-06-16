@@ -1,8 +1,8 @@
 // Types
-import {CycleData, SchoolCycle} from './types';
+import { CycleData, SchoolCycle } from './types';
 
 // Repository
-import {schoolYearRepository} from './repository';
+import { schoolYearRepository } from './repository';
 
 /**
  * Cargar todos los datos de ciclos escolares (activos y eliminados)
@@ -11,17 +11,17 @@ import {schoolYearRepository} from './repository';
  */
 export function loadAllSchoolYearData(
     schoolId: number,
-): Promise<{active: SchoolCycle[]; deleted: SchoolCycle[]}> {
+): Promise<{ active: SchoolCycle[]; deleted: SchoolCycle[] }> {
     return schoolYearRepository.getAllCyclesBySchoolId(schoolId);
 }
 
 export async function loadSchoolYearsBySchoolId(schoolId: number): Promise<SchoolCycle[]> {
-    const {active} = await schoolYearRepository.getAllCyclesBySchoolId(schoolId);
+    const { active } = await schoolYearRepository.getAllCyclesBySchoolId(schoolId);
     return active;
 }
 
 export async function loadDeletedCycles(schoolId: number): Promise<SchoolCycle[]> {
-    const {deleted} = await schoolYearRepository.getAllCyclesBySchoolId(schoolId);
+    const { deleted } = await schoolYearRepository.getAllCyclesBySchoolId(schoolId);
     return deleted;
 }
 
@@ -72,7 +72,7 @@ export async function calculateAverageGrade(groupIds: number[]): Promise<number>
 
     try {
         // Obtener datos de calificaciones desde el repositorio
-        const {totalGrade, gradesCount} = await schoolYearRepository.getGroupGrades(groupIds);
+        const { totalGrade, gradesCount } = await schoolYearRepository.getGroupGrades(groupIds);
 
         // Calcular promedio
         const average = gradesCount > 0 ? totalGrade / gradesCount : 0;

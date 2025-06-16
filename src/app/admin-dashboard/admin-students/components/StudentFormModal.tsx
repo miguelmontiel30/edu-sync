@@ -39,7 +39,7 @@ export default function StudentFormModal({
     onClose,
     onSave,
     selectedStudent,
-    isSaving
+    isSaving,
 }: StudentFormModalProps) {
     // Opciones de género y estado
     const { options: genderOptions, isLoading: isLoadingGenders } = useGenderOptions();
@@ -54,7 +54,7 @@ export default function StudentFormModal({
         gender_id: '',
         curp: '',
         phone: '',
-        email: ''
+        email: '',
     });
 
     // Estado de alertas
@@ -62,7 +62,7 @@ export default function StudentFormModal({
         show: false,
         variant: 'warning',
         title: '',
-        message: ''
+        message: '',
     });
 
     // Función para obtener el valor inicial del género
@@ -116,7 +116,7 @@ export default function StudentFormModal({
                     curp: selectedStudent.curp,
                     phone: selectedStudent.phone || '',
                     email: selectedStudent.email || '',
-                    status_id: selectedStudent.status_id.toString()
+                    status_id: selectedStudent.status_id.toString(),
                 });
             } else {
                 // Modo creación
@@ -129,7 +129,7 @@ export default function StudentFormModal({
                     curp: '',
                     phone: '',
                     email: '',
-                    status_id: '7' // Valor por defecto: STUDENT_ACTIVE
+                    status_id: '7', // Valor por defecto: STUDENT_ACTIVE
                 });
             }
         } else {
@@ -148,7 +148,7 @@ export default function StudentFormModal({
             curp: '',
             phone: '',
             email: '',
-            status_id: '7'
+            status_id: '7',
         });
     }
 
@@ -156,26 +156,31 @@ export default function StudentFormModal({
         const { name, value } = e.target;
         setStudentForm(prev => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
     }
 
     function handleSelectChange(field: string, value: string) {
         setStudentForm(prev => ({
             ...prev,
-            [field]: value
+            [field]: value,
         }));
     }
 
     async function handleSaveStudent() {
         // Validar campos requeridos
-        if (!studentForm.first_name || !studentForm.father_last_name || !studentForm.birth_date ||
-            !studentForm.gender_id || !studentForm.curp) {
+        if (
+            !studentForm.first_name ||
+            !studentForm.father_last_name ||
+            !studentForm.birth_date ||
+            !studentForm.gender_id ||
+            !studentForm.curp
+        ) {
             setAlertState({
                 show: true,
                 variant: 'error',
                 title: 'Error',
-                message: 'Por favor, complete todos los campos obligatorios.'
+                message: 'Por favor, complete todos los campos obligatorios.',
             });
             return;
         }
@@ -186,7 +191,7 @@ export default function StudentFormModal({
                 show: true,
                 variant: 'error',
                 title: 'Error',
-                message: 'La CURP debe tener exactamente 18 caracteres.'
+                message: 'La CURP debe tener exactamente 18 caracteres.',
             });
             return;
         }
@@ -197,7 +202,7 @@ export default function StudentFormModal({
                 show: true,
                 variant: 'error',
                 title: 'Error',
-                message: 'Por favor, ingrese un correo electrónico válido.'
+                message: 'Por favor, ingrese un correo electrónico válido.',
             });
             return;
         }
@@ -214,27 +219,23 @@ export default function StudentFormModal({
                 show: true,
                 variant: 'error',
                 title: 'Error',
-                message: error.message || 'Ocurrió un error al guardar el estudiante.'
+                message: error.message || 'Ocurrió un error al guardar el estudiante.',
             });
         }
     }
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            className="max-w-[700px] p-6 lg:p-10"
-        >
-            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+        <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 lg:p-10">
+            <div className="custom-scrollbar flex flex-col overflow-y-auto px-2">
                 <div className="mb-4">
-                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
-                        {selectedStudent ? "Editar estudiante" : "Registrar nuevo estudiante"}
+                    <h5 className="modal-title mb-2 font-outfit text-theme-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
+                        {selectedStudent ? 'Editar estudiante' : 'Registrar nuevo estudiante'}
                     </h5>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                    <p className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                         {selectedStudent
-                            ? "Actualiza la información del estudiante en el sistema."
-                            : "Completa el formulario para registrar un nuevo estudiante en el sistema."}
+                            ? 'Actualiza la información del estudiante en el sistema.'
+                            : 'Completa el formulario para registrar un nuevo estudiante en el sistema.'}
                     </p>
                 </div>
 
@@ -246,7 +247,7 @@ export default function StudentFormModal({
                     />
                 )}
 
-                <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-2">
+                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                     {/* Nombres y apellidos */}
                     <div>
                         <Label htmlFor="first_name" className="font-outfit">
@@ -310,7 +311,7 @@ export default function StudentFormModal({
                         </Label>
 
                         {isLoadingGenders ? (
-                            <div className="flex items-center justify-center h-[38px] bg-gray-50 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
+                            <div className="flex h-[38px] items-center justify-center rounded border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
                                 <IconFA icon="spinner" spin className="text-gray-400" />
                             </div>
                         ) : (
@@ -318,7 +319,7 @@ export default function StudentFormModal({
                                 key={`gender-select-${isOpen}-${selectedStudent?.id || 'new'}-${genderOptions.length}`}
                                 options={genderOptions}
                                 placeholder="Seleccione un género"
-                                onChange={(value) => handleSelectChange('gender_id', value)}
+                                onChange={value => handleSelectChange('gender_id', value)}
                                 defaultValue={getInitialGender()}
                             />
                         )}
@@ -376,12 +377,10 @@ export default function StudentFormModal({
                     {/* Estado (solo para edición) */}
                     {selectedStudent && (
                         <div>
-                            <Label className="font-outfit">
-                                Estado
-                            </Label>
+                            <Label className="font-outfit">Estado</Label>
 
                             {isLoadingStatus ? (
-                                <div className="flex items-center justify-center h-[38px] bg-gray-50 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
+                                <div className="flex h-[38px] items-center justify-center rounded border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
                                     <IconFA icon="spinner" spin className="text-gray-400" />
                                 </div>
                             ) : (
@@ -389,7 +388,7 @@ export default function StudentFormModal({
                                     key={`status-select-${isOpen}-${selectedStudent?.id || 'new'}-${statusOptions.length}`}
                                     options={statusOptions}
                                     placeholder="Seleccione un estado"
-                                    onChange={(value) => handleSelectChange('status_id', value)}
+                                    onChange={value => handleSelectChange('status_id', value)}
                                     defaultValue={getInitialStatus()}
                                 />
                             )}
@@ -397,27 +396,21 @@ export default function StudentFormModal({
                     )}
                 </div>
 
-                <div className="flex justify-end gap-3 mt-6">
-                    <Button
-                        variant="outline"
-                        onClick={onClose}
-                        disabled={isSaving}
-                    >
+                <div className="mt-6 flex justify-end gap-3">
+                    <Button variant="outline" onClick={onClose} disabled={isSaving}>
                         Cancelar
                     </Button>
 
-                    <Button
-                        variant="primary"
-                        onClick={handleSaveStudent}
-                        disabled={isSaving}
-                    >
+                    <Button variant="primary" onClick={handleSaveStudent} disabled={isSaving}>
                         {isSaving ? (
                             <>
                                 <IconFA icon="spinner" spin className="mr-2" />
                                 <span className="font-outfit">Guardando...</span>
                             </>
                         ) : (
-                            <span className="font-outfit">{selectedStudent ? "Actualizar Estudiante" : "Guardar Estudiante"}</span>
+                            <span className="font-outfit">
+                                {selectedStudent ? 'Actualizar Estudiante' : 'Guardar Estudiante'}
+                            </span>
                         )}
                     </Button>
                 </div>

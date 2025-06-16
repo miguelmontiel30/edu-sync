@@ -23,21 +23,24 @@ const TopDebtorsTable: React.FC<TopDebtorsTableProps> = ({ debtors, isLoading })
     const debtorsColumns: Column<Debtor>[] = [
         { key: 'student', header: 'Estudiante' },
         { key: 'grade', header: 'Grado', width: '130px' },
-        { 
-            key: 'amount', 
-            header: 'Monto Pendiente', 
+        {
+            key: 'amount',
+            header: 'Monto Pendiente',
             width: '160px',
-            render: (row: Debtor) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(row.amount)
+            render: (row: Debtor) =>
+                new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
+                    row.amount,
+                ),
         },
-        { 
-            key: 'invoiceCount', 
-            header: 'Facturas', 
+        {
+            key: 'invoiceCount',
+            header: 'Facturas',
             width: '100px',
-            render: (row: Debtor) => <Badge color="error">{row.invoiceCount}</Badge>
+            render: (row: Debtor) => <Badge color="error">{row.invoiceCount}</Badge>,
         },
-        { 
-            key: 'actions', 
-            header: 'Acciones', 
+        {
+            key: 'actions',
+            header: 'Acciones',
             width: '120px',
             render: () => (
                 <div className="flex space-x-2">
@@ -48,8 +51,8 @@ const TopDebtorsTable: React.FC<TopDebtorsTableProps> = ({ debtors, isLoading })
                         <IconFA icon="phone" style="duotone" />
                     </button>
                 </div>
-            ) 
-        }
+            ),
+        },
     ];
 
     return (
@@ -57,7 +60,7 @@ const TopDebtorsTable: React.FC<TopDebtorsTableProps> = ({ debtors, isLoading })
             <DataTable
                 data={debtors}
                 columns={debtorsColumns}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={item => item.id.toString()}
                 isLoading={isLoading}
                 searchable
                 searchPlaceholder="Buscar deudores..."
@@ -66,4 +69,4 @@ const TopDebtorsTable: React.FC<TopDebtorsTableProps> = ({ debtors, isLoading })
     );
 };
 
-export default TopDebtorsTable; 
+export default TopDebtorsTable;

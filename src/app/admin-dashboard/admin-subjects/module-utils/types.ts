@@ -92,7 +92,7 @@ export interface SubjectManagementHook {
     setIsDeleteModalOpen: (isOpen: boolean) => void;
     handleSaveSubject: (
         subjectData: SubjectData,
-    ) => Promise<{success: boolean; errorMessage?: string}>;
+    ) => Promise<{ success: boolean; errorMessage?: string }>;
     handleRestore: (id: number) => Promise<void>;
     loadAllSubjects: () => Promise<void>;
 }

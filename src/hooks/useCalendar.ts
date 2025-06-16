@@ -1,9 +1,9 @@
-import {useState, useEffect, useMemo} from 'react';
-import {DateSelectArg, EventClickArg} from '@fullcalendar/core';
-import {CalendarEvent, Role} from '@/components/core/calendar/types';
-import {useModal} from './useModal';
-import {useSession} from './useSession';
-import {getEventTypes} from '@/app/admin-dashboard/admin-calendar/module-utils/queries';
+import { useState, useEffect, useMemo } from 'react';
+import { DateSelectArg, EventClickArg } from '@fullcalendar/core';
+import { CalendarEvent, Role } from '@/components/core/calendar/types';
+import { useModal } from './useModal';
+import { useSession } from './useSession';
+import { getEventTypes } from '@/app/admin-dashboard/admin-calendar/module-utils/queries';
 
 // Color por defecto para eventos sin color
 const DEFAULT_COLOR = 'primary';
@@ -52,7 +52,7 @@ interface UseCalendarProps {
     onEventAdd?: (event: CalendarEvent) => void;
     onEventUpdate?: (event: CalendarEvent) => void;
     onEventDelete?: (eventId: string) => void;
-    _availableRoles?: {role_id: string; name: string}[];
+    _availableRoles?: { role_id: string; name: string }[];
 }
 
 export function useCalendar({
@@ -70,8 +70,8 @@ export function useCalendar({
     const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
     const [eventTypes, setEventTypes] = useState<any[]>([]);
     const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(events);
-    const {isOpen, openModal, closeModal} = useModal();
-    const {session} = useSession();
+    const { isOpen, openModal, closeModal } = useModal();
+    const { session } = useSession();
     const [shouldOpenModal, setShouldOpenModal] = useState(false);
 
     // Cargar tipos de eventos cuando se monta el componente
@@ -205,7 +205,9 @@ export function useCalendar({
 
         const eventRoles = fcEvent.extendedProps?.roles || [];
         const typedRoles = Array.isArray(eventRoles)
-            ? eventRoles.map(role => (typeof role === 'string' ? {role_id: '0', name: role} : role))
+            ? eventRoles.map(role =>
+                  typeof role === 'string' ? { role_id: '0', name: role } : role,
+              )
             : [];
 
         setSelectedRoles(typedRoles);

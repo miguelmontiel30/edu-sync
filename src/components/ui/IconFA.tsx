@@ -75,11 +75,16 @@ const IconFA: React.FC<IconFAProps> = ({
     ...props
 }) => {
     // Construir la clase base del icono según el estilo
-    const stylePrefix = style === 'solid' ? 'fa-solid'
-        : style === 'regular' ? 'fa-regular'
-            : style === 'light' ? 'fa-light'
-                : style === 'brands' ? 'fa-brands'
-                    : 'fa-duotone';
+    const stylePrefix =
+        style === 'solid'
+            ? 'fa-solid'
+            : style === 'regular'
+              ? 'fa-regular'
+              : style === 'light'
+                ? 'fa-light'
+                : style === 'brands'
+                  ? 'fa-brands'
+                  : 'fa-duotone';
 
     // Construir todas las clases
     const iconClass = cn(
@@ -91,10 +96,10 @@ const IconFA: React.FC<IconFAProps> = ({
         pulse && 'fa-pulse',
         flip && 'fa-flip',
         rotate && `fa-rotate-${rotate}`,
-        className
+        className,
     );
 
     return <i className={iconClass} {...props} />;
 };
 
-export default IconFA; 
+export default IconFA;

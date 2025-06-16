@@ -1,5 +1,5 @@
-import {useState, useEffect} from 'react';
-import {supabaseClient} from '@/services/config/supabaseClient';
+import { useState, useEffect } from 'react';
+import { supabaseClient } from '@/services/config/supabaseClient';
 import sessionService from '@/services/auth/sessionService';
 
 interface ThemeSettings {
@@ -38,14 +38,14 @@ export function useThemeSettings() {
                 if (!userSession || !school_id) {
                     try {
                         // Verificar si hay sesión activa en Supabase
-                        const {data: sessionData} = await supabaseClient.auth.getSession();
+                        const { data: sessionData } = await supabaseClient.auth.getSession();
 
                         if (sessionData?.session) {
                             // Si hay sesión en Supabase pero no en el servicio, intentar obtener el ID de escuela
-                            const {data: userData} = await supabaseClient.auth.getUser();
+                            const { data: userData } = await supabaseClient.auth.getUser();
 
                             if (userData?.user) {
-                                const {data: profileData} = await supabaseClient
+                                const { data: profileData } = await supabaseClient
                                     .from('users')
                                     .select('school_id')
                                     .eq('email', userData.user.email)
@@ -77,7 +77,7 @@ export function useThemeSettings() {
                 }
 
                 // 4. Obtener la configuración de tema para la escuela
-                const {data, error: settingsError} = await supabaseClient
+                const { data, error: settingsError } = await supabaseClient
                     .from('school_settings')
                     .select('*')
                     .eq('school_id', school_id)
@@ -152,13 +152,13 @@ export function useThemeSettings() {
                 // 2. Si no está en el servicio, intentar obtenerlo de Supabase
                 if (!school_id) {
                     try {
-                        const {data: sessionData} = await supabaseClient.auth.getSession();
+                        const { data: sessionData } = await supabaseClient.auth.getSession();
 
                         if (sessionData?.session) {
-                            const {data: userData} = await supabaseClient.auth.getUser();
+                            const { data: userData } = await supabaseClient.auth.getUser();
 
                             if (userData?.user) {
-                                const {data: profileData} = await supabaseClient
+                                const { data: profileData } = await supabaseClient
                                     .from('users')
                                     .select('school_id')
                                     .eq('email', userData.user.email)
@@ -195,7 +195,7 @@ export function useThemeSettings() {
                     : updatedSettings.primary_color;
 
             // Verificar si ya existe la configuración
-            const {data: existingSettings, error: checkError} = await supabaseClient
+            const { data: existingSettings, error: checkError } = await supabaseClient
                 .from('school_settings')
                 .select('setting_id')
                 .eq('school_id', school_id)
@@ -208,7 +208,7 @@ export function useThemeSettings() {
 
             if (existingSettings) {
                 // Actualizar configuración existente
-                const {error} = await supabaseClient
+                const { error } = await supabaseClient
                     .from('school_settings')
                     .update({
                         value: updatedSettings,
@@ -220,7 +220,7 @@ export function useThemeSettings() {
                 saveError = error;
             } else {
                 // Crear nueva configuración
-                const {error} = await supabaseClient.from('school_settings').insert([
+                const { error } = await supabaseClient.from('school_settings').insert([
                     {
                         school_id: school_id,
                         key: 'theme.settings',
@@ -255,13 +255,13 @@ export function useThemeSettings() {
                 localStorage.setItem('eduSync.theme', JSON.stringify(updatedSettings));
             }
 
-            return {success: true};
+            return { success: true };
         } catch (err) {
             console.error('Error al actualizar la configuración de tema:', err);
             setError(
                 err instanceof Error ? err.message : 'Error desconocido al actualizar el tema',
             );
-            return {success: false, error: err};
+            return { success: false, error: err };
         } finally {
             setIsLoading(false);
         }

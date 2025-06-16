@@ -18,10 +18,14 @@ const mockGroups = [
     { id: 'group5', name: '3° Primaria A' },
 ];
 
-export default function GroupSelector({ selectedGroup, onGroupChange, isLoading: _isLoading }: GroupSelectorProps) {
+export default function GroupSelector({
+    selectedGroup,
+    onGroupChange,
+    isLoading: _isLoading,
+}: GroupSelectorProps) {
     const options = mockGroups.map(group => ({
         value: group.id,
-        label: group.name
+        label: group.name,
     }));
 
     return (
@@ -35,4 +39,4 @@ export default function GroupSelector({ selectedGroup, onGroupChange, isLoading:
             />
         </div>
     );
-} 
+}

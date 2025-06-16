@@ -78,7 +78,9 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
             <div className="relative z-20 inline-block w-full" ref={dropdownRef}>
                 <div className="relative flex flex-col items-center">
                     <div onClick={toggleDropdown} className="w-full">
-                        <div className={`mb-2 flex min-h-[2.75rem] rounded-lg border py-1.5 pl-3 pr-3 shadow-theme-xs outline-none transition ${isOpen ? 'border-brand-400 ring-1 ring-brand-300 dark:border-brand-400 dark:ring-brand-300/50' : 'border-gray-300 dark:border-gray-700'} dark:bg-gray-900`}>
+                        <div
+                            className={`mb-2 flex min-h-[2.75rem] rounded-lg border py-1.5 pl-3 pr-3 shadow-theme-xs outline-none transition ${isOpen ? 'border-brand-400 ring-1 ring-brand-300 dark:border-brand-400 dark:ring-brand-300/50' : 'border-gray-300 dark:border-gray-700'} dark:bg-gray-900`}
+                        >
                             <div className="flex flex-auto flex-wrap gap-2">
                                 {selectedValuesText.length > 0 ? (
                                     selectedValuesText.map((text, index) => (
@@ -89,7 +91,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                                             <span className="max-w-full flex-initial">{text}</span>
                                             <div className="flex flex-auto flex-row-reverse">
                                                 <div
-                                                    onClick={(e) => {
+                                                    onClick={e => {
                                                         e.stopPropagation();
                                                         removeOption(index, selectedOptions[index]);
                                                     }}
@@ -125,7 +127,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                             <div className="flex w-7 items-center py-1 pl-1 pr-1">
                                 <button
                                     type="button"
-                                    onClick={(e) => {
+                                    onClick={e => {
                                         e.stopPropagation();
                                         toggleDropdown();
                                     }}
@@ -154,16 +156,16 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 
                     {isOpen && (
                         <div
-                            className="absolute left-0 top-full z-40 w-full max-h-60 overflow-y-auto rounded-lg bg-white shadow-lg dark:bg-gray-900 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700"
+                            className="scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 absolute left-0 top-full z-40 max-h-60 w-full overflow-y-auto rounded-lg bg-white shadow-lg dark:bg-gray-900"
                             style={{
                                 maxHeight: '200px',
                                 overflowY: 'auto',
                                 position: 'absolute',
-                                transform: 'translateY(4px)'
+                                transform: 'translateY(4px)',
                             }}
                             onClick={e => e.stopPropagation()}
                         >
-                            <div className="flex flex-col w-full">
+                            <div className="flex w-full flex-col">
                                 {options.length === 0 && (
                                     <div className="p-3 text-center text-sm text-gray-500 dark:text-gray-400">
                                         No hay opciones disponibles
@@ -172,14 +174,15 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                                 {options.map((option, index) => (
                                     <div key={index}>
                                         <div
-                                            className={`hover:bg-gray-100 dark:hover:bg-gray-800 w-full cursor-pointer border-b border-gray-200 dark:border-gray-800 last:border-b-0`}
+                                            className={`w-full cursor-pointer border-b border-gray-200 last:border-b-0 hover:bg-gray-100 dark:border-gray-800 dark:hover:bg-gray-800`}
                                             onClick={() => handleSelect(option.value)}
                                         >
                                             <div
-                                                className={`relative flex w-full items-center p-2.5 pl-3 ${selectedOptions.includes(option.value)
-                                                    ? 'bg-brand-50 font-medium text-brand-700 dark:bg-brand-900/20 dark:text-brand-300'
-                                                    : 'text-gray-800 dark:text-white/90'
-                                                    }`}
+                                                className={`relative flex w-full items-center p-2.5 pl-3 ${
+                                                    selectedOptions.includes(option.value)
+                                                        ? 'bg-brand-50 font-medium text-brand-700 dark:bg-brand-900/20 dark:text-brand-300'
+                                                        : 'text-gray-800 dark:text-white/90'
+                                                }`}
                                             >
                                                 <input
                                                     type="checkbox"
@@ -187,7 +190,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
                                                     onChange={() => handleSelect(option.value)}
                                                     className="mr-3 h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-brand-500"
                                                 />
-                                                <span className="mx-2 leading-6 select-none">
+                                                <span className="mx-2 select-none leading-6">
                                                     {option.text}
                                                 </span>
                                             </div>

@@ -1,8 +1,8 @@
 // React
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 // Services
-import genderService, {Gender} from '../services/gender/genderService';
+import genderService, { Gender } from '../services/gender/genderService';
 
 /**
  * Hook para obtener datos de género desde el servicio con caché
@@ -33,7 +33,7 @@ export function useGenderData() {
         fetchData();
     }, []);
 
-    return {genders, isLoading, error};
+    return { genders, isLoading, error };
 }
 
 /**
@@ -41,7 +41,7 @@ export function useGenderData() {
  * @returns Mapa de ids a objetos Gender, estado de carga y error si existe
  */
 export function useGenderMap() {
-    const {genders, isLoading, error} = useGenderData();
+    const { genders, isLoading, error } = useGenderData();
     const [genderMap, setGenderMap] = useState<Record<string, Gender>>({});
 
     useEffect(() => {
@@ -55,7 +55,7 @@ export function useGenderMap() {
         }
     }, [genders]);
 
-    return {genderMap, isLoading, error};
+    return { genderMap, isLoading, error };
 }
 
 /**
@@ -63,8 +63,8 @@ export function useGenderMap() {
  * @returns Array de opciones { value, label }, estado de carga y error si existe
  */
 export function useGenderOptions() {
-    const {genders, isLoading, error} = useGenderData();
-    const [options, setOptions] = useState<Array<{value: string; label: string}>>([]);
+    const { genders, isLoading, error } = useGenderData();
+    const [options, setOptions] = useState<Array<{ value: string; label: string }>>([]);
 
     useEffect(() => {
         if (genders.length > 0) {
@@ -77,7 +77,7 @@ export function useGenderOptions() {
         }
     }, [genders]);
 
-    return {options, isLoading, error};
+    return { options, isLoading, error };
 }
 
 export default useGenderOptions;

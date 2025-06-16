@@ -1,8 +1,8 @@
 // Types
-import {Subject, SubjectData} from './types';
+import { Subject, SubjectData } from './types';
 
 // Repository
-import {subjectRepository} from './repository';
+import { subjectRepository } from './repository';
 
 /**
  * Cargar todos los datos de materias (activas y eliminadas)
@@ -11,18 +11,18 @@ import {subjectRepository} from './repository';
  */
 export function loadAllSubjectsData(
     schoolId: number,
-): Promise<{active: Subject[]; deleted: Subject[]}> {
+): Promise<{ active: Subject[]; deleted: Subject[] }> {
     return subjectRepository.getAllSubjectsBySchoolId(schoolId);
 }
 
 // Funciones individuales para compatibilidad
 export async function loadSubjectsBySchoolId(schoolId: number): Promise<Subject[]> {
-    const {active} = await subjectRepository.getAllSubjectsBySchoolId(schoolId);
+    const { active } = await subjectRepository.getAllSubjectsBySchoolId(schoolId);
     return active;
 }
 
 export async function loadDeletedSubjects(schoolId: number): Promise<Subject[]> {
-    const {deleted} = await subjectRepository.getAllSubjectsBySchoolId(schoolId);
+    const { deleted } = await subjectRepository.getAllSubjectsBySchoolId(schoolId);
     return deleted;
 }
 
@@ -72,7 +72,7 @@ export async function getSubjectAverageGrade(subjectId: number): Promise<number>
 
     try {
         // Obtener datos de calificaciones desde el repositorio
-        const {averageGrade} = await subjectRepository.getSubjectGrades(subjectId);
+        const { averageGrade } = await subjectRepository.getSubjectGrades(subjectId);
 
         // Guardar en cache
         gradeCache.set(subjectId, averageGrade);

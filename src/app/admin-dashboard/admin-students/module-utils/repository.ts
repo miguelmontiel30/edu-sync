@@ -8,10 +8,10 @@ import {
 } from './types';
 
 // Utils
-import {calculateStudentMetrics, filterStudents, sortStudents, prepareStudentData} from './utils';
+import { calculateStudentMetrics, filterStudents, sortStudents, prepareStudentData } from './utils';
 
 // Supabase Client
-import {supabaseClient} from '@/services/config/supabaseClient';
+import { supabaseClient } from '@/services/config/supabaseClient';
 
 // Definición de la interfaz del repositorio
 export interface IStudentRepository {
@@ -60,10 +60,10 @@ export class SupabaseStudentRepository implements IStudentRepository {
     async getActiveStudents(schoolId: number): Promise<Student[]> {
         try {
             // Consulta optimizada usando join en vez de consultas separadas
-            const {data, error} = await this.baseStudentQuery()
+            const { data, error } = await this.baseStudentQuery()
                 .eq('delete_flag', false)
                 .eq('school_id', schoolId)
-                .order('created_at', {ascending: false});
+                .order('created_at', { ascending: false });
 
             if (error) throw error;
             if (!data || data.length === 0) return [];
@@ -116,9 +116,9 @@ export class SupabaseStudentRepository implements IStudentRepository {
     async getDeletedStudents(): Promise<Student[]> {
         try {
             // Consulta optimizada usando join en vez de consultas separadas
-            const {data, error} = await this.baseStudentQuery()
+            const { data, error } = await this.baseStudentQuery()
                 .eq('delete_flag', true)
-                .order('deleted_at', {ascending: false});
+                .order('deleted_at', { ascending: false });
 
             if (error) throw error;
             if (!data || data.length === 0) return [];
@@ -172,7 +172,7 @@ export class SupabaseStudentRepository implements IStudentRepository {
         try {
             // Verificar si el estudiante ya existe por CURP (solo para nuevos estudiantes)
             if (!studentData.id) {
-                const {data: existingStudent} = await supabaseClient
+                const { data: existingStudent } = await supabaseClient
                     .from('students')
                     .select('student_id')
                     .eq('curp', studentData.curp)
@@ -195,13 +195,13 @@ export class SupabaseStudentRepository implements IStudentRepository {
                 phone: studentData.phone || null,
                 email: studentData.email || null,
                 image_url: studentData.image_url || null,
-                ...(studentData.status_id ? {status_id: studentData.status_id} : {}),
+                ...(studentData.status_id ? { status_id: studentData.status_id } : {}),
                 updated_at: new Date().toISOString(),
             };
 
             if (studentData.id) {
                 // Actualizar
-                const {error} = await supabaseClient
+                const { error } = await supabaseClient
                     .from('students')
                     .update(dataToSave)
                     .eq('student_id', studentData.id);
@@ -215,7 +215,7 @@ export class SupabaseStudentRepository implements IStudentRepository {
                 }
 
                 // Crear
-                const {data, error} = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('students')
                     .insert(dataToSave)
                     .select('student_id');
@@ -234,7 +234,7 @@ export class SupabaseStudentRepository implements IStudentRepository {
      */
     async deleteStudent(studentId: number): Promise<void> {
         try {
-            const {error} = await supabaseClient
+            const { error } = await supabaseClient
                 .from('students')
                 .update({
                     delete_flag: true,
@@ -254,7 +254,7 @@ export class SupabaseStudentRepository implements IStudentRepository {
      */
     async restoreStudent(studentId: number): Promise<void> {
         try {
-            const {error} = await supabaseClient
+            const { error } = await supabaseClient
                 .from('students')
                 .update({
                     delete_flag: false,
@@ -275,7 +275,7 @@ export class SupabaseStudentRepository implements IStudentRepository {
     async getStudentGroups(studentId: number): Promise<StudentGroup[]> {
         try {
             // Una sola consulta con joins anidados en vez de múltiples consultas
-            const {data, error} = await supabaseClient
+            const { data, error } = await supabaseClient
                 .from('student_groups')
                 .select(
                     `
@@ -330,7 +330,7 @@ export class SupabaseStudentRepository implements IStudentRepository {
     async getAllActiveStudentGroups(): Promise<StudentGroup[]> {
         try {
             // Consulta optimizada con joins anidados
-            const {data, error} = await supabaseClient
+            const { data, error } = await supabaseClient
                 .from('student_groups')
                 .select(
                     `

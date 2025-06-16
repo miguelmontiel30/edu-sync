@@ -1,4 +1,4 @@
-import {CalendarEvent} from '@/components/core/calendar/types';
+import { CalendarEvent } from '@/components/core/calendar/types';
 
 export interface DatabaseEvent {
     event_id: number;

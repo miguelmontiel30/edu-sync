@@ -26,14 +26,14 @@ const FinancialCharts: React.FC<FinancialChartsProps> = ({
     cashFlowConfig,
     monthlyComparisonConfig,
     agingReceivablesConfig,
-    isLoading
+    isLoading,
 }) => {
     return (
         <>
-            <div className="grid grid-cols-1 gap-6 mb-6 lg:grid-cols-1">
+            <div className="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-1">
                 <ComponentCard title="Flujo de Caja" className="p-4">
                     {isLoading ? (
-                        <div className="flex items-center justify-center h-[350px]">
+                        <div className="flex h-[350px] items-center justify-center">
                             <IconFA icon="spinner" spin className="text-gray-400" />
                         </div>
                     ) : (
@@ -48,7 +48,7 @@ const FinancialCharts: React.FC<FinancialChartsProps> = ({
 
                 <ComponentCard title="Comparativo Mensual" className="p-4">
                     {isLoading ? (
-                        <div className="flex items-center justify-center h-[350px]">
+                        <div className="flex h-[350px] items-center justify-center">
                             <IconFA icon="spinner" spin className="text-gray-400" />
                         </div>
                     ) : (
@@ -65,7 +65,7 @@ const FinancialCharts: React.FC<FinancialChartsProps> = ({
             <div className="mb-6">
                 <ComponentCard title="Aging de Cuentas por Cobrar" className="p-4">
                     {isLoading ? (
-                        <div className="flex items-center justify-center h-[350px]">
+                        <div className="flex h-[350px] items-center justify-center">
                             <IconFA icon="spinner" spin className="text-gray-400" />
                         </div>
                     ) : (
@@ -82,4 +82,4 @@ const FinancialCharts: React.FC<FinancialChartsProps> = ({
     );
 };
 
-export default FinancialCharts; 
+export default FinancialCharts;

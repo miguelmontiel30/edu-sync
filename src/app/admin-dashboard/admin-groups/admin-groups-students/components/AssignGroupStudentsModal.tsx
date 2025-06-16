@@ -47,7 +47,7 @@ export default function AssignGroupStudentsModal({
     isSaving,
     availableStudents,
     isLoadingStudents,
-    onAddStudents
+    onAddStudents,
 }: AssignGroupStudentsModalProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedStudents, setSelectedStudents] = useState<number[]>([]);
@@ -67,27 +67,28 @@ export default function AssignGroupStudentsModal({
     };
 
     // Filtrar estudiantes según el término de búsqueda
-    const filteredStudents = availableStudents.filter(student =>
-        student.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.father_last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.mother_last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.curp?.toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredStudents = availableStudents.filter(
+        student =>
+            student.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            student.father_last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            student.mother_last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            student.curp?.toLowerCase().includes(searchTerm.toLowerCase()),
     );
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={handleClose}
-            className="max-w-[700px] p-6 lg:p-10"
-        >
-            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+        <Modal isOpen={isOpen} onClose={handleClose} className="max-w-[700px] p-6 lg:p-10">
+            <div className="custom-scrollbar flex flex-col overflow-y-auto px-2">
                 <div>
-                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
+                    <h5 className="modal-title mb-2 font-outfit text-theme-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
                         Añadir estudiantes al grupo
                     </h5>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                        Selecciona los estudiantes que deseas añadir al grupo <strong>{selectedGroup?.grade}° {selectedGroup?.group}</strong>.
+                    <p className="font-outfit text-sm text-gray-500 dark:text-gray-400">
+                        Selecciona los estudiantes que deseas añadir al grupo{' '}
+                        <strong>
+                            {selectedGroup?.grade}° {selectedGroup?.group}
+                        </strong>
+                        .
                     </p>
                 </div>
 
@@ -96,15 +97,17 @@ export default function AssignGroupStudentsModal({
                         <Input
                             type="text"
                             placeholder="Buscar estudiantes disponibles..."
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={e => setSearchTerm(e.target.value)}
                             className="pl-10"
-                            startIcon={<IconFA icon="search" style="solid" className="text-gray-400" />}
+                            startIcon={
+                                <IconFA icon="search" style="solid" className="text-gray-400" />
+                            }
                         />
                     </div>
 
                     <div className="max-h-[400px] overflow-y-auto">
                         {isLoadingStudents ? (
-                            <div className="flex items-center justify-center h-[200px]">
+                            <div className="flex h-[200px] items-center justify-center">
                                 <IconFA icon="spinner" spin className="text-gray-400" />
                             </div>
                         ) : (
@@ -114,15 +117,21 @@ export default function AssignGroupStudentsModal({
                                         <TableCell isHeader>
                                             <input
                                                 type="checkbox"
-                                                className="rounded border-gray-300 text-primary focus:ring-primary"
-                                                onChange={(e) => {
+                                                className="text-primary focus:ring-primary rounded border-gray-300"
+                                                onChange={e => {
                                                     if (e.target.checked) {
-                                                        setSelectedStudents(filteredStudents.map(s => s.id));
+                                                        setSelectedStudents(
+                                                            filteredStudents.map(s => s.id),
+                                                        );
                                                     } else {
                                                         setSelectedStudents([]);
                                                     }
                                                 }}
-                                                checked={selectedStudents.length > 0 && selectedStudents.length === filteredStudents.length}
+                                                checked={
+                                                    selectedStudents.length > 0 &&
+                                                    selectedStudents.length ===
+                                                        filteredStudents.length
+                                                }
                                             />
                                         </TableCell>
                                         <TableCell isHeader>Nombre</TableCell>
@@ -131,40 +140,58 @@ export default function AssignGroupStudentsModal({
                                 </TableHeader>
                                 <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                                     {filteredStudents.length > 0 ? (
-                                        filteredStudents.map((student) => (
+                                        filteredStudents.map(student => (
                                             <TableRow
                                                 key={student.id}
                                                 className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50"
                                                 onClick={() => {
                                                     if (selectedStudents.includes(student.id)) {
-                                                        setSelectedStudents(selectedStudents.filter(id => id !== student.id));
+                                                        setSelectedStudents(
+                                                            selectedStudents.filter(
+                                                                id => id !== student.id,
+                                                            ),
+                                                        );
                                                     } else {
-                                                        setSelectedStudents([...selectedStudents, student.id]);
+                                                        setSelectedStudents([
+                                                            ...selectedStudents,
+                                                            student.id,
+                                                        ]);
                                                     }
                                                 }}
                                             >
                                                 <TableCell className="px-5 py-4 text-center sm:px-6">
                                                     <input
                                                         type="checkbox"
-                                                        className="rounded border-gray-300 text-primary focus:ring-primary"
-                                                        checked={selectedStudents.includes(student.id)}
-                                                        onChange={(e) => {
+                                                        className="text-primary focus:ring-primary rounded border-gray-300"
+                                                        checked={selectedStudents.includes(
+                                                            student.id,
+                                                        )}
+                                                        onChange={e => {
                                                             e.stopPropagation();
                                                             if (e.target.checked) {
-                                                                setSelectedStudents([...selectedStudents, student.id]);
+                                                                setSelectedStudents([
+                                                                    ...selectedStudents,
+                                                                    student.id,
+                                                                ]);
                                                             } else {
-                                                                setSelectedStudents(selectedStudents.filter(id => id !== student.id));
+                                                                setSelectedStudents(
+                                                                    selectedStudents.filter(
+                                                                        id => id !== student.id,
+                                                                    ),
+                                                                );
                                                             }
                                                         }}
                                                     />
                                                 </TableCell>
                                                 <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
-                                                        {student.first_name} {student.father_last_name} {student.mother_last_name}
+                                                    <span className="block font-outfit text-sm font-medium text-gray-800 dark:text-white/90">
+                                                        {student.first_name}{' '}
+                                                        {student.father_last_name}{' '}
+                                                        {student.mother_last_name}
                                                     </span>
                                                 </TableCell>
                                                 <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
+                                                    <span className="font-outfit text-sm text-gray-600 dark:text-gray-300">
                                                         {student.curp}
                                                     </span>
                                                 </TableCell>
@@ -172,8 +199,11 @@ export default function AssignGroupStudentsModal({
                                         ))
                                     ) : (
                                         <TableRow>
-                                            <TableCell colSpan={3} className="px-5 py-4 text-center sm:px-6">
-                                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                            <TableCell
+                                                colSpan={3}
+                                                className="px-5 py-4 text-center sm:px-6"
+                                            >
+                                                <span className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                                                     No hay estudiantes disponibles para añadir.
                                                 </span>
                                             </TableCell>
@@ -185,7 +215,7 @@ export default function AssignGroupStudentsModal({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+                <div className="modal-footer mt-6 flex items-center gap-3 sm:justify-end">
                     <Button
                         onClick={handleClose}
                         variant="outline"
@@ -205,8 +235,7 @@ export default function AssignGroupStudentsModal({
                         <span className="font-outfit">
                             {isSaving
                                 ? 'Guardando...'
-                                : `Añadir ${selectedStudents.length} Estudiantes`
-                            }
+                                : `Añadir ${selectedStudents.length} Estudiantes`}
                         </span>
                     </Button>
                 </div>

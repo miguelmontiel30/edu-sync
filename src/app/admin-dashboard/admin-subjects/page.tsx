@@ -39,7 +39,13 @@ export default function AdminSubjectsDashboard() {
     const { metricsConfig, chartConfigs } = useMetricsConfig(subjects);
 
     // Table Configs
-    const { deletedSubjectListConfig, deleteConfirmModalConfig, subjectColumns, subjectActionButtons, subjectListConfig } = useTableConfig({
+    const {
+        deletedSubjectListConfig,
+        deleteConfirmModalConfig,
+        subjectColumns,
+        subjectActionButtons,
+        subjectListConfig,
+    } = useTableConfig({
         handleEdit,
         handleDelete,
     });
@@ -53,11 +59,7 @@ export default function AdminSubjectsDashboard() {
 
             {/* Error Alert */}
             {errorAlert && (
-                <Alert
-                    title={errorAlert.title}
-                    message={errorAlert.message}
-                    variant="error"
-                />
+                <Alert title={errorAlert.title} message={errorAlert.message} variant="error" />
             )}
 
             {/* Metrics and Charts Wrapper */}
@@ -119,9 +121,9 @@ export default function AdminSubjectsDashboard() {
                     warningTitle: deleteConfirmModalConfig.warningTitle,
                     warningMessage: deleteConfirmModalConfig.warningMessage,
                     errorTitle: deleteConfirmModalConfig.errorTitle,
-                    errorMessage: deleteConfirmModalConfig.errorMessage
+                    errorMessage: deleteConfirmModalConfig.errorMessage,
                 }}
             />
         </div>
     );
-} 
+}

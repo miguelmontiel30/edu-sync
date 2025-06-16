@@ -10,7 +10,7 @@ import {
     GroupSubjectAssignment,
     TeacherWithSubjects,
     DeletedGroupSubject,
-    TeacherInfo
+    TeacherInfo,
 } from '../module-utils/types';
 
 // Services
@@ -23,7 +23,7 @@ import {
     removeTeacherFromSubject,
     createSubjectAssignment,
     deleteSubjectFromGroup,
-    restoreSubjectToGroup
+    restoreSubjectToGroup,
 } from '../module-utils/services';
 
 // Hooks
@@ -35,7 +35,7 @@ import {
     groupAndSortGroupsBySchoolYear,
     createGroupCategories,
     extractAssignedTeachers,
-    formatTeacherData
+    formatTeacherData,
 } from '../module-utils/utils';
 
 export const useGroupTeachersManagement = () => {
@@ -91,7 +91,7 @@ export const useGroupTeachersManagement = () => {
             console.error('Error al cargar grupos:', error);
             setErrorState(prev => ({
                 ...prev,
-                groups: 'No se pudieron cargar los grupos.'
+                groups: 'No se pudieron cargar los grupos.',
             }));
         } finally {
             setLoadingState(prev => ({ ...prev, groups: false }));
@@ -133,24 +133,31 @@ export const useGroupTeachersManagement = () => {
         setLoadingState(prev => ({
             ...prev,
             groupSubjects: true,
-            deletedSubjects: true
+            deletedSubjects: true,
         }));
         setErrorState(prev => ({ ...prev, subjects: null }));
 
         try {
             // Cargar asignaciones optimizadas (activas y eliminadas en una sola llamada)
-            const { active, deleted } = await fetchAllGroupSubjects(selectedGroup.id, session.school_id as number);
+            const { active, deleted } = await fetchAllGroupSubjects(
+                selectedGroup.id,
+                session.school_id as number,
+            );
 
             // Asegurarnos de que cada asignación tenga datos de profesor formateados correctamente
             const formattedActive = active.map(assignment => ({
                 ...assignment,
-                teacherData: assignment.teacherData ? formatTeacherData(assignment.teacherData) : null
+                teacherData: assignment.teacherData
+                    ? formatTeacherData(assignment.teacherData)
+                    : null,
             }));
 
             // Asegurarnos de que cada materia eliminada tenga datos de profesor formateados correctamente
             const formattedDeleted = deleted.map(deletedSubject => ({
                 ...deletedSubject,
-                teacher: deletedSubject.teacher ? formatTeacherData(deletedSubject.teacher) : undefined
+                teacher: deletedSubject.teacher
+                    ? formatTeacherData(deletedSubject.teacher)
+                    : undefined,
             })) as DeletedGroupSubject[];
 
             setGroupAssignments(formattedActive);
@@ -163,7 +170,7 @@ export const useGroupTeachersManagement = () => {
             console.error('Error al cargar datos del grupo:', error);
             setErrorState(prev => ({
                 ...prev,
-                subjects: 'No se pudieron cargar las materias del grupo.'
+                subjects: 'No se pudieron cargar las materias del grupo.',
             }));
             setGroupAssignments([]);
             setAssignedTeachers([]);
@@ -172,7 +179,7 @@ export const useGroupTeachersManagement = () => {
             setLoadingState(prev => ({
                 ...prev,
                 groupSubjects: false,
-                deletedSubjects: false
+                deletedSubjects: false,
             }));
         }
     }, [selectedGroup, session?.school_id]);
@@ -184,14 +191,14 @@ export const useGroupTeachersManagement = () => {
         setLoadingState(prev => ({
             ...prev,
             availableTeachers: true,
-            availableSubjects: true
+            availableSubjects: true,
         }));
 
         try {
             // Ejecutar ambas consultas en paralelo
             const [allTeachers, subjects] = await Promise.all([
                 fetchAllTeachers(session.school_id as number),
-                fetchAvailableSubjects(session.school_id as number)
+                fetchAvailableSubjects(session.school_id as number),
             ]);
 
             // Formatear datos de profesores para asegurar consistencia
@@ -206,7 +213,7 @@ export const useGroupTeachersManagement = () => {
             setErrorState(prev => ({
                 ...prev,
                 teachers: 'No se pudieron cargar los profesores disponibles.',
-                subjects: 'No se pudieron cargar las materias disponibles.'
+                subjects: 'No se pudieron cargar las materias disponibles.',
             }));
             setAvailableTeachers([]);
             setAvailableSubjects([]);
@@ -214,7 +221,7 @@ export const useGroupTeachersManagement = () => {
             setLoadingState(prev => ({
                 ...prev,
                 availableTeachers: false,
-                availableSubjects: false
+                availableSubjects: false,
             }));
         }
     }, [session?.school_id]);
@@ -247,7 +254,7 @@ export const useGroupTeachersManagement = () => {
             console.error('Error al asignar profesor:', error);
             setErrorState(prev => ({
                 ...prev,
-                saving: 'No se pudo asignar el profesor a la materia.'
+                saving: 'No se pudo asignar el profesor a la materia.',
             }));
         } finally {
             setLoadingState(prev => ({ ...prev, saving: false }));
@@ -261,7 +268,11 @@ export const useGroupTeachersManagement = () => {
         setErrorState(prev => ({ ...prev, saving: null }));
 
         try {
-            const { success } = await createSubjectAssignment(selectedGroup.id, subjectId, teacherId);
+            const { success } = await createSubjectAssignment(
+                selectedGroup.id,
+                subjectId,
+                teacherId,
+            );
             if (!success) {
                 throw new Error('Error al crear asignación');
             }
@@ -272,7 +283,7 @@ export const useGroupTeachersManagement = () => {
             console.error('Error al agregar materia:', error);
             setErrorState(prev => ({
                 ...prev,
-                saving: 'No se pudo agregar la materia al grupo.'
+                saving: 'No se pudo agregar la materia al grupo.',
             }));
         } finally {
             setLoadingState(prev => ({ ...prev, saving: false }));
@@ -297,7 +308,7 @@ export const useGroupTeachersManagement = () => {
             console.error('Error al eliminar materia:', error);
             setErrorState(prev => ({
                 ...prev,
-                saving: 'No se pudo eliminar la materia del grupo.'
+                saving: 'No se pudo eliminar la materia del grupo.',
             }));
         } finally {
             setLoadingState(prev => ({ ...prev, saving: false }));
@@ -323,7 +334,7 @@ export const useGroupTeachersManagement = () => {
             console.error('Error al restaurar materia:', error);
             setErrorState(prev => ({
                 ...prev,
-                saving: 'No se pudo restaurar la materia al grupo.'
+                saving: 'No se pudo restaurar la materia al grupo.',
             }));
         } finally {
             setLoadingState(prev => ({ ...prev, saving: false }));
@@ -369,6 +380,6 @@ export const useGroupTeachersManagement = () => {
         handleAddSubject,
         handleDeleteSubject,
         handleEditAssignment,
-        handleRestoreSubject
+        handleRestoreSubject,
     };
-}; 
+};

@@ -14,7 +14,7 @@ El componente `DataTable` es una tabla genérica y reutilizable que integra func
 ## Uso Básico
 
 ```tsx
-import DataTable, {Column} from '@/components/core/table/DataTable';
+import DataTable, { Column } from '@/components/core/table/DataTable';
 
 // Definir interface para los datos
 interface User {
@@ -25,8 +25,8 @@ interface User {
 
 // Ejemplo de datos
 const users = [
-    {id: 1, name: 'Juan Pérez', email: 'juan@ejemplo.com'},
-    {id: 2, name: 'María García', email: 'maria@ejemplo.com'},
+    { id: 1, name: 'Juan Pérez', email: 'juan@ejemplo.com' },
+    { id: 2, name: 'María García', email: 'maria@ejemplo.com' },
 ];
 
 // Definir columnas
@@ -193,7 +193,7 @@ function MyComponent() {
             itemsPerPage={5}
             loadingComponent={
                 <div className="flex h-[200px] flex-col items-center justify-center">
-                    <IconFA icon="spinner" spin className="text-brand-500 mb-2 text-xl" />
+                    <IconFA icon="spinner" spin className="mb-2 text-xl text-brand-500" />
                     <p className="text-gray-500">Cargando usuarios...</p>
                 </div>
             }

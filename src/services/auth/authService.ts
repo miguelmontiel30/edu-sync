@@ -1,5 +1,5 @@
-import {supabaseClient} from '../config/supabaseClient';
-import sessionService, {UserSession} from './sessionService';
+import { supabaseClient } from '../config/supabaseClient';
+import sessionService, { UserSession } from './sessionService';
 
 /**
  * Iniciar sesión y guardar los datos en caché
@@ -15,7 +15,7 @@ export async function login(email: string, password: string): Promise<UserSessio
         }
 
         // Autenticar directamente contra tabla users
-        const {data: userData, error: userError} = await supabaseClient
+        const { data: userData, error: userError } = await supabaseClient
             .from('users')
             .select('user_id, email, first_name, last_name, school_id, plain_password, linked_type')
             .eq('email', email)
@@ -41,7 +41,7 @@ export async function login(email: string, password: string): Promise<UserSessio
 
         try {
             // Buscar roles del usuario
-            const {data: userRoles, error: rolesError} = await supabaseClient
+            const { data: userRoles, error: rolesError } = await supabaseClient
                 .from('user_roles')
                 .select('role_id')
                 .eq('user_id', userData.user_id)

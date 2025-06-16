@@ -85,7 +85,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 isAuthenticated: !!session,
                 refreshSession,
                 logout,
-                hasRole
+                hasRole,
             }}
         >
             {children}
@@ -93,4 +93,4 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     );
 };
 
-export default SessionContext; 
+export default SessionContext;

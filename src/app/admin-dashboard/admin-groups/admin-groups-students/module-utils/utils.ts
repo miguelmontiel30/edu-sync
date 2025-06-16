@@ -1,10 +1,10 @@
 // Services
-import {Status} from '@/services/status/statusService';
+import { Status } from '@/services/status/statusService';
 
 // Types
-import {Category, STUDENT_GROUP_STATUS} from './types';
-import {Student} from '@/app/admin-dashboard/admin-students/module-utils/types';
-import {Group, GROUP_STATUS} from '@/app/admin-dashboard/admin-groups/module-utils/types';
+import { Category, STUDENT_GROUP_STATUS } from './types';
+import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';
+import { Group, GROUP_STATUS } from '@/app/admin-dashboard/admin-groups/module-utils/types';
 
 /**
  * Calcula la edad de un estudiante basada en su fecha de nacimiento.
@@ -236,7 +236,7 @@ export function createStudentGroupMap(
  * Formatea la fecha actual en formato ISO para la base de datos
  * @returns Objeto con fecha completa y solo fecha (YYYY-MM-DD)
  */
-export function getCurrentDateFormatted(): {isoDate: string; datePart: string} {
+export function getCurrentDateFormatted(): { isoDate: string; datePart: string } {
     const currentDate = new Date().toISOString();
     return {
         isoDate: currentDate,
@@ -256,7 +256,7 @@ export function generateStudentGroupRecords(
     groupId: number,
     statusId: number,
 ): any[] {
-    const {isoDate, datePart} = getCurrentDateFormatted();
+    const { isoDate, datePart } = getCurrentDateFormatted();
 
     return studentIds.map(studentId => ({
         student_id: studentId,

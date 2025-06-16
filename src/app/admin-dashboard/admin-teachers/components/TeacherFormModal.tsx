@@ -21,7 +21,7 @@ export default function TeacherFormModal({
     onClose,
     onSave,
     selectedTeacher,
-    isSaving
+    isSaving,
 }: TeacherFormModalProps) {
     // Estado para el formulario
     const [formData, setFormData] = useState<TeacherForm>({
@@ -33,11 +33,11 @@ export default function TeacherFormModal({
         curp: '',
         email: '',
         phone: '',
-        image_url: ''
+        image_url: '',
     });
 
     // Estado para géneros
-    const [genders, setGenders] = useState<{ gender_id: number, name: string }[]>([]);
+    const [genders, setGenders] = useState<{ gender_id: number; name: string }[]>([]);
     const [isLoadingGenders, setIsLoadingGenders] = useState(false);
 
     // Cargar géneros al montar el componente
@@ -69,7 +69,7 @@ export default function TeacherFormModal({
                 curp: selectedTeacher.curp || '',
                 email: selectedTeacher.email || '',
                 phone: selectedTeacher.phone || '',
-                image_url: selectedTeacher.image_url || ''
+                image_url: selectedTeacher.image_url || '',
             });
         } else {
             // Resetear el formulario
@@ -82,7 +82,7 @@ export default function TeacherFormModal({
                 curp: '',
                 email: '',
                 phone: '',
-                image_url: ''
+                image_url: '',
             });
         }
     }, [selectedTeacher]);
@@ -111,22 +111,18 @@ export default function TeacherFormModal({
     };
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            className="max-w-[700px] p-6 lg:p-10"
-        >
-            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+        <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 lg:p-10">
+            <div className="custom-scrollbar flex flex-col overflow-y-auto px-2">
                 <div>
-                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
-                        {selectedTeacher ? "Editar profesor" : "Define un nuevo profesor"}
+                    <h5 className="modal-title mb-2 font-outfit text-theme-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
+                        {selectedTeacher ? 'Editar profesor' : 'Define un nuevo profesor'}
                     </h5>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                    <p className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                         Ingresa la información del profesor para registrarlo en el sistema.
                     </p>
                 </div>
                 <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         {/* Nombre */}
                         <div>
                             <Label htmlFor="first_name">Nombre</Label>
@@ -183,18 +179,20 @@ export default function TeacherFormModal({
                         <div>
                             <Label htmlFor="gender_id">Género</Label>
                             {isLoadingGenders ? (
-                                <div className="flex items-center space-x-2 h-10">
+                                <div className="flex h-10 items-center space-x-2">
                                     <IconFA icon="spinner" spin className="text-gray-400" />
-                                    <span className="text-sm text-gray-500">Cargando géneros...</span>
+                                    <span className="text-sm text-gray-500">
+                                        Cargando géneros...
+                                    </span>
                                 </div>
                             ) : (
                                 <Select
                                     options={[
-                                        { value: "", label: "Selecciona un género" },
+                                        { value: '', label: 'Selecciona un género' },
                                         ...genders.map(g => ({
                                             value: g.gender_id.toString(),
-                                            label: g.name
-                                        }))
+                                            label: g.name,
+                                        })),
                                     ]}
                                     onChange={handleSelectChange}
                                     defaultValue={formData.gender_id.toString()}
@@ -259,7 +257,7 @@ export default function TeacherFormModal({
                     </div>
 
                     {/* Botones */}
-                    <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
+                    <div className="modal-footer mt-6 flex items-center gap-3 sm:justify-end">
                         <Button
                             type="button"
                             onClick={onClose}
@@ -282,7 +280,7 @@ export default function TeacherFormModal({
                                 </>
                             ) : (
                                 <span className="font-outfit">
-                                    {selectedTeacher ? "Actualizar Profesor" : "Crear Profesor"}
+                                    {selectedTeacher ? 'Actualizar Profesor' : 'Crear Profesor'}
                                 </span>
                             )}
                         </Button>
@@ -291,4 +289,4 @@ export default function TeacherFormModal({
             </div>
         </Modal>
     );
-} 
+}

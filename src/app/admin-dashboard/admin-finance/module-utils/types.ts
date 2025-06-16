@@ -68,4 +68,4 @@ export interface FinancialFilters {
     dateRange: string;
     schoolYear: string;
     transactionType: string;
-} 
+}
