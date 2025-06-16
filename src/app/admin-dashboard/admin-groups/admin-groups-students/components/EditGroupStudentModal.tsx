@@ -9,11 +9,12 @@ import Label from '@/components/form/Label';
 import Select from '@/components/form/Select';
 
 // Core Components
-import Button from '@/components/core/button/Button';
 import IconFA from '@/components/ui/IconFA';
+import Button from '@/components/core/button/Button';
+import ProfileAvatar from '@/components/core/avatar/ProfileAvatar';
 import { Table, TableBody, TableRow, TableCell } from '@/components/core/table';
 
-// Tipos
+// Types
 import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';
 
 // Interfaz para el estado del estudiante en el grupo
@@ -108,7 +109,13 @@ export default function EditGroupStudentModal({
                                 <TableRow>
                                     <TableCell isHeader className="w-1/3">Nombre Completo</TableCell>
                                     <TableCell>
-                                        {studentData.student.first_name} {studentData.student.father_last_name} {studentData.student.mother_last_name}
+                                        <div className="flex items-center justify-center">
+                                            <ProfileAvatar size="sm" name={`${studentData.student.first_name} ${studentData.student.father_last_name}`} />
+
+                                            <span className="text-sm font-outfit ml-2">
+                                                {`${studentData.student.first_name} ${studentData.student.father_last_name} ${studentData.student.mother_last_name || ''}`}
+                                            </span>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>

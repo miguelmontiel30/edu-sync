@@ -32,4 +32,5 @@ export interface DataTableProps<T> {
     readonly loadingComponent?: ReactNode;
     readonly onSearch?: (searchTerm: string) => void;
     readonly onSort?: (field: string, direction: SortDirection) => void;
+    readonly onRowClick?: (item: T) => void;
 }

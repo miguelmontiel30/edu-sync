@@ -10,9 +10,10 @@ import Input from '@/components/form/input/InputField';
 // Core Components
 import Button from '@/components/core/button/Button';
 import IconFA from '@/components/ui/IconFA';
+import ProfileAvatar from '@/components/core/avatar/ProfileAvatar';
 import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/core/table';
 
-// Tipos
+// Types
 import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';
 
 // Interfaz simplificada para el grupo en este contexto
@@ -159,9 +160,13 @@ export default function AssignGroupStudentsModal({
                                                     />
                                                 </TableCell>
                                                 <TableCell className="px-5 py-4 text-center sm:px-6">
-                                                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
-                                                        {student.first_name} {student.father_last_name} {student.mother_last_name}
-                                                    </span>
+                                                    <div className="flex items-center justify-center">
+                                                        <ProfileAvatar size="sm" name={`${student.first_name} ${student.father_last_name}`} />
+
+                                                        <span className="text-sm font-outfit ml-2">
+                                                            {`${student.first_name} ${student.father_last_name} ${student.mother_last_name || ''}`}
+                                                        </span>
+                                                    </div>
                                                 </TableCell>
                                                 <TableCell className="px-5 py-4 text-center sm:px-6">
                                                     <span className="text-sm text-gray-600 dark:text-gray-300 font-outfit">
