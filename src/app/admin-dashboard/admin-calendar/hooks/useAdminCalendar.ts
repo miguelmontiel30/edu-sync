@@ -1,11 +1,11 @@
 // React
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 // Hooks
-import {useSession} from '@/hooks/useSession';
+import { useSession } from '@/hooks/useSession';
 
 // Services
-import {loadSchoolYearsBySchoolId} from '../../admin-school-year/module-utils/services';
+import { loadSchoolYearsBySchoolId } from '../../admin-school-year/module-utils/services';
 import {
     getCalendarData,
     createEvent,
@@ -14,12 +14,12 @@ import {
 } from '../module-utils/services';
 
 // Utils
-import {processEvents, translateRolesToSpanish} from '../module-utils/utils';
+import { processEvents, translateRolesToSpanish } from '../module-utils/utils';
 
 // Types
-import {CalendarEvent} from '@/components/core/calendar';
-import {EventData, EventRecipient} from '../module-utils/types';
-import {SchoolCycle} from '../../admin-school-year/module-utils/types';
+import { CalendarEvent } from '@/components/core/calendar';
+import { EventData, EventRecipient } from '../module-utils/types';
+import { SchoolCycle } from '../../admin-school-year/module-utils/types';
 
 // Interfaz para el ciclo escolar desde la base de datos
 interface DatabaseSchoolYear {
@@ -31,12 +31,12 @@ interface DatabaseSchoolYear {
 
 export function useAdminCalendar() {
     const [events, setEvents] = useState<CalendarEvent[]>([]);
-    const [availableRoles, setAvailableRoles] = useState<{role_id: string; name: string}[]>([]);
+    const [availableRoles, setAvailableRoles] = useState<{ role_id: string; name: string }[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [activeSchoolYear, setActiveSchoolYear] = useState<DatabaseSchoolYear | null>(null);
 
     // Hook de sesion
-    const {session} = useSession();
+    const { session } = useSession();
     const schoolId = session?.school_id;
 
     useEffect(() => {

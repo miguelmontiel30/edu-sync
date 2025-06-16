@@ -67,7 +67,10 @@ export default function RootLayout({
                 <link rel="icon" href="/images/EduSync-logo.png" type="image/png" />
                 <link rel="shortcut icon" href="/images/EduSync-logo.png" type="image/png" />
                 <title>EduSync</title>
-                <meta name="description" content="Plataforma educativa para gestión de aprendizaje" />
+                <meta
+                    name="description"
+                    content="Plataforma educativa para gestión de aprendizaje"
+                />
                 <meta name="theme-color" content="#465FFF" />
             </head>
             <body className={`${outfit.variable} dark:bg-gray-900`} suppressHydrationWarning>
@@ -77,9 +80,7 @@ export default function RootLayout({
                             <ThemeProvider>
                                 <SidebarProvider>
                                     <StatusProvider>
-                                        <AuthRedirectWrapper>
-                                            {children}
-                                        </AuthRedirectWrapper>
+                                        <AuthRedirectWrapper>{children}</AuthRedirectWrapper>
                                     </StatusProvider>
                                 </SidebarProvider>
                             </ThemeProvider>
@@ -94,4 +95,3 @@ export default function RootLayout({
         </html>
     );
 }
-

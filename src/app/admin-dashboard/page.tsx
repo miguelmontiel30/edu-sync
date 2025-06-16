@@ -16,7 +16,7 @@ export default function AdminMainContent() {
         totalTeachers: 0,
         totalGroups: 0,
         averageGrade: 0,
-        recentStudents: 0
+        recentStudents: 0,
     });
     const [monthlyGrades, setMonthlyGrades] = useState<number[]>([]);
     const [monthlyAttendance, setMonthlyAttendance] = useState<number[]>([]);
@@ -45,44 +45,49 @@ export default function AdminMainContent() {
                 .eq('delete_flag', false);
 
             // Calcular estudiantes recientes (últimos 30 días)
-            const recentStudents = studentsData?.filter(student => {
-                const studentDate = new Date(student.created_at);
-                const thirtyDaysAgo = new Date();
-                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                return studentDate >= thirtyDaysAgo;
-            }).length || 0;
+            const recentStudents =
+                studentsData?.filter(student => {
+                    const studentDate = new Date(student.created_at);
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    return studentDate >= thirtyDaysAgo;
+                }).length || 0;
 
             // Calcular promedio general
-            const totalAverage = groupsData?.reduce((acc, group) => acc + (group.general_average || 0), 0) || 0;
+            const totalAverage =
+                groupsData?.reduce((acc, group) => acc + (group.general_average || 0), 0) || 0;
             const averageGrade = groupsData?.length ? totalAverage / groupsData.length : 0;
 
             // Obtener mejores grupos por grado
-            const bestGroupsByGrade = groupsData
-                ?.reduce((acc: any[], group) => {
-                    const existingGrade = acc.find(g => g.grade === group.grade);
-                    if (!existingGrade || existingGrade.average < group.general_average) {
-                        const index = existingGrade ? acc.indexOf(existingGrade) : -1;
-                        if (index !== -1) acc[index] = { grade: group.grade, average: group.general_average };
-                        else acc.push({ grade: group.grade, average: group.general_average });
-                    }
-                    return acc;
-                }, [])
-                .sort((a, b) => a.grade - b.grade) || [];
+            const bestGroupsByGrade =
+                groupsData
+                    ?.reduce((acc: any[], group) => {
+                        const existingGrade = acc.find(g => g.grade === group.grade);
+                        if (!existingGrade || existingGrade.average < group.general_average) {
+                            const index = existingGrade ? acc.indexOf(existingGrade) : -1;
+                            if (index !== -1)
+                                acc[index] = { grade: group.grade, average: group.general_average };
+                            else acc.push({ grade: group.grade, average: group.general_average });
+                        }
+                        return acc;
+                    }, [])
+                    .sort((a, b) => a.grade - b.grade) || [];
 
             setStats({
                 totalStudents: studentsData?.length || 0,
                 totalTeachers: teachersData?.length || 0,
                 totalGroups: groupsData?.length || 0,
                 averageGrade,
-                recentStudents
+                recentStudents,
             });
 
             setBestGroups(bestGroupsByGrade);
 
             // Datos de ejemplo para gráficos (reemplazar con datos reales cuando estén disponibles)
             setMonthlyGrades([9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 8.3, 9.0, 9.1, 9.2, 8.7, 9.6]);
-            setMonthlyAttendance([90.5, 93.2, 95.3, 94.4, 95.5, 96.6, 98.3, 99.0, 99.1, 99.2, 98.7, 99.6]);
-
+            setMonthlyAttendance([
+                90.5, 93.2, 95.3, 94.4, 95.5, 96.6, 98.3, 99.0, 99.1, 99.2, 98.7, 99.6,
+            ]);
         } catch (error) {
             console.error('Error al cargar datos del dashboard:', error);
         }
@@ -348,10 +353,10 @@ export default function AdminMainContent() {
                                 <i className="fa-duotone fa-solid fa-users-medical fa-xl text-blue-600 dark:text-blue-500"></i>
                             </div>
                             <div className="mt-5">
-                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                <span className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                                     Grupos
                                 </span>
-                                <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
+                                <h4 className="mt-2 font-outfit text-title-sm font-bold text-gray-800 dark:text-white/90">
                                     {stats.totalGroups}
                                 </h4>
                             </div>
@@ -364,10 +369,10 @@ export default function AdminMainContent() {
                                 <i className="fa-duotone fa-solid fa-user-graduate fa-xl text-green-600 dark:text-green-500"></i>
                             </div>
                             <div className="mt-5">
-                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                <span className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                                     Alumnos
                                 </span>
-                                <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
+                                <h4 className="mt-2 font-outfit text-title-sm font-bold text-gray-800 dark:text-white/90">
                                     {stats.totalStudents}
                                 </h4>
                             </div>
@@ -380,10 +385,10 @@ export default function AdminMainContent() {
                                 <i className="fa-duotone fa-solid fa-chalkboard-teacher fa-xl text-purple-600 dark:text-purple-500"></i>
                             </div>
                             <div className="mt-5">
-                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                <span className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                                     Profesores
                                 </span>
-                                <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
+                                <h4 className="mt-2 font-outfit text-title-sm font-bold text-gray-800 dark:text-white/90">
                                     {stats.totalTeachers}
                                 </h4>
                             </div>
@@ -396,10 +401,10 @@ export default function AdminMainContent() {
                                 <i className="fa-duotone fa-solid fa-book fa-xl text-orange-600 dark:text-orange-500"></i>
                             </div>
                             <div className="mt-5">
-                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                <span className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                                     Materias
                                 </span>
-                                <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
+                                <h4 className="mt-2 font-outfit text-title-sm font-bold text-gray-800 dark:text-white/90">
                                     Ver
                                 </h4>
                             </div>
@@ -416,10 +421,10 @@ export default function AdminMainContent() {
 
                         <div className="mt-5 flex items-end justify-between">
                             <div>
-                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                <span className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                                     Promedio General
                                 </span>
-                                <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
+                                <h4 className="mt-2 font-outfit text-title-sm font-bold text-gray-800 dark:text-white/90">
                                     {stats.averageGrade.toFixed(1)}
                                 </h4>
                             </div>
@@ -436,17 +441,23 @@ export default function AdminMainContent() {
                         </div>
                         <div className="mt-5 flex items-end justify-between">
                             <div>
-                                <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                <span className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                                     Asistencia
                                 </span>
-                                <h4 className="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90 font-outfit">
+                                <h4 className="mt-2 font-outfit text-title-sm font-bold text-gray-800 dark:text-white/90">
                                     {monthlyAttendance[monthlyAttendance.length - 1]}%
                                 </h4>
                             </div>
 
                             <Badge color="success">
                                 <IconFA icon="arrow-up" className="text-success-500" />
-                                {((monthlyAttendance[monthlyAttendance.length - 1] - monthlyAttendance[monthlyAttendance.length - 2]) / monthlyAttendance[monthlyAttendance.length - 2] * 100).toFixed(1)}%
+                                {(
+                                    ((monthlyAttendance[monthlyAttendance.length - 1] -
+                                        monthlyAttendance[monthlyAttendance.length - 2]) /
+                                        monthlyAttendance[monthlyAttendance.length - 2]) *
+                                    100
+                                ).toFixed(1)}
+                                %
                             </Badge>
                         </div>
                     </div>
@@ -456,7 +467,7 @@ export default function AdminMainContent() {
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
+                            <h3 className="font-outfit text-lg font-semibold text-gray-800 dark:text-white/90">
                                 Calificaciones por Mes
                             </h3>
                         </div>
@@ -476,10 +487,10 @@ export default function AdminMainContent() {
                     <div className="rounded-2xl border border-gray-200 bg-white px-5 pb-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6">
                         <div className="mb-6 flex flex-col gap-5 sm:flex-row sm:justify-between">
                             <div className="w-full">
-                                <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
+                                <h3 className="font-outfit text-lg font-semibold text-gray-800 dark:text-white/90">
                                     Asistencia Diaria
                                 </h3>
-                                <p className="mt-1 text-theme-sm text-gray-500 dark:text-gray-400 font-outfit">
+                                <p className="mt-1 font-outfit text-theme-sm text-gray-500 dark:text-gray-400">
                                     Seguimiento de asistencia mensual
                                 </p>
                             </div>

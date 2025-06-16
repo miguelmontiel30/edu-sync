@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useRef, useEffect, ReactNode } from 'react';
 import IconFA from '@/components/ui/IconFA';
@@ -35,7 +35,7 @@ export function Popover({
     linkText = 'Aprender más',
     linkIcon = 'arrow-right',
     trigger = 'click',
-    hoverDelay = 200
+    hoverDelay = 200,
 }: PopoverProps) {
     const [isOpen, setIsOpen] = useState(false);
     const triggerRef = useRef<HTMLDivElement>(null);
@@ -132,11 +132,7 @@ export function Popover({
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            <div
-                ref={triggerRef}
-                onClick={handleToggle}
-                className="inline-block cursor-pointer"
-            >
+            <div ref={triggerRef} onClick={handleToggle} className="inline-block cursor-pointer">
                 {children}
             </div>
 
@@ -148,22 +144,25 @@ export function Popover({
                     onMouseLeave={trigger === 'hover' ? handleMouseLeave : undefined}
                 >
                     {showArrow && (
-                        <div className={`absolute w-0 h-0 border-[6px] ${getArrowPosition()}`}></div>
+                        <div
+                            className={`absolute h-0 w-0 border-[6px] ${getArrowPosition()}`}
+                        ></div>
                     )}
 
                     {title && (
-                        <div className="mb-1 font-medium text-gray-800 dark:text-white text-theme-sm">
+                        <div className="mb-1 text-theme-sm font-medium text-gray-800 dark:text-white">
                             {title}
                         </div>
                     )}
 
-                    <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {content}
-                    </div>
+                    <div className="text-sm text-gray-700 dark:text-gray-300">{content}</div>
 
                     {withButton && (
                         <div className="mt-3">
-                            <button type="button" className="rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-600">
+                            <button
+                                type="button"
+                                className="rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-600"
+                            >
                                 {buttonText}
                             </button>
                         </div>
@@ -171,7 +170,10 @@ export function Popover({
 
                     {withLink && (
                         <div className="mt-3">
-                            <a href="#" className="inline-flex items-center gap-1 text-xs font-medium text-brand-500 hover:text-brand-600">
+                            <a
+                                href="#"
+                                className="inline-flex items-center gap-1 text-xs font-medium text-brand-500 hover:text-brand-600"
+                            >
                                 {linkText}
                                 <IconFA icon={linkIcon} size="xs" />
                             </a>
@@ -183,4 +185,4 @@ export function Popover({
     );
 }
 
-export default Popover; 
+export default Popover;

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { Popover } from './Popover';
 import { ReactNode } from 'react';
@@ -24,7 +24,7 @@ export function PopoverWithLink({
     linkIcon = 'arrow-right',
     className = '',
     trigger = 'click',
-    hoverDelay = 200
+    hoverDelay = 200,
 }: PopoverWithLinkProps) {
     return (
         <Popover
@@ -44,4 +44,4 @@ export function PopoverWithLink({
     );
 }
 
-export default PopoverWithLink; 
+export default PopoverWithLink;

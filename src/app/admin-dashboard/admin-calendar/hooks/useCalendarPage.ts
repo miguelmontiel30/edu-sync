@@ -1,12 +1,12 @@
 // React
-import {useState} from 'react';
+import { useState } from 'react';
 
 // Hooks
-import {useAdminCalendar} from './useAdminCalendar';
-import {useSession} from '@/hooks/useSession';
+import { useAdminCalendar } from './useAdminCalendar';
+import { useSession } from '@/hooks/useSession';
 
 // Types
-import {CalendarEvent, Role} from '@/components/core/calendar/types';
+import { CalendarEvent, Role } from '@/components/core/calendar/types';
 
 export function useCalendarPage() {
     // Estado para el modal de eventos
@@ -19,7 +19,7 @@ export function useCalendarPage() {
     const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
 
     // Datos de sesión para el modal
-    const {session} = useSession();
+    const { session } = useSession();
 
     // Hook para los datos y operaciones de calendario
     const {

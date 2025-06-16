@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
 // React
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 // Components
-import { Modal } from "@/components/ui/modal";
-import IconFA from "@/components/ui/IconFA";
-import Label from "@/components/form/Label";
-import Input from "@/components/form/input/InputField";
-import Button from "@/components/core/button/Button";
-import MultiSelect from "@/components/form/MultiSelect";
-import SelectWithCategories from "@/components/core/select/SelectWithCategories";
+import { Modal } from '@/components/ui/modal';
+import IconFA from '@/components/ui/IconFA';
+import Label from '@/components/form/Label';
+import Input from '@/components/form/input/InputField';
+import Button from '@/components/core/button/Button';
+import MultiSelect from '@/components/form/MultiSelect';
+import SelectWithCategories from '@/components/core/select/SelectWithCategories';
 
 // API y Datos
 import {
@@ -19,11 +19,11 @@ import {
     deleteEvent,
     saveEventRecipients,
     deleteEventRecipients,
-    getEventTypes
-} from "@/app/admin-dashboard/admin-calendar/module-utils/queries";
+    getEventTypes,
+} from '@/app/admin-dashboard/admin-calendar/module-utils/queries';
 
 // Types
-import { CalendarEvent, Role } from "@/components/core/calendar/types";
+import { CalendarEvent, Role } from '@/components/core/calendar/types';
 
 // Constantes
 const DEFAULT_COLOR = 'primary';
@@ -86,18 +86,18 @@ export function EventModal({
     _eventTypes = [],
     schoolId = 1,
     schoolYearId = 4,
-    userId = 1
+    userId = 1,
 }: EventModalProps) {
     // Estado local
     const [title, setTitle] = useState(eventTitle);
-    const [description, setDescription] = useState("");
+    const [description, setDescription] = useState('');
     const [startDate, setStartDate] = useState(eventStartDate);
     const [endDate, setEndDate] = useState(eventEndDate || eventStartDate);
-    const [startTime, setStartTime] = useState("00:00");
-    const [endTime, setEndTime] = useState("23:59");
+    const [startTime, setStartTime] = useState('00:00');
+    const [endTime, setEndTime] = useState('23:59');
     const [allDay, setAllDay] = useState(true);
     const [eventTypeId, setEventTypeId] = useState<number | undefined>(undefined);
-    const [error, setError] = useState("");
+    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [availableEventTypes, setAvailableEventTypes] = useState<EventType[]>([]);
 
@@ -111,8 +111,8 @@ export function EventModal({
                         setAvailableEventTypes(response.data);
                     }
                 } catch (err) {
-                    console.error("Error al cargar tipos de eventos:", err);
-                    setError("No se pudieron cargar los tipos de eventos");
+                    console.error('Error al cargar tipos de eventos:', err);
+                    setError('No se pudieron cargar los tipos de eventos');
                 }
             }
         };
@@ -123,7 +123,7 @@ export function EventModal({
     // Inicializar datos cuando se abre el modal
     useEffect(() => {
         if (isOpen) {
-            console.log("Inicializando datos del modal con evento:", selectedEvent);
+            console.log('Inicializando datos del modal con evento:', selectedEvent);
 
             // Datos básicos
             setTitle(eventTitle);
@@ -133,28 +133,28 @@ export function EventModal({
             // Datos extendidos si hay un evento seleccionado
             if (selectedEvent) {
                 // Buscar descripción tanto en el nivel principal como en extendedProps
-                const eventDescription = selectedEvent.description ||
-                    selectedEvent.extendedProps?.description || "";
+                const eventDescription =
+                    selectedEvent.description || selectedEvent.extendedProps?.description || '';
 
                 // Buscar tipo de evento tanto en el nivel principal como en extendedProps
-                const typeId = selectedEvent.event_type_id ||
-                    selectedEvent.extendedProps?.event_type_id;
+                const typeId =
+                    selectedEvent.event_type_id || selectedEvent.extendedProps?.event_type_id;
 
-                console.log("Cargando datos existentes:", {
+                console.log('Cargando datos existentes:', {
                     descripcion: eventDescription,
-                    tipoEvento: typeId
+                    tipoEvento: typeId,
                 });
 
                 setDescription(eventDescription);
                 setEventTypeId(typeId !== undefined ? Number(typeId) : undefined);
             } else {
-                setDescription("");
+                setDescription('');
                 setEventTypeId(undefined);
             }
 
             // Configuración de horario
-            setStartTime("00:00");
-            setEndTime("23:59");
+            setStartTime('00:00');
+            setEndTime('23:59');
             setAllDay(true);
         }
     }, [isOpen, eventTitle, eventStartDate, eventEndDate, selectedEvent]);
@@ -162,7 +162,7 @@ export function EventModal({
     // Limpiar el error cuando cambia el estado del modal
     useEffect(() => {
         if (isOpen) {
-            setError("");
+            setError('');
         }
     }, [isOpen]);
 
@@ -177,13 +177,13 @@ export function EventModal({
     const roleOptions: Option[] = availableRoles.map(role => {
         // Detección mejorada de roles seleccionados con depuración
         const isSelected = selectedRoles.some(
-            selectedRole => selectedRole.name.toLowerCase() === role.name.toLowerCase()
+            selectedRole => selectedRole.name.toLowerCase() === role.name.toLowerCase(),
         );
 
         return {
             value: role.role_id,
             text: role.name.charAt(0).toUpperCase() + role.name.slice(1),
-            selected: isSelected
+            selected: isSelected,
         };
     });
 
@@ -192,16 +192,16 @@ export function EventModal({
         .map(role => {
             // Buscar el role_id correspondiente al nombre del rol seleccionado con comparación case-insensitive
             const matchingRole = availableRoles.find(
-                availableRole => availableRole.role_id === role.role_id
+                availableRole => availableRole.role_id === role.role_id,
             );
 
             if (matchingRole) {
                 return matchingRole.role_id;
             } else {
-                return "";
+                return '';
             }
         })
-        .filter(id => id !== ""); // Filtrar IDs vacíos
+        .filter(id => id !== ''); // Filtrar IDs vacíos
 
     // Manejadores de eventos
     const handleRoleChange = (selectedIds: string[]) => {
@@ -213,7 +213,7 @@ export function EventModal({
                 if (role) {
                     return {
                         role_id: role.role_id,
-                        name: role.name
+                        name: role.name,
                     };
                 }
                 return null;
@@ -225,7 +225,7 @@ export function EventModal({
 
     // Manejador para cerrar el modal correctamente
     const handleClose = () => {
-        setError("");
+        setError('');
         setIsLoading(false);
         onClose();
     };
@@ -234,17 +234,17 @@ export function EventModal({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        setError("");
+        setError('');
 
         // Validación
         if (!title.trim()) {
-            setError("El título es obligatorio");
+            setError('El título es obligatorio');
             setIsLoading(false);
             return;
         }
 
         if (!startDate) {
-            setError("La fecha de inicio es obligatoria");
+            setError('La fecha de inicio es obligatoria');
             setIsLoading(false);
             return;
         }
@@ -261,7 +261,8 @@ export function EventModal({
                 // Si estamos editando, actualizamos las propiedades del evento seleccionado
                 selectedEvent.title = title;
                 selectedEvent.description = description;
-                selectedEvent.event_type_id = eventTypeId !== undefined ? eventTypeId.toString() : "";
+                selectedEvent.event_type_id =
+                    eventTypeId !== undefined ? eventTypeId.toString() : '';
                 selectedEvent.start = startDateTime;
                 selectedEvent.end = endDateTime;
 
@@ -269,7 +270,7 @@ export function EventModal({
                 if (!selectedEvent.extendedProps) {
                     selectedEvent.extendedProps = {
                         calendar: eventLevel || DEFAULT_COLOR,
-                        roles: selectedRoles || []
+                        roles: selectedRoles || [],
                     };
                 }
 
@@ -288,13 +289,13 @@ export function EventModal({
                 end_time: endDateTime,
                 all_day: allDay,
                 status_id: ACTIVE_STATUS_ID,
-                created_by: userId
+                created_by: userId,
             };
 
-            console.log("Datos del evento a guardar:", {
+            console.log('Datos del evento a guardar:', {
                 ...eventData,
                 selectedRoles,
-                eventoActual: selectedEvent
+                eventoActual: selectedEvent,
             });
 
             let savedEvent;
@@ -314,13 +315,14 @@ export function EventModal({
                 // Mejorar la comparación con case-insensitive
                 const recipients = availableRoles
                     .filter(role =>
-                        selectedRoles.some(selectedRole =>
-                            selectedRole.name.toLowerCase() === role.name.toLowerCase()
-                        )
+                        selectedRoles.some(
+                            selectedRole =>
+                                selectedRole.name.toLowerCase() === role.name.toLowerCase(),
+                        ),
                     )
                     .map(role => ({
                         event_id: savedEvent.event_id,
-                        role_id: role.role_id
+                        role_id: role.role_id,
                     }));
 
                 await saveEventRecipients(recipients);
@@ -330,8 +332,8 @@ export function EventModal({
             onSave();
             handleClose();
         } catch (err) {
-            console.error("Error al guardar el evento:", err);
-            setError("Ocurrió un error al guardar el evento. Inténtalo de nuevo.");
+            console.error('Error al guardar el evento:', err);
+            setError('Ocurrió un error al guardar el evento. Inténtalo de nuevo.');
             setIsLoading(false);
         }
     };
@@ -339,9 +341,9 @@ export function EventModal({
     // Eliminar evento
     const handleDeleteEvent = async () => {
         setIsLoading(true);
-        setError("");
+        setError('');
 
-        console.log("Solicitud de eliminación para evento:", selectedEvent);
+        console.log('Solicitud de eliminación para evento:', selectedEvent);
 
         // Extraer el ID del evento de FullCalendar (puede venir en diferentes formatos)
         let eventDbId = null;
@@ -354,7 +356,7 @@ export function EventModal({
             eventDbId = selectedEvent._def.extendedProps.event_id;
         } else if (typeof selectedEvent === 'object' && selectedEvent !== null) {
             // Buscar en todas las propiedades anidadas posibles
-            console.log("Buscando ID en el objeto evento:", selectedEvent);
+            console.log('Buscando ID en el objeto evento:', selectedEvent);
 
             // Si es un objeto nativo de FullCalendar
             const fcEvent = selectedEvent as any;
@@ -363,30 +365,33 @@ export function EventModal({
             }
         }
 
-        console.log("ID de base de datos encontrado:", eventDbId);
+        console.log('ID de base de datos encontrado:', eventDbId);
 
         if (eventDbId && onDelete) {
             try {
-                console.log("Eliminando evento con ID en DB:", eventDbId);
+                console.log('Eliminando evento con ID en DB:', eventDbId);
                 await deleteEvent(eventDbId);
 
                 // Llamar a onDelete para actualizar la UI
                 onDelete();
                 handleClose();
             } catch (err) {
-                console.error("Error al eliminar el evento:", err);
-                setError("Ocurrió un error al eliminar el evento.");
+                console.error('Error al eliminar el evento:', err);
+                setError('Ocurrió un error al eliminar el evento.');
                 setIsLoading(false);
             }
         } else {
-            console.error("No se puede eliminar el evento: ID de base de datos no disponible", selectedEvent);
+            console.error(
+                'No se puede eliminar el evento: ID de base de datos no disponible',
+                selectedEvent,
+            );
             // Si no tenemos ID de BD pero sí onDelete, intentemos eliminarlo solo de la UI
             if (onDelete) {
-                console.log("Eliminando solo de la UI sin ID de base de datos");
+                console.log('Eliminando solo de la UI sin ID de base de datos');
                 onDelete();
                 handleClose();
             } else {
-                setError("No se puede eliminar: falta información del evento");
+                setError('No se puede eliminar: falta información del evento');
                 setIsLoading(false);
             }
         }
@@ -395,42 +400,54 @@ export function EventModal({
     // Obtener categorías de eventos organizadas por color
     const getEventTypeCategories = () => {
         // Retornar una sola categoría con todos los tipos de eventos
-        return [{
-            label: 'Tipos de eventos',
-            options: availableEventTypes.map(eventType => ({
-                value: eventType.event_type_id.toString(),
-                label: eventType.name
-            }))
-        }];
+        return [
+            {
+                label: 'Tipos de eventos',
+                options: availableEventTypes.map(eventType => ({
+                    value: eventType.event_type_id.toString(),
+                    label: eventType.name,
+                })),
+            },
+        ];
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={handleClose} isFullscreen={false} className="max-w-[900px] p-2 lg:p-6">
-            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar max-h-[80vh] relative">
+        <Modal
+            isOpen={isOpen}
+            onClose={handleClose}
+            isFullscreen={false}
+            className="max-w-[900px] p-2 lg:p-6"
+        >
+            <div className="custom-scrollbar relative flex max-h-[80vh] flex-col overflow-y-auto px-2">
                 {/* Overlay de carga */}
                 {isLoading && (
-                    <div className="absolute inset-0 bg-white/50 dark:bg-gray-900/50 z-50 flex items-center justify-center">
-                        <div className="flex flex-col items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg">
-                            <IconFA icon="spinner" className="animate-spin text-primary text-xl mb-2" />
+                    <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/50 dark:bg-gray-900/50">
+                        <div className="flex flex-col items-center rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800">
+                            <IconFA
+                                icon="spinner"
+                                className="text-primary mb-2 animate-spin text-xl"
+                            />
                             <span className="text-gray-800 dark:text-gray-200">Procesando...</span>
                         </div>
                     </div>
                 )}
 
                 {/* Cabecera */}
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                     <div>
-                        <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
+                        <h5 className="modal-title mb-2 font-outfit text-theme-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
                             {selectedEvent?.id ? 'Editar Evento' : 'Crear Nuevo Evento'}
                         </h5>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                            {selectedEvent?.id ? 'Edita el evento para actualizar sus datos' : 'Crea un nuevo evento para la agenda'}
+                        <p className="font-outfit text-sm text-gray-500 dark:text-gray-400">
+                            {selectedEvent?.id
+                                ? 'Edita el evento para actualizar sus datos'
+                                : 'Crea un nuevo evento para la agenda'}
                         </p>
                     </div>
 
                     {isLoading && (
-                        <div className="flex items-center text-primary">
-                            <IconFA icon="spinner" className="animate-spin mr-2" />
+                        <div className="text-primary flex items-center">
+                            <IconFA icon="spinner" className="mr-2 animate-spin" />
                             <span className="text-sm">Procesando...</span>
                         </div>
                     )}
@@ -457,7 +474,7 @@ export function EventModal({
                                 <Input
                                     id="title"
                                     value={title}
-                                    onChange={(e) => {
+                                    onChange={e => {
                                         setTitle(e.target.value);
                                         onTitleChange(e.target.value);
                                     }}
@@ -471,14 +488,14 @@ export function EventModal({
                                 <SelectWithCategories
                                     options={getEventTypeCategories()}
                                     placeholder="Seleccionar tipo de evento"
-                                    onChange={(value) => {
+                                    onChange={value => {
                                         const eventTypeIdNum = value ? parseInt(value) : undefined;
                                         setEventTypeId(eventTypeIdNum);
 
                                         // Aplicar color del tipo de evento
                                         if (value) {
                                             const selectedType = availableEventTypes.find(
-                                                t => t.event_type_id === eventTypeIdNum
+                                                t => t.event_type_id === eventTypeIdNum,
                                             );
                                             if (selectedType?.color) {
                                                 onLevelChange(selectedType.color);
@@ -506,10 +523,12 @@ export function EventModal({
                                     type="checkbox"
                                     id="allDay"
                                     checked={allDay}
-                                    onChange={(e) => setAllDay(e.target.checked)}
+                                    onChange={e => setAllDay(e.target.checked)}
                                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                 />
-                                <Label htmlFor="allDay" className="m-0">Todo el día</Label>
+                                <Label htmlFor="allDay" className="m-0">
+                                    Todo el día
+                                </Label>
                             </div>
 
                             {/* Fecha y hora de inicio */}
@@ -522,7 +541,7 @@ export function EventModal({
                                         id="startDate"
                                         type="date"
                                         value={startDate}
-                                        onChange={(e) => {
+                                        onChange={e => {
                                             setStartDate(e.target.value);
                                             onStartDateChange(e.target.value);
                                         }}
@@ -537,13 +556,12 @@ export function EventModal({
                                             id="startTime"
                                             type="time"
                                             value={startTime}
-                                            onChange={(e) => setStartTime(e.target.value)}
+                                            onChange={e => setStartTime(e.target.value)}
                                             startIcon={<IconFA icon="clock" />}
                                         />
                                     </div>
                                 )}
                             </div>
-
 
                             {/* Fecha y hora de finalización */}
                             {!allDay && (
@@ -554,7 +572,7 @@ export function EventModal({
                                             id="endDate"
                                             type="date"
                                             value={endDate}
-                                            onChange={(e) => {
+                                            onChange={e => {
                                                 setEndDate(e.target.value);
                                                 onEndDateChange(e.target.value);
                                             }}
@@ -569,7 +587,7 @@ export function EventModal({
                                                 id="endTime"
                                                 type="time"
                                                 value={endTime}
-                                                onChange={(e) => setEndTime(e.target.value)}
+                                                onChange={e => setEndTime(e.target.value)}
                                                 startIcon={<IconFA icon="clock" />}
                                             />
                                         </div>
@@ -585,7 +603,7 @@ export function EventModal({
                                     <textarea
                                         id="description"
                                         value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
+                                        onChange={e => setDescription(e.target.value)}
                                         placeholder="Descripción del evento"
                                         className="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
                                         rows={3}
@@ -611,8 +629,14 @@ export function EventModal({
                                     type="button"
                                     onClick={handleDeleteEvent}
                                     disabled={isLoading}
-                                    className="text-red-500 border-red-500 hover:bg-red-50 hover:text-red-600"
-                                    startIcon={isLoading ? <IconFA icon="spinner" className="animate-spin" /> : <IconFA icon="trash-alt" />}
+                                    className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"
+                                    startIcon={
+                                        isLoading ? (
+                                            <IconFA icon="spinner" className="animate-spin" />
+                                        ) : (
+                                            <IconFA icon="trash-alt" />
+                                        )
+                                    }
                                 >
                                     {isLoading ? 'Eliminando...' : 'Eliminar'}
                                 </Button>
@@ -622,7 +646,16 @@ export function EventModal({
                                 variant="primary"
                                 type="submit"
                                 disabled={isLoading}
-                                startIcon={isLoading ? <IconFA icon="spinner" className="animate-spin text-white" /> : <IconFA icon="save" />}
+                                startIcon={
+                                    isLoading ? (
+                                        <IconFA
+                                            icon="spinner"
+                                            className="animate-spin text-white"
+                                        />
+                                    ) : (
+                                        <IconFA icon="save" />
+                                    )
+                                }
                             >
                                 {isLoading ? 'Guardando...' : 'Guardar evento'}
                             </Button>
@@ -632,4 +665,4 @@ export function EventModal({
             </div>
         </Modal>
     );
-} 
+}

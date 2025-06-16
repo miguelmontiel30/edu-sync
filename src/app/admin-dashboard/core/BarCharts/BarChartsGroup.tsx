@@ -116,21 +116,22 @@ export function BarChart({
     chartConfig,
     data,
     isLoading,
-    emptyMessage = "Registra tus datos para poder ver las métricas",
-    customOptions
+    emptyMessage = 'Registra tus datos para poder ver las métricas',
+    customOptions,
 }: Readonly<BarChartProps>) {
     const { title, dataKey, color, yAxisTitle, isEmpty, blurMessage } = chartConfig;
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-[180px]">
+            <div className="flex h-[180px] items-center justify-center">
                 <IconFA icon="spinner" spin className="text-gray-400" />
             </div>
         );
     }
 
     // Verificar si los datos son válidos (hay datos y tienen la propiedad dataKey)
-    const hasValidData = data && data.length > 0 && data.some(item => typeof item[dataKey] === 'number');
+    const hasValidData =
+        data && data.length > 0 && data.some(item => typeof item[dataKey] === 'number');
 
     // Si isEmpty está definido explícitamente, usar ese valor; de lo contrario, usar la lógica existente
     const shouldShowEmpty = isEmpty !== undefined ? isEmpty : !hasValidData;
@@ -140,11 +141,11 @@ export function BarChart({
         return (
             <>
                 <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
+                    <h3 className="font-outfit text-lg font-semibold text-gray-800 dark:text-white/90">
                         {title}
                     </h3>
                 </div>
-                <div className="custom-scrollbar max-w-full overflow-x-auto h-[180px] flex items-center justify-center">
+                <div className="custom-scrollbar flex h-[180px] max-w-full items-center justify-center overflow-x-auto">
                     <div className="h-full w-full" style={{ opacity: 0.3 }}>
                         <ReactApexChart
                             options={{
@@ -162,19 +163,23 @@ export function BarChart({
                                     ...defaultBarOptions.chart,
                                     fontFamily: 'Outfit, sans-serif',
                                 },
-                                ...customOptions
+                                ...customOptions,
                             }}
-                            series={[{
-                                name: yAxisTitle,
-                                data: [30, 45, 20]
-                            }]}
+                            series={[
+                                {
+                                    name: yAxisTitle,
+                                    data: [30, 45, 20],
+                                },
+                            ]}
                             type="bar"
                             height={180}
                         />
                     </div>
                 </div>
                 <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50 backdrop-blur-sm">
-                    <span className="text-lg font-semibold text-white font-outfit text-center px-4">{emptyDisplayMessage}</span>
+                    <span className="px-4 text-center font-outfit text-lg font-semibold text-white">
+                        {emptyDisplayMessage}
+                    </span>
                 </div>
             </>
         );
@@ -185,7 +190,7 @@ export function BarChart({
         .filter(item => typeof item[dataKey] === 'number')
         .map(item => ({
             name: item.name || 'Sin nombre',
-            value: item[dataKey] || 0
+            value: item[dataKey] || 0,
         }));
 
     // Asegurarse de que siempre haya al menos un elemento en el array de datos
@@ -196,7 +201,7 @@ export function BarChart({
     return (
         <>
             <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 font-outfit">
+                <h3 className="font-outfit text-lg font-semibold text-gray-800 dark:text-white/90">
                     {title}
                 </h3>
             </div>
@@ -218,12 +223,14 @@ export function BarChart({
                                 ...defaultBarOptions.chart,
                                 fontFamily: 'Outfit, sans-serif',
                             },
-                            ...customOptions
+                            ...customOptions,
                         }}
-                        series={[{
-                            name: yAxisTitle,
-                            data: chartData.map(item => item.value)
-                        }]}
+                        series={[
+                            {
+                                name: yAxisTitle,
+                                data: chartData.map(item => item.value),
+                            },
+                        ]}
                         type="bar"
                         height={180}
                     />
@@ -242,11 +249,11 @@ export default function BarChartsGroup({
     charts,
     emptyMessage,
     customOptions,
-    className = "grid my-6 grid-cols-1 gap-6 md:grid-cols-2"
+    className = 'grid my-6 grid-cols-1 gap-6 md:grid-cols-2',
 }: Readonly<BarChartsGroupProps>) {
     return (
         <div className={className}>
-            {charts.map((chartConfig) => (
+            {charts.map(chartConfig => (
                 <div
                     key={`chart-${chartConfig.title}-${chartConfig.dataKey}`}
                     className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6"
@@ -262,4 +269,4 @@ export default function BarChartsGroup({
             ))}
         </div>
     );
-} 
+}

@@ -1,6 +1,6 @@
 'use client';
 // Context
-import {useSidebar} from '@/context/SidebarContext';
+import { useSidebar } from '@/context/SidebarContext';
 
 // Components
 import AdminSidebar from '@/components/navigation/AdminSidebar';
@@ -9,9 +9,9 @@ import AdminNavbar from '@/components/navigation/AdminNavbar';
 // Routes
 import ProtectedRoute from '@/app/(auth)/ProtectedRoute';
 
-export default function NotificationsLayout({children}: Readonly<{children: React.ReactNode}>) {
+export default function NotificationsLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     // Sidebar state
-    const {isExpanded, isHovered, isMobileOpen} = useSidebar();
+    const { isExpanded, isHovered, isMobileOpen } = useSidebar();
 
     // Dynamic class for main content margin based on sidebar state
     let mainContentMargin = 'lg:ml-[90px]';
@@ -41,4 +41,4 @@ export default function NotificationsLayout({children}: Readonly<{children: Reac
             </div>
         </ProtectedRoute>
     );
-} 
+}

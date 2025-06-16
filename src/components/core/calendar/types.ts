@@ -1,4 +1,4 @@
-import {EventInput} from '@fullcalendar/core';
+import { EventInput } from '@fullcalendar/core';
 
 /**
  * Interfaz para representar un rol dentro del sistema

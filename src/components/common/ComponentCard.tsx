@@ -20,13 +20,21 @@ const ComponentCard: React.FC<ComponentCardProps> = ({
             {/* Card Header - Only render if title or desc is provided */}
             {(title || desc) && (
                 <div className="px-6 py-5">
-                    {title && <h3 className="text-base font-medium text-gray-800 dark:text-white/90">{title}</h3>}
-                    {desc && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{desc}</p>}
+                    {title && (
+                        <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
+                            {title}
+                        </h3>
+                    )}
+                    {desc && (
+                        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{desc}</p>
+                    )}
                 </div>
             )}
 
             {/* Card Body */}
-            <div className={`${title || desc ? 'border-t border-gray-100 dark:border-gray-800' : ''} p-2 sm:p-2`}>
+            <div
+                className={`${title || desc ? 'border-t border-gray-100 dark:border-gray-800' : ''} p-2 sm:p-2`}
+            >
                 <div className="space-y-6">{children}</div>
             </div>
         </div>

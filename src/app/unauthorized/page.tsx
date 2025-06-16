@@ -26,12 +26,12 @@ const UnauthorizedPage = () => {
                         id: session.id,
                         email: session.email,
                         role: session.role || 'sin rol',
-                        isAuthenticated: isAuthenticated
+                        isAuthenticated: isAuthenticated,
                     });
                 } else {
                     setSessionInfo({
                         message: 'No hay sesión activa',
-                        isAuthenticated: isAuthenticated
+                        isAuthenticated: isAuthenticated,
                     });
                 }
             } catch (error) {
@@ -102,8 +102,8 @@ const UnauthorizedPage = () => {
                             Acceso Restringido
                         </h1>
                         <p className="mb-8 text-gray-600 dark:text-gray-400">
-                            No tienes permisos para acceder a esta sección. Por favor, contacta al administrador
-                            si necesitas acceso.
+                            No tienes permisos para acceder a esta sección. Por favor, contacta al
+                            administrador si necesitas acceso.
                         </p>
 
                         {/* Información de depuración */}
@@ -153,4 +153,4 @@ const UnauthorizedPage = () => {
     );
 };
 
-export default UnauthorizedPage; 
+export default UnauthorizedPage;

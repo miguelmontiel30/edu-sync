@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react';
+import React, { ReactNode } from 'react';
 
 interface ButtonProps {
     children: ReactNode; // Button text or content
@@ -32,7 +32,8 @@ const Button: React.FC<ButtonProps> = ({
     // Variant Classes
     const variantClasses = {
         primary: 'bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300',
-        secondary: 'bg-indigo-500 text-white shadow-theme-xs hover:bg-indigo-600 disabled:bg-indigo-300',
+        secondary:
+            'bg-indigo-500 text-white shadow-theme-xs hover:bg-indigo-600 disabled:bg-indigo-300',
         danger: 'bg-red-500 text-white shadow-theme-xs hover:bg-red-600 disabled:bg-red-300',
         warning: 'bg-amber-500 text-white shadow-theme-xs hover:bg-amber-600 disabled:bg-amber-300',
         info: 'bg-blue-500 text-white shadow-theme-xs hover:bg-blue-600 disabled:bg-blue-300',

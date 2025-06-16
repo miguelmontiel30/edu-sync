@@ -1,19 +1,19 @@
 'use client';
 
 // React
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 // Components
 import PageBreadcrumb from '@/components/common/PageBreadCrumb';
 import Button from '@/components/core/button/Button';
-import {Table, TableHeader, TableBody, TableRow, TableCell} from '@/components/core/table';
-import {Modal} from '@/components/ui/modal';
+import { Table, TableHeader, TableBody, TableRow, TableCell } from '@/components/core/table';
+import { Modal } from '@/components/ui/modal';
 import Label from '@/components/form/Label';
 import Input from '@/components/form/input/InputField';
 import Select from '@/components/form/Select';
 
 // Services
-import {supabaseClient} from '@/services/config/supabaseClient';
+import { supabaseClient } from '@/services/config/supabaseClient';
 
 // Interfaces
 interface User {
@@ -58,7 +58,7 @@ export default function AdminUsersDashboard() {
 
     const loadUsers = async () => {
         try {
-            const {data, error} = await supabaseClient
+            const { data, error } = await supabaseClient
                 .from('users')
                 .select(
                     `
@@ -93,7 +93,7 @@ export default function AdminUsersDashboard() {
 
     const loadRoles = async () => {
         try {
-            const {data, error} = await supabaseClient
+            const { data, error } = await supabaseClient
                 .from('roles')
                 .select('*')
                 .eq('delete_flag', false);
@@ -107,7 +107,7 @@ export default function AdminUsersDashboard() {
 
     // Handlers
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value,
@@ -120,7 +120,7 @@ export default function AdminUsersDashboard() {
 
         try {
             // Crear usuario
-            const {data: userData, error: userError} = await supabaseClient
+            const { data: userData, error: userError } = await supabaseClient
                 .from('users')
                 .insert({
                     email: formData.email,
@@ -134,7 +134,7 @@ export default function AdminUsersDashboard() {
             if (userError) throw userError;
 
             // Asignar rol
-            const {error: roleError} = await supabaseClient.from('user_roles').insert({
+            const { error: roleError } = await supabaseClient.from('user_roles').insert({
                 user_id: userData.user_id,
                 role_id: parseInt(formData.role_id),
             });
@@ -308,7 +308,9 @@ export default function AdminUsersDashboard() {
                                     }))}
                                     placeholder="Seleccionar rol"
                                     onChange={value =>
-                                        handleInputChange({target: {name: 'role_id', value}} as any)
+                                        handleInputChange({
+                                            target: { name: 'role_id', value },
+                                        } as any)
                                     }
                                     defaultValue={formData.role_id}
                                 />

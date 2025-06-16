@@ -1,4 +1,4 @@
-import {Column} from '@/components/core/table/module-utils/types';
+import { Column } from '@/components/core/table/module-utils/types';
 
 // Definición básica de BaseItem que todos los elementos en listas deben tener
 export interface BaseItem {

@@ -10,7 +10,9 @@ import AdminNavbar from '@/components/navigation/AdminNavbar';
 // Routes
 import ProtectedRoute from '@/app/(auth)/ProtectedRoute';
 
-export default function TeacherDashboardLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function TeacherDashboardLayout({
+    children,
+}: Readonly<{ children: React.ReactNode }>) {
     // Sidebar state
     const { isExpanded, isHovered, isMobileOpen } = useSidebar();
 
@@ -30,17 +32,21 @@ export default function TeacherDashboardLayout({ children }: Readonly<{ children
                 <AdminSidebar />
 
                 {/* Contenido principal */}
-                <div className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}>
+                <div
+                    className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}
+                >
                     {/* Navbar */}
                     <AdminNavbar />
 
                     {/* Main content */}
                     <div className="mx-auto max-w-screen-2xl p-4 md:p-6">
-                        <h1 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-white">Panel de Profesor</h1>
+                        <h1 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-white">
+                            Panel de Profesor
+                        </h1>
                         {children}
                     </div>
                 </div>
             </div>
         </ProtectedRoute>
     );
-} 
+}

@@ -9,7 +9,7 @@ import IconFA from '@/components/ui/IconFA';
 import Input from '@/components/form/input/InputField';
 
 // Types
-import { DataTableProps, SortDirection, } from './module-utils/types';
+import { DataTableProps, SortDirection } from './module-utils/types';
 
 export default function DataTable<T>({
     data,
@@ -28,7 +28,7 @@ export default function DataTable<T>({
     emptyStateComponent,
     loadingComponent,
     onSearch,
-    onSort
+    onSort,
 }: DataTableProps<T>) {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortField, setSortField] = useState<string | null>(defaultSortField || null);
@@ -53,7 +53,7 @@ export default function DataTable<T>({
                     if (value === null || value === undefined) return false;
 
                     return String(value).toLowerCase().includes(searchTermLower);
-                })
+                }),
             );
 
             setFilteredData(filtered);
@@ -138,7 +138,7 @@ export default function DataTable<T>({
     return (
         <div className={`w-full ${className}`}>
             {searchable && (
-                <div className="mb-4 relative w-full sm:w-64">
+                <div className="relative mb-4 w-full sm:w-64">
                     <Input
                         type="text"
                         placeholder={searchPlaceholder}
@@ -153,7 +153,7 @@ export default function DataTable<T>({
             <div className="overflow-x-auto">
                 {isLoading ? (
                     loadingComponent || (
-                        <div className="flex items-center justify-center h-[200px]">
+                        <div className="flex h-[200px] items-center justify-center">
                             <IconFA icon="spinner" spin className="text-gray-400" />
                         </div>
                     )
@@ -161,24 +161,36 @@ export default function DataTable<T>({
                     <Table className="min-w-full" maxHeight={maxHeight}>
                         <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
                             <TableRow>
-                                {columns.map((column) => (
+                                {columns.map(column => (
                                     <TableCell
                                         key={column.key.toString()}
                                         isHeader
                                         className={[
                                             'px-5 py-3 text-center',
-                                            column.sortable ? 'cursor-pointer hover:text-gray-700 dark:hover:text-gray-300' : '',
+                                            column.sortable
+                                                ? 'cursor-pointer hover:text-gray-700 dark:hover:text-gray-300'
+                                                : '',
                                             column.className || '',
-                                            column.width ? `w-[${column.width}]` : ''
-                                        ].filter(Boolean).join(' ')}
-                                        onClick={column.sortable ? () => handleSort(column.key.toString()) : undefined}
+                                            column.width ? `w-[${column.width}]` : '',
+                                        ]
+                                            .filter(Boolean)
+                                            .join(' ')}
+                                        onClick={
+                                            column.sortable
+                                                ? () => handleSort(column.key.toString())
+                                                : undefined
+                                        }
                                     >
                                         {column.sortable ? (
                                             <div className="flex items-center justify-center gap-1">
                                                 {column.header}
                                                 {sortField === column.key && (
                                                     <IconFA
-                                                        icon={sortDirection === 'asc' ? 'arrow-up' : 'arrow-down'}
+                                                        icon={
+                                                            sortDirection === 'asc'
+                                                                ? 'arrow-up'
+                                                                : 'arrow-down'
+                                                        }
                                                         style="solid"
                                                         className="text-gray-500"
                                                     />
@@ -193,27 +205,31 @@ export default function DataTable<T>({
                         </TableHeader>
                         <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                             {displayData.length > 0 ? (
-                                displayData.map((item) => (
+                                displayData.map(item => (
                                     <TableRow key={keyExtractor(item)}>
-                                        {columns.map((column) => (
+                                        {columns.map(column => (
                                             <TableCell
                                                 key={`${keyExtractor(item)}_${column.key.toString()}`}
                                                 className="px-5 py-4 text-center sm:px-6"
                                             >
                                                 {column.render
                                                     ? column.render(item)
-                                                    : String(item[column.key as keyof T] || '')
-                                                }
+                                                    : String(item[column.key as keyof T] || '')}
                                             </TableCell>
                                         ))}
                                     </TableRow>
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={columns.length} className="px-5 py-4 text-center sm:px-6">
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="px-5 py-4 text-center sm:px-6"
+                                    >
                                         {emptyStateComponent || (
-                                            <span className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                                                {data.length === 0 ? noDataMessage : searchNoResultsMessage}
+                                            <span className="font-outfit text-sm text-gray-500 dark:text-gray-400">
+                                                {data.length === 0
+                                                    ? noDataMessage
+                                                    : searchNoResultsMessage}
                                             </span>
                                         )}
                                     </TableCell>
@@ -225,9 +241,14 @@ export default function DataTable<T>({
             </div>
 
             {!isLoading && (
-                <div className="flex flex-col items-center md:flex-row md:justify-between md:items-center mt-4 px-2 gap-y-3 md:gap-y-0">
-                    <div className="text-sm text-gray-500 dark:text-gray-400 font-outfit text-center md:text-left">
-                        Mostrando {Math.min(itemsPerPage, filteredData.length - (currentPage - 1) * itemsPerPage)} de {filteredData.length} registros
+                <div className="mt-4 flex flex-col items-center gap-y-3 px-2 md:flex-row md:items-center md:justify-between md:gap-y-0">
+                    <div className="text-center font-outfit text-sm text-gray-500 dark:text-gray-400 md:text-left">
+                        Mostrando{' '}
+                        {Math.min(
+                            itemsPerPage,
+                            filteredData.length - (currentPage - 1) * itemsPerPage,
+                        )}{' '}
+                        de {filteredData.length} registros
                     </div>
 
                     <div className="flex items-center space-x-2">
@@ -235,7 +256,7 @@ export default function DataTable<T>({
                             type="button"
                             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                             disabled={currentPage === 1}
-                            className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white/[0.03] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                            className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300 dark:hover:bg-gray-800"
                         >
                             Anterior
                         </button>
@@ -244,7 +265,7 @@ export default function DataTable<T>({
                             type="button"
                             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                             disabled={currentPage === totalPages || totalPages === 0}
-                            className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-white/[0.03] dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                            className="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-white/[0.03] dark:text-gray-300 dark:hover:bg-gray-800"
                         >
                             Siguiente
                         </button>
@@ -253,4 +274,4 @@ export default function DataTable<T>({
             )}
         </div>
     );
-} 
+}

@@ -31,7 +31,12 @@ interface ThemeSettings {
 
 export default function ThemeConfig() {
     // Usar el hook personalizado para manejar el estado del tema
-    const { themeSettings, isLoading: isLoadingSettings, error, updateThemeSettings } = useThemeSettings();
+    const {
+        themeSettings,
+        isLoading: isLoadingSettings,
+        error,
+        updateThemeSettings,
+    } = useThemeSettings();
     // Obtener la sesión del contexto
     const { session, isLoading: isLoadingSession } = useSessionContext();
 
@@ -53,7 +58,7 @@ export default function ThemeConfig() {
         } else if (!isLoadingSession) {
             setMessage({
                 type: 'error',
-                text: 'No se encontró la escuela asociada a tu usuario. Por favor, contacta al administrador.'
+                text: 'No se encontró la escuela asociada a tu usuario. Por favor, contacta al administrador.',
             });
         }
     }, [session, isLoadingSession]);
@@ -66,7 +71,11 @@ export default function ThemeConfig() {
                 custom_color: themeSettings.custom_color || '',
                 use_custom_color: themeSettings.use_custom_color,
             });
-            setPreviewColor(themeSettings.use_custom_color ? themeSettings.custom_color : themeSettings.primary_color);
+            setPreviewColor(
+                themeSettings.use_custom_color
+                    ? themeSettings.custom_color
+                    : themeSettings.primary_color,
+            );
         }
     }, [themeSettings]);
 
@@ -75,7 +84,10 @@ export default function ThemeConfig() {
         if (error) {
             setMessage({
                 type: 'error',
-                text: typeof error === 'string' ? error : 'Ha ocurrido un error al cargar la configuración del tema.'
+                text:
+                    typeof error === 'string'
+                        ? error
+                        : 'Ha ocurrido un error al cargar la configuración del tema.',
             });
         }
     }, [error]);
@@ -110,7 +122,9 @@ export default function ThemeConfig() {
             use_custom_color: checked,
         };
         setLocalSettings(newSettings);
-        setPreviewColor(checked ? newSettings.custom_color || '#FFFFFF' : newSettings.primary_color);
+        setPreviewColor(
+            checked ? newSettings.custom_color || '#FFFFFF' : newSettings.primary_color,
+        );
     };
 
     // Función para calcular tonalidades de un color
@@ -146,10 +160,10 @@ export default function ThemeConfig() {
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result
             ? {
-                r: parseInt(result[1], 16),
-                g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16),
-            }
+                  r: parseInt(result[1], 16),
+                  g: parseInt(result[2], 16),
+                  b: parseInt(result[3], 16),
+              }
             : null;
     };
 
@@ -187,20 +201,31 @@ export default function ThemeConfig() {
                 // Intentar refrescar la sesión para obtener el ID de la escuela
                 if (session) {
                     // Si hay sesión pero no school_id, es posible que haya un problema con el perfil
-                    throw new Error('No se ha podido identificar la escuela asociada a tu cuenta. Por favor, contacta al administrador.');
+                    throw new Error(
+                        'No se ha podido identificar la escuela asociada a tu cuenta. Por favor, contacta al administrador.',
+                    );
                 } else {
                     // Si no hay sesión, es posible que haya expirado
-                    throw new Error('Tu sesión ha expirado. Por favor, recarga la página o inicia sesión nuevamente.');
+                    throw new Error(
+                        'Tu sesión ha expirado. Por favor, recarga la página o inicia sesión nuevamente.',
+                    );
                 }
             }
 
             // Asegurarse de que el color de vista previa sea válido
-            if (localSettings.use_custom_color && (!localSettings.custom_color || !/^#[0-9A-F]{6}$/i.test(localSettings.custom_color))) {
-                throw new Error('El color personalizado no es válido. Debe ser un código HEX válido (ej: #FF5500)');
+            if (
+                localSettings.use_custom_color &&
+                (!localSettings.custom_color || !/^#[0-9A-F]{6}$/i.test(localSettings.custom_color))
+            ) {
+                throw new Error(
+                    'El color personalizado no es válido. Debe ser un código HEX válido (ej: #FF5500)',
+                );
             }
 
             // Generar la paleta de colores basada en el color actual
-            const colorToUse = localSettings.use_custom_color ? localSettings.custom_color : localSettings.primary_color;
+            const colorToUse = localSettings.use_custom_color
+                ? localSettings.custom_color
+                : localSettings.primary_color;
             const generatedPalette = calculateShades(colorToUse || '#465FFF');
 
             // Preparar los datos para actualizar
@@ -216,7 +241,11 @@ export default function ThemeConfig() {
             const result = await updateThemeSettings(settingsToUpdate);
 
             if (!result.success) {
-                throw new Error(result.error instanceof Error ? result.error.message : 'No se pudo actualizar la configuración');
+                throw new Error(
+                    result.error instanceof Error
+                        ? result.error.message
+                        : 'No se pudo actualizar la configuración',
+                );
             }
 
             setMessage({
@@ -227,7 +256,10 @@ export default function ThemeConfig() {
             console.error('Error al guardar la configuración:', error);
             setMessage({
                 type: 'error',
-                text: error instanceof Error ? error.message : 'Ha ocurrido un error al guardar la configuración del tema.',
+                text:
+                    error instanceof Error
+                        ? error.message
+                        : 'Ha ocurrido un error al guardar la configuración del tema.',
             });
         } finally {
             setIsLoading(false);
@@ -248,14 +280,17 @@ export default function ThemeConfig() {
             {/* Mensaje de estado */}
             {message.text && (
                 <div
-                    className={`mb-4 rounded-lg p-4 ${message.type === 'success'
-                        ? 'bg-success-50 text-success-700 dark:bg-success-500/20 dark:text-success-400'
-                        : 'bg-error-50 text-error-700 dark:bg-error-500/20 dark:text-error-400'
-                        }`}
+                    className={`mb-4 rounded-lg p-4 ${
+                        message.type === 'success'
+                            ? 'bg-success-50 text-success-700 dark:bg-success-500/20 dark:text-success-400'
+                            : 'bg-error-50 text-error-700 dark:bg-error-500/20 dark:text-error-400'
+                    }`}
                 >
                     <div className="flex items-center">
                         <IconFA
-                            icon={message.type === 'success' ? 'check-circle' : 'exclamation-circle'}
+                            icon={
+                                message.type === 'success' ? 'check-circle' : 'exclamation-circle'
+                            }
                             className="mr-2"
                             size="lg"
                         />
@@ -280,21 +315,23 @@ export default function ThemeConfig() {
                         <div className="mb-6">
                             <Label htmlFor="presetColors">Selecciona un color predefinido</Label>
                             <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
-                                {predefinedColors.map((color) => (
+                                {predefinedColors.map(color => (
                                     <button
                                         key={color.value}
                                         type="button"
-                                        className={`flex h-10 w-full items-center justify-center rounded-lg border ${localSettings.primary_color === color.value
-                                            ? 'border-gray-800 dark:border-white'
-                                            : 'border-gray-200 dark:border-gray-700'
-                                            } p-1`}
+                                        className={`flex h-10 w-full items-center justify-center rounded-lg border ${
+                                            localSettings.primary_color === color.value
+                                                ? 'border-gray-800 dark:border-white'
+                                                : 'border-gray-200 dark:border-gray-700'
+                                        } p-1`}
                                         style={{ backgroundColor: color.value }}
                                         onClick={() => handleColorSelect(color.value)}
                                         disabled={localSettings.use_custom_color}
                                     >
-                                        {localSettings.primary_color === color.value && !localSettings.use_custom_color && (
-                                            <IconFA icon="check" className="text-white" />
-                                        )}
+                                        {localSettings.primary_color === color.value &&
+                                            !localSettings.use_custom_color && (
+                                                <IconFA icon="check" className="text-white" />
+                                            )}
                                     </button>
                                 ))}
                             </div>
@@ -311,7 +348,9 @@ export default function ThemeConfig() {
 
                         {localSettings.use_custom_color && (
                             <div className="mb-6">
-                                <Label htmlFor="customColor">Color personalizado (código HEX)</Label>
+                                <Label htmlFor="customColor">
+                                    Color personalizado (código HEX)
+                                </Label>
                                 <div className="mt-2 flex items-center gap-3">
                                     <div
                                         className="h-10 w-10 rounded-lg border border-gray-200 dark:border-gray-700"
@@ -339,7 +378,9 @@ export default function ThemeConfig() {
                             onClick={saveThemeSettings}
                             disabled={isLoading}
                             className="mt-4"
-                            startIcon={<IconFA icon={isLoading ? 'spinner' : 'save'} spin={isLoading} />}
+                            startIcon={
+                                <IconFA icon={isLoading ? 'spinner' : 'save'} spin={isLoading} />
+                            }
                         >
                             {isLoading ? 'Guardando...' : 'Guardar Configuración'}
                         </Button>
@@ -396,7 +437,7 @@ export default function ThemeConfig() {
                                         className="inline-flex items-center rounded-full bg-opacity-10 px-2.5 py-0.5 text-sm font-medium"
                                         style={{
                                             backgroundColor: `${previewColor}20`,
-                                            color: previewColor
+                                            color: previewColor,
                                         }}
                                     >
                                         Badge
@@ -408,11 +449,11 @@ export default function ThemeConfig() {
                                                 className="block h-6 w-11 rounded-full transition duration-150 ease-linear"
                                                 style={{ backgroundColor: previewColor }}
                                             ></div>
-                                            <div
-                                                className="absolute left-0.5 top-0.5 h-5 w-5 transform translate-x-full rounded-full bg-white shadow-theme-sm"
-                                            ></div>
+                                            <div className="absolute left-0.5 top-0.5 h-5 w-5 translate-x-full transform rounded-full bg-white shadow-theme-sm"></div>
                                         </div>
-                                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-400">Switch</span>
+                                        <span className="ml-2 text-sm text-gray-700 dark:text-gray-400">
+                                            Switch
+                                        </span>
                                     </div>
                                 </div>
 
@@ -432,4 +473,4 @@ export default function ThemeConfig() {
             )}
         </div>
     );
-} 
+}

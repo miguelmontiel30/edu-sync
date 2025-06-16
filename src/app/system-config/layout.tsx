@@ -30,16 +30,16 @@ export default function SystemConfigLayout({ children }: Readonly<{ children: Re
                 <AdminSidebar />
 
                 {/* Contenido principal */}
-                <div className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}>
+                <div
+                    className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}
+                >
                     {/* Navbar */}
                     <AdminNavbar />
 
                     {/* Main content */}
-                    <div className="mx-auto max-w-screen-2xl p-4 md:p-6">
-                        {children}
-                    </div>
+                    <div className="mx-auto max-w-screen-2xl p-4 md:p-6">{children}</div>
                 </div>
             </div>
         </ProtectedRoute>
     );
-} 
+}

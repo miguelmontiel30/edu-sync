@@ -15,8 +15,8 @@ Este componente permite mostrar y gestionar listas de datos en formato de tabla,
 ## Uso Básico
 
 ```tsx
-import ItemsList, {BaseItem, ActionButton} from '@/app/admin-dashboard/core/Tables/ItemsList';
-import {Column} from '@/components/core/table/DataTable';
+import ItemsList, { BaseItem, ActionButton } from '@/app/admin-dashboard/core/Tables/ItemsList';
+import { Column } from '@/components/core/table/DataTable';
 
 // Tipo de datos
 interface Teacher extends BaseItem {
