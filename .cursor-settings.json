@@ -1,0 +1,32 @@
+{
+    "commitMessage": {
+        "useConventionalCommits": false,
+        "language": "es",
+        "template": "[{type}] {description}\n\n{body}",
+        "types": [
+            { "value": "feat", "name": "feat: Nueva funcionalidad o característica" },
+            { "value": "fix", "name": "fix: Corrección de errores o bugs" },
+            { "value": "refactor", "name": "refactor: Refactorización de código existente" },
+            { "value": "config", "name": "config: Nuevas dependencias o configuraciones" },
+            { "value": "docs", "name": "docs: Documentación o comentarios" }
+        ],
+        "scopes": [
+            "auth",
+            "ui",
+            "api",
+            "db",
+            "config",
+            "components",
+            "services",
+            "utils",
+            "calendar",
+            "roles"
+        ],
+        "rules": {
+            "maxLength": 100,
+            "minLength": 5,
+            "requireScope": false,
+            "requireBody": true
+        }
+    }
+}
