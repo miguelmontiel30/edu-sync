@@ -49,7 +49,8 @@ export default function Home() {
                         // No hay información de rol, por seguridad ir al login
                         router.push('/login');
                     }
-                } catch (_error) {
+                } catch (error) {
+                    console.error('Error al verificar la sesión:', error);
                     router.push('/login');
                 }
             };
