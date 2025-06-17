@@ -1,17 +1,17 @@
 'use client';
 
 // React
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 
 // Next.js
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 
 // Context
-import { useSessionContext } from '@/context/SessionContext';
+import {useSessionContext} from '@/context/SessionContext';
 
 export default function Home() {
     const router = useRouter();
-    const { session, isLoading, isAuthenticated, refreshSession, hasRole } = useSessionContext();
+    const {session, isLoading, isAuthenticated, refreshSession, hasRole} = useSessionContext();
     const [isRedirecting, setIsRedirecting] = useState(false);
 
     useEffect(() => {
@@ -36,7 +36,7 @@ export default function Home() {
                         if (hasRole('admin')) {
                             targetPath = '/admin-dashboard';
                         } else if (hasRole('teacher')) {
-                            targetPath = '/teacher-dashboard/dashboard';
+                            targetPath = '/teacher-dashboard';
                         } else if (hasRole('student')) {
                             targetPath = '/student-dashboard/dashboard';
                         } else {
