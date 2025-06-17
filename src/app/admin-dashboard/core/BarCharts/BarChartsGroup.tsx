@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 // Libraries
 import { ApexOptions } from 'apexcharts';
 import IconFA from '@/components/ui/IconFA';
+import ApexCharts from 'apexcharts';
+import React, { useEffect, useState } from 'react';
 
 // Importación dinámica para evitar errores de SSR
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -84,13 +86,14 @@ export interface ChartData {
     [key: string]: any;
 }
 
+// Interfaz para la configuración de cada gráfico
 interface ChartConfig {
-    readonly title: string;
-    readonly dataKey: string;
-    readonly color: string;
-    readonly yAxisTitle: string;
-    readonly isEmpty?: boolean;
-    readonly blurMessage?: string;
+    id: string;
+    title: string;
+    dataKey: string;
+    series: { name: string; data: (number | null)[] }[];
+    categories: string[];
+    options?: ApexOptions;
 }
 
 export interface BarChartProps {
@@ -101,13 +104,13 @@ export interface BarChartProps {
     readonly customOptions?: Partial<ApexOptions>;
 }
 
-interface BarChartsGroupProps {
-    readonly data: ChartData[];
-    readonly isLoading: boolean;
-    readonly charts: ChartConfig[];
-    readonly emptyMessage?: string;
-    readonly customOptions?: Partial<ApexOptions>;
-    readonly className?: string;
+interface BarChartsGroupProps<T> {
+    data: T[];
+    isLoading: boolean;
+    charts: ChartConfig[];
+    emptyMessage?: string;
+    customOptions?: Partial<ApexOptions>;
+    className?: string;
 }
 
 /**
@@ -244,14 +247,14 @@ export function BarChart({
 /**
  * Componente principal para renderizar un grupo de gráficas de barras
  */
-export default function BarChartsGroup({
+export default function BarChartsGroup<T>({
     data,
     isLoading,
     charts,
     emptyMessage,
     customOptions,
     className = 'grid my-6 grid-cols-1 gap-6 md:grid-cols-2',
-}: Readonly<BarChartsGroupProps>) {
+}: Readonly<BarChartsGroupProps<T>>) {
     return (
         <div className={className}>
             {charts.map(chartConfig => (
