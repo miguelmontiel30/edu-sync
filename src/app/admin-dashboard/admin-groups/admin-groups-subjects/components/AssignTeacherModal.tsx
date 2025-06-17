@@ -178,9 +178,7 @@ export default function AssignTeacherModal({
                                         Grupo
                                     </TableCell>
                                     <TableCell>
-                                        {selectedGroup
-                                            ? `${selectedGroup.grade}° ${selectedGroup.group}`
-                                            : ''}
+                                        {`${selectedGroup.grade}° ${selectedGroup.group}`}
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
