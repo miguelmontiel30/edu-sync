@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Supabase client
-import {supabaseClient} from '@/services/config/supabaseClient';
+import { supabaseClient } from '@/services/config/supabaseClient';
 
 /**
  * Consulta base para seleccionar profesores
@@ -110,14 +111,14 @@ export const getAvailableSubjects = (schoolId: number) =>
 export const assignTeacherToGroupSubject = (groupSubjectId: number, teacherId: number) =>
     supabaseClient
         .from('group_subjects')
-        .update({teacher_id: teacherId, updated_at: new Date().toISOString()})
+        .update({ teacher_id: teacherId, updated_at: new Date().toISOString() })
         .eq('group_subject_id', groupSubjectId);
 
 // Remover profesor de una materia
 export const removeTeacherFromGroupSubject = (groupSubjectId: number) =>
     supabaseClient
         .from('group_subjects')
-        .update({teacher_id: null, updated_at: new Date().toISOString()})
+        .update({ teacher_id: null, updated_at: new Date().toISOString() })
         .eq('group_subject_id', groupSubjectId);
 
 // Crear asignación de materia a grupo
@@ -166,7 +167,7 @@ export async function getDeletedGroupSubjects(groupId: number) {
         )
         .eq('group_id', groupId)
         .eq('delete_flag', true)
-        .order('deleted_at', {ascending: false});
+        .order('deleted_at', { ascending: false });
 }
 
 /**

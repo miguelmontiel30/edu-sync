@@ -2,7 +2,7 @@
 const nextConfig = {
     webpack(config: {
         module: {
-            rules: {test: RegExp; use: {loader: string; options: object}[]}[];
+            rules: { test: RegExp; use: { loader: string; options: object }[] }[];
         };
     }) {
         // Configuración para cargar archivos SVG

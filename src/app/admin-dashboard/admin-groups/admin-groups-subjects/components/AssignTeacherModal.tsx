@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 // React
@@ -55,14 +56,15 @@ const ensureValidTeacher = (teacher: any): any => {
 
     // Asegurarnos de que el ID está definido
     const id = teacher.teacher_id || teacher.id || 0;
-    const name = teacher.name ||
+    const name =
+        teacher.name ||
         `${teacher.first_name || ''} ${teacher.father_last_name || ''}`.trim() ||
         'Profesor sin nombre';
 
     return {
         ...teacher,
         id: id,
-        name: name
+        name: name,
     };
 };
 
@@ -104,10 +106,8 @@ export default function AssignTeacherModal({
                 const isCurrentTeacher = teacher.id.toString() === currentTeacherId;
                 return {
                     value: teacher.id.toString(),
-                    label: isCurrentTeacher
-                        ? `${teacher.name} (Profesor actual)`
-                        : teacher.name,
-                    isCurrentTeacher
+                    label: isCurrentTeacher ? `${teacher.name} (Profesor actual)` : teacher.name,
+                    isCurrentTeacher,
                 };
             });
 
@@ -118,10 +118,12 @@ export default function AssignTeacherModal({
             return a.label.localeCompare(b.label);
         });
 
-        return [{
-            label: 'Profesores disponibles',
-            options: teacherOptions
-        }];
+        return [
+            {
+                label: 'Profesores disponibles',
+                options: teacherOptions,
+            },
+        ];
     }, [availableTeachers, selectedAssignment]);
 
     // Manejar la asignación del profesor
@@ -133,8 +135,8 @@ export default function AssignTeacherModal({
         const teacherId = removeTeacher
             ? null
             : selectedTeacherId
-                ? parseInt(selectedTeacherId)
-                : null;
+              ? parseInt(selectedTeacherId)
+              : null;
 
         onAssignTeacher(selectedAssignment.group_subject_id!, teacherId);
     };
@@ -142,23 +144,24 @@ export default function AssignTeacherModal({
     if (!selectedGroup || !selectedAssignment) return null;
 
     // Determinar si el profesor seleccionado es diferente del actual
-    const isChangingTeacher = selectedAssignment.teacher_id?.toString() !== selectedTeacherId && !removeTeacher;
+    const isChangingTeacher =
+        selectedAssignment.teacher_id?.toString() !== selectedTeacherId && !removeTeacher;
 
     return (
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            className="max-w-[600px] p-6 lg:p-10 min-h-[500px]"
+            className="min-h-[500px] max-w-[600px] p-6 lg:p-10"
         >
-            <div className="flex flex-col px-2 custom-scrollbar">
+            <div className="custom-scrollbar flex flex-col px-2">
                 <div>
-                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
+                    <h5 className="modal-title mb-2 font-outfit text-theme-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
                         {selectedAssignment.teacherData
                             ? 'Editar Asignación de Profesor'
                             : 'Asignar Profesor a Materia'}
                     </h5>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                    <p className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                         {selectedAssignment.teacherData
                             ? 'Puedes cambiar el profesor asignado o eliminar la asignación actual.'
                             : 'Selecciona un profesor para asignar a esta materia.'}
@@ -171,9 +174,11 @@ export default function AssignTeacherModal({
                         <Table className="min-w-full">
                             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                                 <TableRow>
-                                    <TableCell isHeader className="w-1/3">Grupo</TableCell>
+                                    <TableCell isHeader className="w-1/3">
+                                        Grupo
+                                    </TableCell>
                                     <TableCell>
-                                        {selectedGroup ? `${selectedGroup.grade}° ${selectedGroup.group}` : ''}
+                                        {`${selectedGroup.grade}° ${selectedGroup.group}`}
                                     </TableCell>
                                 </TableRow>
                                 <TableRow>
@@ -181,7 +186,8 @@ export default function AssignTeacherModal({
                                     <TableCell>
                                         <div className="flex items-center">
                                             <IconFA icon="book" className="mr-2 text-indigo-600" />
-                                            {selectedAssignment.subject?.name || 'Materia sin nombre'}
+                                            {selectedAssignment.subject?.name ||
+                                                'Materia sin nombre'}
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -191,14 +197,22 @@ export default function AssignTeacherModal({
                                         <TableCell>
                                             <div className="flex items-center">
                                                 <div
-                                                    className="h-8 w-8 rounded-full flex items-center justify-center mr-2"
+                                                    className="mr-2 flex h-8 w-8 items-center justify-center rounded-full"
                                                     style={{
-                                                        backgroundColor: generatePastelColor(selectedAssignment.teacherData.first_name),
-                                                        color: generateTextColor(selectedAssignment.teacherData.first_name)
+                                                        backgroundColor: generatePastelColor(
+                                                            selectedAssignment.teacherData
+                                                                .first_name,
+                                                        ),
+                                                        color: generateTextColor(
+                                                            selectedAssignment.teacherData
+                                                                .first_name,
+                                                        ),
                                                     }}
                                                 >
                                                     <span className="text-sm font-semibold">
-                                                        {selectedAssignment.teacherData.first_name.charAt(0).toUpperCase()}
+                                                        {selectedAssignment.teacherData.first_name
+                                                            .charAt(0)
+                                                            .toUpperCase()}
                                                     </span>
                                                 </div>
 
@@ -219,15 +233,18 @@ export default function AssignTeacherModal({
                                     type="checkbox"
                                     id="remove-teacher"
                                     checked={removeTeacher}
-                                    onChange={(e) => {
+                                    onChange={e => {
                                         setRemoveTeacher(e.target.checked);
                                         if (e.target.checked) {
                                             setSelectedTeacherId('');
                                         }
                                     }}
-                                    className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                 />
-                                <label htmlFor="remove-teacher" className="ml-2 block text-sm text-gray-700 font-outfit">
+                                <label
+                                    htmlFor="remove-teacher"
+                                    className="ml-2 block font-outfit text-sm text-gray-700"
+                                >
                                     Quitar asignación de profesor
                                 </label>
                             </div>
@@ -237,7 +254,7 @@ export default function AssignTeacherModal({
                     {/* Selector de profesor */}
                     {!removeTeacher && (
                         <div className="mb-8">
-                            <Label htmlFor="teacher-select" className="font-outfit mb-2">
+                            <Label htmlFor="teacher-select" className="mb-2 font-outfit">
                                 {selectedAssignment.teacherData
                                     ? 'Seleccionar Profesor'
                                     : 'Asignar Profesor'}
@@ -247,24 +264,25 @@ export default function AssignTeacherModal({
                                 <>
                                     <SelectWithCategories
                                         options={teacherCategories}
-                                        onChange={(value) => setSelectedTeacherId(value)}
+                                        onChange={value => setSelectedTeacherId(value)}
                                         placeholder="Selecciona un profesor"
                                         defaultValue={selectedTeacherId}
                                     />
 
                                     {isChangingTeacher && (
-                                        <div className="mt-3 p-2 bg-blue-50 rounded-md">
+                                        <div className="mt-3 rounded-md bg-blue-50 p-2">
                                             <div className="flex items-center text-blue-700">
                                                 <IconFA icon="info-circle" className="mr-2" />
-                                                <span className="text-sm font-outfit">
-                                                    Estás cambiando el profesor asignado a esta materia
+                                                <span className="font-outfit text-sm">
+                                                    Estás cambiando el profesor asignado a esta
+                                                    materia
                                                 </span>
                                             </div>
                                         </div>
                                     )}
                                 </>
                             ) : (
-                                <div className="text-yellow-500 flex items-center mt-2 p-3 bg-yellow-50 rounded-md">
+                                <div className="mt-2 flex items-center rounded-md bg-yellow-50 p-3 text-yellow-500">
                                     <IconFA icon="exclamation-triangle" className="mr-2" />
                                     No hay profesores disponibles para asignar.
                                 </div>
@@ -274,12 +292,8 @@ export default function AssignTeacherModal({
                 </div>
 
                 {/* Botones de acciones */}
-                <div className="flex justify-end gap-2 mt-8">
-                    <Button
-                        variant="outline"
-                        onClick={onClose}
-                        className="font-outfit"
-                    >
+                <div className="mt-8 flex justify-end gap-2">
+                    <Button variant="outline" onClick={onClose} className="font-outfit">
                         Cancelar
                     </Button>
                     <Button
@@ -304,4 +318,4 @@ export default function AssignTeacherModal({
             </div>
         </Modal>
     );
-} 
+}

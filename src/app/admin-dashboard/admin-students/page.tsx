@@ -17,12 +17,7 @@ import DeletedItemsList from '../core/Tables/DeletedItemsList';
 import ItemsList from '../core/Tables/ItemsList';
 
 // Hooks
-import {
-    useStudentManagement,
-    useMetricsConfig,
-    useTableConfig
-} from './hooks';
-
+import { useStudentManagement, useMetricsConfig, useTableConfig } from './hooks';
 
 export default function StudentsDashboard() {
     // Usar hook principal para gestión de estudiantes
@@ -43,7 +38,7 @@ export default function StudentsDashboard() {
         closeModal,
         setIsDeleteModalOpen,
         handleSaveStudent,
-        handleRestore
+        handleRestore,
     } = useStudentManagement();
 
     // Configuración de métricas y gráficos
@@ -60,15 +55,15 @@ export default function StudentsDashboard() {
                     name: 'Sin datos',
                     full_name: 'Sin datos',
                     status_id: 0,
-                    gender_id: 0
-                }
+                    gender_id: 0,
+                },
             ];
         }
 
         // Tenemos estudiantes, los mapeamos con solo las propiedades necesarias
         return students.map(student => ({
             ...student,
-            name: student.full_name || 'Sin nombre'
+            name: student.full_name || 'Sin nombre',
         }));
     }, [students]);
 
@@ -78,11 +73,11 @@ export default function StudentsDashboard() {
         studentActionButtons,
         studentListConfig,
         deletedStudentListConfig,
-        deleteConfirmModalConfig
+        deleteConfirmModalConfig,
     } = useTableConfig({
         handleEdit,
         handleDelete,
-        students
+        students,
     });
 
     return (
@@ -92,11 +87,7 @@ export default function StudentsDashboard() {
 
             {/* Error Alert */}
             {errorAlert && (
-                <Alert
-                    title={errorAlert.title}
-                    message={errorAlert.message}
-                    variant="error"
-                />
+                <Alert title={errorAlert.title} message={errorAlert.message} variant="error" />
             )}
 
             {/* Metrics and Charts Wrapper */}
@@ -157,4 +148,4 @@ export default function StudentsDashboard() {
             />
         </div>
     );
-} 
+}

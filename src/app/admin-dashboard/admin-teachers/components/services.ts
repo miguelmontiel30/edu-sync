@@ -1,10 +1,11 @@
-import {supabaseClient} from '@/services/config/supabaseClient';
-import {Teacher, TeacherForm} from './types';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { supabaseClient } from '@/services/config/supabaseClient';
+import { Teacher, TeacherForm } from './types';
 
 export async function loadTeachers(schoolId: number): Promise<Teacher[]> {
     try {
         // Consultar profesores activos
-        const {data, error} = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('teachers')
             .select(
                 `
@@ -14,7 +15,7 @@ export async function loadTeachers(schoolId: number): Promise<Teacher[]> {
             )
             .eq('delete_flag', false)
             .eq('school_id', schoolId)
-            .order('created_at', {ascending: false});
+            .order('created_at', { ascending: false });
 
         if (error) throw error;
 
@@ -23,7 +24,7 @@ export async function loadTeachers(schoolId: number): Promise<Teacher[]> {
             const teachersWithMetrics = await Promise.all(
                 data.map(async teacher => {
                     // Consultar cuántos grupos tiene asignados este profesor
-                    const {data: groupsData, error: groupsError} = await supabaseClient
+                    const { data: groupsData, error: groupsError } = await supabaseClient
                         .from('group_subjects')
                         .select('group_id')
                         .eq('teacher_id', teacher.teacher_id)
@@ -32,7 +33,7 @@ export async function loadTeachers(schoolId: number): Promise<Teacher[]> {
                     if (groupsError) throw groupsError;
 
                     // Consultar cuántas materias imparte
-                    const {data: subjectsData, error: subjectsError} = await supabaseClient
+                    const { data: subjectsData, error: subjectsError } = await supabaseClient
                         .from('group_subjects')
                         .select('subject_id')
                         .eq('teacher_id', teacher.teacher_id)
@@ -72,7 +73,7 @@ export async function loadTeachers(schoolId: number): Promise<Teacher[]> {
 export async function loadDeletedTeachers(schoolId: number): Promise<Teacher[]> {
     try {
         // Consultar profesores eliminados
-        const {data, error} = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('teachers')
             .select(
                 `
@@ -82,7 +83,7 @@ export async function loadDeletedTeachers(schoolId: number): Promise<Teacher[]> 
             )
             .eq('delete_flag', true)
             .eq('school_id', schoolId)
-            .order('deleted_at', {ascending: false});
+            .order('deleted_at', { ascending: false });
 
         if (error) throw error;
 
@@ -111,7 +112,7 @@ export async function loadDeletedTeachers(schoolId: number): Promise<Teacher[]> 
 
 export async function loadActiveGroups() {
     try {
-        const {data, error} = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('groups')
             .select(
                 `
@@ -125,9 +126,9 @@ export async function loadActiveGroups() {
             `,
             )
             .eq('delete_flag', false)
-            .eq('status_id', (status: {code: string}) => status.code === 'ACTIVE')
-            .order('grade', {ascending: true})
-            .order('group_name', {ascending: true});
+            .eq('status_id', (status: { code: string }) => status.code === 'ACTIVE')
+            .order('grade', { ascending: true })
+            .order('group_name', { ascending: true });
 
         if (error) throw error;
 
@@ -149,7 +150,7 @@ export async function loadActiveGroups() {
 
 export async function loadTeachersByGroup(schoolYearName: string) {
     try {
-        const {data, error} = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('group_subjects')
             .select(
                 `
@@ -168,7 +169,7 @@ export async function loadTeachersByGroup(schoolYearName: string) {
         if (error) throw error;
 
         if (data) {
-            const groupCounts: {[key: string]: number} = {};
+            const groupCounts: { [key: string]: number } = {};
             data.forEach((item: any) => {
                 const groupKey = `${item.groups.grade}${item.groups.group_name}`;
                 groupCounts[groupKey] = (groupCounts[groupKey] || 0) + 1;
@@ -184,7 +185,7 @@ export async function loadTeachersByGroup(schoolYearName: string) {
 
 export async function loadGenders() {
     try {
-        const {data, error} = await supabaseClient
+        const { data, error } = await supabaseClient
             .from('genders')
             .select('*')
             .eq('delete_flag', false);
@@ -201,7 +202,7 @@ export async function saveTeacher(teacherData: TeacherForm, teacherId?: number):
     try {
         if (teacherId) {
             // Actualizar profesor existente
-            const {error} = await supabaseClient
+            const { error } = await supabaseClient
                 .from('teachers')
                 .update(teacherData)
                 .eq('teacher_id', teacherId);
@@ -209,9 +210,9 @@ export async function saveTeacher(teacherData: TeacherForm, teacherId?: number):
             if (error) throw error;
         } else {
             // Crear nuevo profesor
-            const {error} = await supabaseClient
+            const { error } = await supabaseClient
                 .from('teachers')
-                .insert([{...teacherData, school_id: 1}]);
+                .insert([{ ...teacherData, school_id: 1 }]);
 
             if (error) throw error;
         }
@@ -223,7 +224,7 @@ export async function saveTeacher(teacherData: TeacherForm, teacherId?: number):
 
 export async function deleteTeacher(id: number): Promise<void> {
     try {
-        const {error} = await supabaseClient
+        const { error } = await supabaseClient
             .from('teachers')
             .update({
                 delete_flag: true,
@@ -240,7 +241,7 @@ export async function deleteTeacher(id: number): Promise<void> {
 
 export async function restoreTeacher(id: number): Promise<void> {
     try {
-        const {error} = await supabaseClient
+        const { error } = await supabaseClient
             .from('teachers')
             .update({
                 delete_flag: false,

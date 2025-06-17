@@ -52,7 +52,9 @@ export default function AdminLayout({ children }: Readonly<{ children: React.Rea
                 <AdminSidebar />
 
                 {/* Contenido principal */}
-                <div className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}>
+                <div
+                    className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}
+                >
                     {/* Navbar */}
                     <AdminNavbar />
 

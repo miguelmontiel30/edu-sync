@@ -15,8 +15,10 @@ Un componente reutilizable para mostrar elementos eliminados en formato de tabla
 ## Uso básico
 
 ```tsx
-import DeletedItemsList, {DeletedItemsListConfig} from '@/components/common/lists/DeletedItemsList';
-import {createStatusColorMapper} from '@/components/common/lists/utils';
+import DeletedItemsList, {
+    DeletedItemsListConfig,
+} from '@/components/common/lists/DeletedItemsList';
+import { createStatusColorMapper } from '@/components/common/lists/utils';
 
 // Define tu tipo de datos (debe extender BaseItem que requiere propiedad 'id')
 interface MiEntidad {

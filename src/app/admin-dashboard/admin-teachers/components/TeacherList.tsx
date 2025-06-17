@@ -22,7 +22,13 @@ interface TeacherListProps {
     readonly onAddNew: () => void;
 }
 
-export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onAddNew }: TeacherListProps) {
+export default function TeacherList({
+    teachers,
+    isLoading,
+    onEdit,
+    onDelete,
+    onAddNew,
+}: TeacherListProps) {
     // States
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredTeachers, setFilteredTeachers] = useState<Teacher[]>(teachers);
@@ -36,7 +42,6 @@ export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onA
             setFilteredTeachers(filtered);
         }
     }, [teachers, searchTerm]);
-
 
     // Manejar la búsqueda desde el DataTable
     const handleSearch = (term: string) => {
@@ -70,8 +75,10 @@ export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onA
             header: 'Email',
             sortable: true,
             render: (teacher: Teacher) => (
-                <span>{teacher.email || <span className="text-gray-400 italic">No disponible</span>}</span>
-            )
+                <span>
+                    {teacher.email || <span className="italic text-gray-400">No disponible</span>}
+                </span>
+            ),
         },
         {
             id: 'phone',
@@ -81,8 +88,10 @@ export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onA
             header: 'Teléfono',
             sortable: true,
             render: (teacher: Teacher) => (
-                <span>{teacher.phone || <span className="text-gray-400 italic">No disponible</span>}</span>
-            )
+                <span>
+                    {teacher.phone || <span className="italic text-gray-400">No disponible</span>}
+                </span>
+            ),
         },
         {
             id: 'groupsCount',
@@ -93,11 +102,11 @@ export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onA
             sortable: true,
             render: (teacher: Teacher) => (
                 <div className="text-center">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-md">
+                    <span className="rounded-md bg-blue-100 px-2 py-1 text-blue-800">
                         {teacher.groupsCount}
                     </span>
                 </div>
-            )
+            ),
         },
         {
             id: 'subjectsCount',
@@ -108,18 +117,18 @@ export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onA
             sortable: true,
             render: (teacher: Teacher) => (
                 <div className="text-center">
-                    <span className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-md">
+                    <span className="rounded-md bg-indigo-100 px-2 py-1 text-indigo-800">
                         {teacher.subjectsCount}
                     </span>
                 </div>
-            )
+            ),
         },
         {
             key: 'actions',
             header: 'Acciones',
             sortable: false,
             render: (teacher: Teacher) => (
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <div className="flex flex-col justify-center gap-2 sm:flex-row">
                     <Button
                         variant="outline"
                         size="sm"
@@ -138,8 +147,8 @@ export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onA
                         <span className="font-outfit">Eliminar</span>
                     </Button>
                 </div>
-            )
-        }
+            ),
+        },
     ];
 
     return (
@@ -159,14 +168,14 @@ export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onA
 
             <div className="overflow-x-auto">
                 {isLoading ? (
-                    <div className="flex items-center justify-center h-[200px]">
+                    <div className="flex h-[200px] items-center justify-center">
                         <IconFA icon="spinner" spin className="text-gray-400" />
                     </div>
                 ) : (
                     <DataTable
                         data={filteredTeachers}
                         columns={columns}
-                        keyExtractor={(teacher) => teacher.teacher_id}
+                        keyExtractor={teacher => teacher.teacher_id}
                         searchable
                         searchPlaceholder="Buscar por nombre, email, teléfono..."
                         defaultSortField="name"
@@ -182,4 +191,4 @@ export default function TeacherList({ teachers, isLoading, onEdit, onDelete, onA
             </div>
         </ComponentCard>
     );
-} 
+}

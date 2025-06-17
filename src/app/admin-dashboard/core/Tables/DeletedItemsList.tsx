@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // React
 import { useState } from 'react';
 
@@ -15,7 +16,9 @@ export interface BaseItem {
 export interface StatusConfig {
     statusKey: string;
     statusNameKey: string;
-    getStatusColor: (status: string) => 'primary' | 'success' | 'error' | 'warning' | 'info' | 'light' | 'dark';
+    getStatusColor: (
+        status: string,
+    ) => 'primary' | 'success' | 'error' | 'warning' | 'info' | 'light' | 'dark';
 }
 
 export interface DeletedItemsListConfig<T extends BaseItem> {
@@ -45,7 +48,7 @@ export default function DeletedItemsList<T extends BaseItem>({
     isLoading,
     onRestore,
     config,
-    className = ''
+    className = '',
 }: DeletedItemsListProps<T>) {
     const [showDeleted, setShowDeleted] = useState(false);
 
@@ -64,16 +67,12 @@ export default function DeletedItemsList<T extends BaseItem>({
                 >
                     <span className="font-outfit">Restaurar</span>
                 </Button>
-            )
-        }
+            ),
+        },
     ];
 
     return (
-        <ComponentCard
-            title={config.title}
-            desc={config.description}
-            className={className}
-        >
+        <ComponentCard title={config.title} desc={config.description} className={className}>
             <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <Button
                     variant="outline"
@@ -81,7 +80,11 @@ export default function DeletedItemsList<T extends BaseItem>({
                     onClick={() => setShowDeleted(!showDeleted)}
                     className="flex items-center gap-1"
                 >
-                    <IconFA icon={showDeleted ? 'eye-slash' : 'eye'} style="solid" className="text-gray-500" />
+                    <IconFA
+                        icon={showDeleted ? 'eye-slash' : 'eye'}
+                        style="solid"
+                        className="text-gray-500"
+                    />
                     <span className="font-outfit">
                         {showDeleted ? 'Ocultar' : 'Mostrar'} {config.buttonLabel || 'Eliminados'}
                     </span>
@@ -92,18 +95,21 @@ export default function DeletedItemsList<T extends BaseItem>({
                 <DataTable
                     data={items}
                     columns={columns}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={item => item.id}
                     searchable
                     searchPlaceholder={config.searchPlaceholder || 'Buscar elementos eliminados...'}
                     defaultSortField={config.defaultSortField || 'name'}
                     defaultSortDirection={config.defaultSortDirection || 'asc'}
                     isLoading={isLoading}
                     noDataMessage={config.noDataMessage || 'No hay elementos eliminados'}
-                    searchNoResultsMessage={config.searchNoResultsMessage || 'No se encontraron elementos que coincidan con la búsqueda'}
+                    searchNoResultsMessage={
+                        config.searchNoResultsMessage ||
+                        'No se encontraron elementos que coincidan con la búsqueda'
+                    }
                     itemsPerPage={config.itemsPerPage || 5}
                     maxHeight={config.maxHeight || '400px'}
                 />
             )}
         </ComponentCard>
     );
-} 
+}

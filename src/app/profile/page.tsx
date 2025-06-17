@@ -1,10 +1,10 @@
 'use client';
 
 // React
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
 // Next.js
-import {useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 // Components
 import ComponentCard from '@/components/common/ComponentCard';
@@ -14,13 +14,13 @@ import Label from '@/components/form/Label';
 import Button from '@/components/core/button/Button';
 
 // Context
-import {useAuth} from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 
 // Services
-import {supabaseClient} from '@/services/config/supabaseClient';
+import { supabaseClient } from '@/services/config/supabaseClient';
 
 export default function ProfilePage() {
-    const {profile} = useAuth();
+    const { profile } = useAuth();
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
     const [formData, setFormData] = useState({
@@ -33,7 +33,7 @@ export default function ProfilePage() {
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value,
@@ -46,7 +46,7 @@ export default function ProfilePage() {
 
         try {
             // Actualizar datos del perfil
-            const {error: updateError} = await supabaseClient
+            const { error: updateError } = await supabaseClient
                 .from('users')
                 .update({
                     first_name: formData.first_name,
@@ -63,7 +63,7 @@ export default function ProfilePage() {
                     throw new Error('Las contraseñas no coinciden');
                 }
 
-                const {error: passwordError} = await supabaseClient.auth.updateUser({
+                const { error: passwordError } = await supabaseClient.auth.updateUser({
                     password: formData.new_password,
                 });
 

@@ -1,5 +1,5 @@
 // React
-import {ReactNode} from 'react';
+import { ReactNode } from 'react';
 
 // Types
 export type SortDirection = 'asc' | 'desc';

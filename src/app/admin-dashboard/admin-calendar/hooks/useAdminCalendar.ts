@@ -1,11 +1,11 @@
 // React
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 // Hooks
-import {useSession} from '@/hooks/useSession';
+import { useSession } from '@/hooks/useSession';
 
 // Services
-import {loadSchoolYearsBySchoolId} from '../../admin-school-year/module-utils/services';
+import { loadSchoolYearsBySchoolId } from '../../admin-school-year/module-utils/services';
 import {
     getCalendarData,
     createEvent,
@@ -14,29 +14,30 @@ import {
 } from '../module-utils/services';
 
 // Utils
-import {processEvents, translateRolesToSpanish} from '../module-utils/utils';
+import { processEvents, translateRolesToSpanish } from '../module-utils/utils';
 
 // Types
-import {CalendarEvent} from '@/components/core/calendar';
-import {EventData, EventRecipient} from '../module-utils/types';
-import {SchoolCycle} from '../../admin-school-year/module-utils/types';
+import { CalendarEvent } from '@/components/core/calendar';
+import { EventData, EventRecipient } from '../module-utils/types';
+import { SchoolCycle } from '../../admin-school-year/module-utils/types';
 
 // Interfaz para el ciclo escolar desde la base de datos
 interface DatabaseSchoolYear {
     school_year_id: number;
     name: string;
     status_id: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
 }
 
 export function useAdminCalendar() {
     const [events, setEvents] = useState<CalendarEvent[]>([]);
-    const [availableRoles, setAvailableRoles] = useState<{role_id: string; name: string}[]>([]);
+    const [availableRoles, setAvailableRoles] = useState<{ role_id: string; name: string }[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [activeSchoolYear, setActiveSchoolYear] = useState<DatabaseSchoolYear | null>(null);
 
     // Hook de sesion
-    const {session} = useSession();
+    const { session } = useSession();
     const schoolId = session?.school_id;
 
     useEffect(() => {
@@ -46,11 +47,11 @@ export function useAdminCalendar() {
         }
 
         fetchActiveSchoolYear(schoolId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [schoolId]);
 
     const fetchActiveSchoolYear = async (schoolId: number) => {
         try {
-            console.log(`Buscando ciclo escolar activo para escuela ${schoolId}`);
             const schoolYears = await loadSchoolYearsBySchoolId(schoolId);
 
             // Transformar los datos al formato esperado de DatabaseSchoolYear
@@ -68,17 +69,14 @@ export function useAdminCalendar() {
             const activeYear = formattedSchoolYears.find(year => year.status_id === 1);
 
             if (activeYear) {
-                console.log('Ciclo escolar activo encontrado:', activeYear);
                 setActiveSchoolYear(activeYear);
 
                 // Cargar los eventos del ciclo escolar activo
                 fetchCalendarData(schoolId, activeYear.school_year_id);
             } else {
-                console.warn('No se encontró un ciclo escolar activo');
                 setIsLoading(false);
             }
         } catch (error) {
-            console.error('Error al buscar el ciclo escolar activo:', error);
             setIsLoading(false);
         }
     };
@@ -86,9 +84,6 @@ export function useAdminCalendar() {
     const fetchCalendarData = async (schoolId: number, schoolYearId: number) => {
         try {
             setIsLoading(true);
-            console.log(
-                `Cargando eventos para escuela ${schoolId} y ciclo escolar ${schoolYearId}`,
-            );
 
             // Obtener datos del calendario usando el servicio
             const calendarData = await getCalendarData(schoolId, schoolYearId);
@@ -97,10 +92,8 @@ export function useAdminCalendar() {
             if (calendarData.events && calendarData.events.length > 0) {
                 // Procesar eventos para corregir problemas de zona horaria
                 const processedEvents = processEvents(calendarData.events);
-                console.log(`Eventos cargados: ${processedEvents.length}`);
                 setEvents(processedEvents);
             } else {
-                console.log('No se encontraron eventos para este ciclo escolar');
                 setEvents([]);
             }
 
@@ -126,17 +119,10 @@ export function useAdminCalendar() {
                 return;
             }
 
-            console.log('Evento recibido para crear:', event);
-
             // Extraer la información del tipo de evento y descripción
             // Revisamos tanto en el nivel principal como en extendedProps
             const eventTypeId = event.event_type_id || event.extendedProps?.event_type_id || 1;
             const eventDescription = event.description || event.extendedProps?.description || '';
-
-            console.log('Datos procesados del evento:', {
-                tipo: eventTypeId,
-                descripcion: eventDescription,
-            });
 
             // Preparar el evento para la base de datos
             const eventData: EventData = {
@@ -155,19 +141,15 @@ export function useAdminCalendar() {
 
             // Preparar destinatarios (roles)
             const recipients: EventRecipient[] =
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 event.extendedProps?.roles?.map((role: any) => ({
                     role_id: Number(role.role_id),
                 })) || [];
-
-            console.log('Datos a enviar a la base de datos:', eventData);
 
             // Crear evento en la base de datos
             const result = await createEvent(eventData, recipients);
 
             if (result.success && result.data) {
-                console.log('Evento creado con éxito:', result.data);
-
-                // Asegurarnos de que el evento incluya allDay para evitar problemas de zona horaria
                 // y que la descripción y tipo de evento se mantengan
                 const eventToAdd = {
                     ...event,
@@ -205,18 +187,10 @@ export function useAdminCalendar() {
                 return;
             }
 
-            console.log('Evento recibido para actualizar:', event);
-
             // Extraer la información del tipo de evento y descripción
             // Revisamos tanto en el nivel principal como en extendedProps
             const eventTypeId = event.event_type_id || event.extendedProps?.event_type_id || 1;
             const eventDescription = event.description || event.extendedProps?.description || '';
-
-            console.log('Datos procesados del evento a actualizar:', {
-                eventId,
-                tipo: eventTypeId,
-                descripcion: eventDescription,
-            });
 
             // Preparar el evento para la base de datos
             const eventData: Partial<EventData> = {
@@ -233,18 +207,15 @@ export function useAdminCalendar() {
 
             // Preparar destinatarios (roles)
             const recipients: EventRecipient[] =
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 event.extendedProps?.roles?.map((role: any) => ({
                     role_id: Number(role.role_id),
                 })) || [];
-
-            console.log('Datos a enviar a la base de datos para actualizar:', eventData);
 
             // Actualizar evento en la base de datos
             const result = await updateEventWithRecipients(eventId, eventData, recipients);
 
             if (result.success) {
-                console.log('Evento actualizado con éxito');
-
                 // Asegurarnos de que el evento incluya allDay para evitar problemas de zona horaria
                 // y que la descripción y tipo de evento se mantengan
                 const eventToUpdate = {
@@ -270,8 +241,6 @@ export function useAdminCalendar() {
 
     const handleEventDelete = async (eventId: string) => {
         try {
-            console.log('Solicitud de eliminación para evento con ID:', eventId);
-
             // Buscar el evento para obtener su ID de base de datos
             const eventToDelete = events.find(e => e.id === eventId);
 
@@ -281,18 +250,14 @@ export function useAdminCalendar() {
             }
 
             // Intentar obtener el ID de diferentes formas
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let dbEventId: any = null;
 
             if (eventToDelete.extendedProps?.event_id) {
                 dbEventId = eventToDelete.extendedProps.event_id;
             } else if (typeof eventToDelete === 'object' && eventToDelete !== null) {
-                // Explorar el objeto en busca del ID
-                console.log(
-                    'Evento encontrado pero sin ID de base de datos en extendedProps:',
-                    eventToDelete,
-                );
-
                 // Verificar si es un objeto de FullCalendar
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const fcEvent = eventToDelete as any;
                 if (fcEvent._def?.extendedProps?.event_id) {
                     dbEventId = fcEvent._def.extendedProps.event_id;
@@ -301,18 +266,14 @@ export function useAdminCalendar() {
 
             // Si tenemos un ID de base de datos, intentar eliminar en la BD
             if (dbEventId) {
-                console.log('Eliminando evento de la base de datos con ID:', dbEventId);
-
                 // Eliminar evento (borrado lógico) en la base de datos
                 const result = await removeEvent(dbEventId);
 
                 if (result.success) {
-                    console.log('Evento eliminado con éxito de la base de datos');
-                } else {
                     console.error('Error al eliminar el evento de la BD:', result.error);
                 }
             } else {
-                console.log('Evento sin ID de base de datos, solo se eliminará de la UI');
+                console.error('Evento sin ID de base de datos, solo se eliminará de la UI');
             }
 
             // Siempre actualizar la UI eliminando el evento, incluso si falló la eliminación en BD

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Tipos base desde la base de datos
 
 // Estado para relaciones grupo-profesor
@@ -9,7 +10,7 @@ export const TEACHER_GROUP_STATUS = {
 // Tipos para UI
 export interface Category {
     label: string;
-    options: Array<{value: string; label: string}>;
+    options: Array<{ value: string; label: string }>;
     isActive?: boolean;
 }
 

@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // React
-import {useState, useEffect, useCallback} from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // Types and utils
-import {Student, StudentFormData, StudentGroup, AlertState} from '../module-utils/types';
-import {studentRepository} from '../module-utils/repository';
+import { Student, StudentFormData, StudentGroup, AlertState } from '../module-utils/types';
+import { studentRepository } from '../module-utils/repository';
 
 // Hooks
-import {useSession} from '@/hooks/useSession';
+import { useSession } from '@/hooks/useSession';
 
 interface LoadingState {
     students: boolean;
@@ -67,7 +68,7 @@ export function useStudentManagement() {
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
     // Obtener datos de sesión
-    const {session} = useSession();
+    const { session } = useSession();
 
     /**
      * Carga inicial de datos
@@ -93,7 +94,7 @@ export function useStudentManagement() {
      * Carga la lista de estudiantes activos
      */
     const loadStudents = async () => {
-        setLoadingState(prev => ({...prev, students: true}));
+        setLoadingState(prev => ({ ...prev, students: true }));
 
         try {
             if (!session?.school_id) {
@@ -112,7 +113,7 @@ export function useStudentManagement() {
             });
             console.error('Error al cargar estudiantes:', error);
         } finally {
-            setLoadingState(prev => ({...prev, students: false}));
+            setLoadingState(prev => ({ ...prev, students: false }));
         }
     };
 
@@ -120,7 +121,7 @@ export function useStudentManagement() {
      * Carga la lista de estudiantes eliminados
      */
     const loadDeletedStudents = async () => {
-        setLoadingState(prev => ({...prev, deleted: true}));
+        setLoadingState(prev => ({ ...prev, deleted: true }));
 
         try {
             const data = await studentRepository.getDeletedStudents();
@@ -128,7 +129,7 @@ export function useStudentManagement() {
         } catch (error) {
             console.error('Error al cargar estudiantes eliminados:', error);
         } finally {
-            setLoadingState(prev => ({...prev, deleted: false}));
+            setLoadingState(prev => ({ ...prev, deleted: false }));
         }
     };
 
@@ -136,7 +137,7 @@ export function useStudentManagement() {
      * Carga los grupos de estudiantes
      */
     const loadStudentGroups = async () => {
-        setLoadingState(prev => ({...prev, studentGroups: true}));
+        setLoadingState(prev => ({ ...prev, studentGroups: true }));
 
         try {
             const data = await studentRepository.getAllActiveStudentGroups();
@@ -144,7 +145,7 @@ export function useStudentManagement() {
         } catch (error) {
             console.error('Error al cargar grupos de estudiantes:', error);
         } finally {
-            setLoadingState(prev => ({...prev, studentGroups: false, metrics: false}));
+            setLoadingState(prev => ({ ...prev, studentGroups: false, metrics: false }));
         }
     };
 
@@ -186,7 +187,7 @@ export function useStudentManagement() {
     const confirmDelete = async () => {
         if (!studentToDelete) return;
 
-        setLoadingState(prev => ({...prev, processing: true}));
+        setLoadingState(prev => ({ ...prev, processing: true }));
 
         try {
             await studentRepository.deleteStudent(studentToDelete.id);
@@ -206,7 +207,7 @@ export function useStudentManagement() {
             });
             console.error('Error al eliminar estudiante:', error);
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     };
 
@@ -214,7 +215,7 @@ export function useStudentManagement() {
      * Gestiona la restauración de un estudiante eliminado
      */
     const handleRestore = async (studentId: number) => {
-        setLoadingState(prev => ({...prev, processing: true}));
+        setLoadingState(prev => ({ ...prev, processing: true }));
 
         try {
             await studentRepository.restoreStudent(studentId);
@@ -231,7 +232,7 @@ export function useStudentManagement() {
             });
             console.error('Error al restaurar estudiante:', error);
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     };
 
@@ -255,7 +256,7 @@ export function useStudentManagement() {
      * Guarda un estudiante (nuevo o editado)
      */
     const handleSaveStudent = async (studentData: StudentFormData) => {
-        setLoadingState(prev => ({...prev, processing: true}));
+        setLoadingState(prev => ({ ...prev, processing: true }));
 
         try {
             await studentRepository.saveStudent(studentData);
@@ -275,7 +276,7 @@ export function useStudentManagement() {
             });
             console.error('Error al guardar estudiante:', error);
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     };
 

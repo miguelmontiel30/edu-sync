@@ -1,5 +1,5 @@
 // React
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 // Types and Services
 import {
@@ -17,7 +17,7 @@ import {
 } from '../module-utils/services';
 
 // Hooks
-import {useSession} from '@/hooks/useSession';
+import { useSession } from '@/hooks/useSession';
 
 export function useSubjectManagement(): SubjectManagementHook {
     // Estados de datos
@@ -40,7 +40,7 @@ export function useSubjectManagement(): SubjectManagementHook {
     });
 
     // Obtener datos de sesión
-    const {session} = useSession();
+    const { session } = useSession();
 
     // Cargar datos al montar el componente
     useEffect(() => {
@@ -65,7 +65,7 @@ export function useSubjectManagement(): SubjectManagementHook {
             }
 
             // Cargar todas las materias en una sola llamada
-            const {active, deleted} = await loadAllSubjectsData(session.school_id);
+            const { active, deleted } = await loadAllSubjectsData(session.school_id);
 
             // Actualizar los estados
             setSubjects(active);
@@ -115,7 +115,7 @@ export function useSubjectManagement(): SubjectManagementHook {
     async function confirmDelete() {
         if (!subjectToDelete) return;
 
-        setLoadingState(prev => ({...prev, processing: true}));
+        setLoadingState(prev => ({ ...prev, processing: true }));
 
         try {
             // Eliminar la materia
@@ -136,7 +136,7 @@ export function useSubjectManagement(): SubjectManagementHook {
                 message: 'No se pudo eliminar la materia. Por favor intenta nuevamente.',
             });
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     }
 
@@ -159,25 +159,25 @@ export function useSubjectManagement(): SubjectManagementHook {
     } {
         // Validar nombre (requerido)
         if (!subjectData.name || subjectData.name.trim() === '') {
-            return {isValid: false, errorMessage: 'El nombre de la materia es obligatorio'};
+            return { isValid: false, errorMessage: 'El nombre de la materia es obligatorio' };
         }
 
         // Si llegamos aquí, la validación es exitosa
-        return {isValid: true};
+        return { isValid: true };
     }
 
     // Guardar materia (crear o actualizar)
     async function handleSaveSubject(
         subjectData: SubjectData,
-    ): Promise<{success: boolean; errorMessage?: string}> {
-        setLoadingState(prev => ({...prev, processing: true}));
+    ): Promise<{ success: boolean; errorMessage?: string }> {
+        setLoadingState(prev => ({ ...prev, processing: true }));
 
         try {
             // Validar datos
             const validation = validateSubjectData(subjectData);
 
             if (!validation.isValid) {
-                setLoadingState(prev => ({...prev, processing: false}));
+                setLoadingState(prev => ({ ...prev, processing: false }));
                 // Retornamos el error para que se muestre en el formulario
                 return {
                     success: false,
@@ -195,7 +195,7 @@ export function useSubjectManagement(): SubjectManagementHook {
             // Cerrar modal
             closeModal();
 
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al guardar la materia:', error);
 
@@ -205,13 +205,13 @@ export function useSubjectManagement(): SubjectManagementHook {
                 errorMessage: 'No se pudo guardar la materia. Por favor intenta nuevamente.',
             };
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     }
 
     // Restaurar materia eliminada
     async function handleRestore(id: number) {
-        setLoadingState(prev => ({...prev, deleted: true}));
+        setLoadingState(prev => ({ ...prev, deleted: true }));
 
         try {
             // Restaurar materia
@@ -228,7 +228,7 @@ export function useSubjectManagement(): SubjectManagementHook {
                 message: 'No se pudo restaurar la materia. Por favor intenta nuevamente.',
             });
         } finally {
-            setLoadingState(prev => ({...prev, deleted: false}));
+            setLoadingState(prev => ({ ...prev, deleted: false }));
         }
     }
 

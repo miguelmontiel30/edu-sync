@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface CheckboxProps {
     label?: string; // Optional label for the checkbox
@@ -8,37 +8,37 @@ interface CheckboxProps {
     disabled?: boolean; // Disabled state
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({
-    label,
-    checked,
-    id,
-    onChange,
-    disabled = false,
-}) => (
-    <label className={`flex items-center gap-2 cursor-pointer ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}>
+const Checkbox: React.FC<CheckboxProps> = ({ label, checked, id, onChange, disabled = false }) => (
+    <label
+        className={`flex cursor-pointer items-center gap-2 ${disabled ? 'cursor-not-allowed opacity-60' : ''}`}
+    >
         <input
             id={id}
             type="checkbox"
             checked={checked}
-            onChange={(e) => onChange(e.target.checked)}
+            onChange={e => onChange(e.target.checked)}
             disabled={disabled}
             className="sr-only"
         />
         <span
-            className={`
-        flex items-center justify-center w-5 h-5 rounded border
-        ${checked ? "bg-brand-500 border-brand-500" : "bg-white border-gray-300"}
-        transition-colors
-      `}
+            className={`flex h-5 w-5 items-center justify-center rounded border ${checked ? 'border-brand-500 bg-brand-500' : 'border-gray-300 bg-white'} transition-colors`}
         >
             {checked && (
-                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                <svg
+                    className="h-3 w-3 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                    viewBox="0 0 24 24"
+                >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
             )}
         </span>
         {label && (
-            <span className="font-medium font-outfit text-gray-700 text-theme-sm dark:text-white">{label}</span>
+            <span className="font-outfit text-theme-sm font-medium text-gray-700 dark:text-white">
+                {label}
+            </span>
         )}
     </label>
 );

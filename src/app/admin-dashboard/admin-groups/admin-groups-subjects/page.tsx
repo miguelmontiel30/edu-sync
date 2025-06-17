@@ -21,7 +21,9 @@ import DeletedItemsList from '../../core/Tables/DeletedItemsList';
 export default function GroupTeachersDashboard() {
     // Estado local para el modal de confirmación de eliminación
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [assignmentToDelete, setAssignmentToDelete] = useState<GroupSubjectAssignment | null>(null);
+    const [assignmentToDelete, setAssignmentToDelete] = useState<GroupSubjectAssignment | null>(
+        null,
+    );
 
     // Estado de gestión de profesores y materias por grupo
     const {
@@ -43,7 +45,7 @@ export default function GroupTeachersDashboard() {
         handleAddSubject,
         handleDeleteSubject,
         handleEditAssignment,
-        handleRestoreSubject
+        handleRestoreSubject,
     } = useGroupTeachersManagement();
 
     // Handlers para el modal de confirmación de eliminación
@@ -70,13 +72,13 @@ export default function GroupTeachersDashboard() {
         subjectActionButtons,
         subjectListConfig,
         deleteConfirmModalConfig,
-        deletedSubjectsListConfig
+        deletedSubjectsListConfig,
     } = useTableConfig({
         handleEditAssignment,
         handleShowDeleteConfirm,
         handleRestoreSubject,
         selectedGroup,
-        groupAssignments
+        groupAssignments,
     });
 
     return (
@@ -84,7 +86,11 @@ export default function GroupTeachersDashboard() {
             <PageBreadcrumb pageTitle="Gestión de materias por grupo" />
 
             {/* Selector de Grupo */}
-            <ComponentCard title="Seleccionar Grupo" desc="Selecciona un grupo para gestionar las materias y profesores." className="mb-6">
+            <ComponentCard
+                title="Seleccionar Grupo"
+                desc="Selecciona un grupo para gestionar las materias y profesores."
+                className="mb-6"
+            >
                 <div className="mb-6 px-4">
                     <Label htmlFor="group-select" className="font-outfit">
                         Seleccionar Grupo
@@ -114,11 +120,17 @@ export default function GroupTeachersDashboard() {
                             config={{
                                 ...subjectListConfig,
                                 title: `Materias del grupo ${selectedGroup.grade}° ${selectedGroup.group}`,
-                                description: 'Gestiona las materias asignadas al grupo y sus profesores',
+                                description:
+                                    'Gestiona las materias asignadas al grupo y sus profesores',
                                 addButtonLabel: 'Agregar materia',
                                 searchPlaceholder: 'Buscar materia...',
                                 noDataMessage: 'No hay materias asignadas a este grupo',
-                                searchableFields: ['subject.name', 'subject.description', 'teacherData.first_name', 'teacherData.father_last_name']
+                                searchableFields: [
+                                    'subject.name',
+                                    'subject.description',
+                                    'teacherData.first_name',
+                                    'teacherData.father_last_name',
+                                ],
                             }}
                         />
                     </div>
@@ -169,4 +181,4 @@ export default function GroupTeachersDashboard() {
             )}
         </div>
     );
-} 
+}

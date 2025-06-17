@@ -138,8 +138,8 @@ export interface StudentMetrics {
     inactive: number;
     male: number;
     female: number;
-    byGrade: {[key: string]: number};
-    byGroup: {[key: string]: number};
+    byGrade: { [key: string]: number };
+    byGroup: { [key: string]: number };
 }
 
 export interface AlertState {
@@ -148,3 +148,20 @@ export interface AlertState {
     title: string;
     message: string;
 }
+
+export interface Document {
+    id: number;
+    student_id: number;
+    type: DocumentType;
+    status: DocumentStatus;
+    fileUrl: string;
+    name: string;
+    comments: string;
+    created_at: string;
+    updated_at: string;
+    delete_flag: boolean;
+}
+
+export type DocumentType = 'acta' | 'curp' | 'domicilio' | 'vacunacion' | 'otro';
+
+export type DocumentStatus = 'pendiente' | 'aprobado' | 'rechazado';

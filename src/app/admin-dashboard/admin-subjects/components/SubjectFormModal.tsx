@@ -21,7 +21,9 @@ import { useStatusOptions } from '@/hooks/useStatusData';
 interface SubjectFormModalProps {
     readonly isOpen: boolean;
     readonly onClose: () => void;
-    readonly onSave: (subjectData: SubjectData) => Promise<{ success: boolean; errorMessage?: string }>;
+    readonly onSave: (
+        subjectData: SubjectData,
+    ) => Promise<{ success: boolean; errorMessage?: string }>;
     readonly selectedSubject: Subject | null;
     readonly isSaving: boolean;
 }
@@ -138,13 +140,13 @@ export default function SubjectFormModal({
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 lg:p-10">
-            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+            <div className="custom-scrollbar flex flex-col overflow-y-auto px-2">
                 <div className="mb-4">
-                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
+                    <h5 className="modal-title mb-2 font-outfit text-theme-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
                         {selectedSubject ? 'Editar materia' : 'Nueva materia'}
                     </h5>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
+                    <p className="font-outfit text-sm text-gray-500 dark:text-gray-400">
                         Define los detalles de la materia para la enseñanza académica.
                     </p>
                 </div>
@@ -187,7 +189,7 @@ export default function SubjectFormModal({
                     </div>
 
                     {isLoadingStatus ? (
-                        <div className="flex items-center justify-center h-[38px] bg-gray-50 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
+                        <div className="flex h-[38px] items-center justify-center rounded border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
                             <IconFA icon="spinner" spin className="text-gray-400" />
                         </div>
                     ) : (
@@ -206,12 +208,8 @@ export default function SubjectFormModal({
                     )}
                 </div>
 
-                <div className="flex flex-col-reverse items-center gap-4 mt-8 md:flex-row md:justify-end">
-                    <Button
-                        variant="outline"
-                        onClick={onClose}
-                        className="w-full md:w-auto"
-                    >
+                <div className="mt-8 flex flex-col-reverse items-center gap-4 md:flex-row md:justify-end">
+                    <Button variant="outline" onClick={onClose} className="w-full md:w-auto">
                         Cancelar
                     </Button>
 
@@ -240,4 +238,4 @@ export default function SubjectFormModal({
             </div>
         </Modal>
     );
-} 
+}

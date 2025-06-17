@@ -21,36 +21,39 @@ interface UpcomingPaymentsTableProps {
 const UpcomingPaymentsTable: React.FC<UpcomingPaymentsTableProps> = ({ payments, isLoading }) => {
     // Columnas para la tabla de pagos próximos
     const paymentsColumns: Column<Payment>[] = [
-        { 
-            key: 'dueDate', 
-            header: 'Fecha Vencimiento', 
-            width: '150px', 
-            render: (row: Payment) => new Date(row.dueDate).toLocaleDateString('es-MX') 
+        {
+            key: 'dueDate',
+            header: 'Fecha Vencimiento',
+            width: '150px',
+            render: (row: Payment) => new Date(row.dueDate).toLocaleDateString('es-MX'),
         },
         { key: 'concept', header: 'Concepto' },
-        { 
-            key: 'amount', 
-            header: 'Monto', 
+        {
+            key: 'amount',
+            header: 'Monto',
             width: '150px',
-            render: (row: Payment) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(row.amount)
+            render: (row: Payment) =>
+                new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(
+                    row.amount,
+                ),
         },
-        { 
-            key: 'daysRemaining', 
-            header: 'Días Restantes', 
+        {
+            key: 'daysRemaining',
+            header: 'Días Restantes',
             width: '130px',
             render: (row: Payment) => {
                 let color: 'primary' | 'success' | 'error' | 'warning' = 'primary';
-                
+
                 if (row.daysRemaining > 10) color = 'success';
                 else if (row.daysRemaining > 5) color = 'warning';
                 else color = 'error';
-                
+
                 return <Badge color={color}>{row.daysRemaining} días</Badge>;
-            }
+            },
         },
-        { 
-            key: 'actions', 
-            header: 'Acciones', 
+        {
+            key: 'actions',
+            header: 'Acciones',
             width: '120px',
             render: () => (
                 <div className="flex space-x-2">
@@ -61,8 +64,8 @@ const UpcomingPaymentsTable: React.FC<UpcomingPaymentsTableProps> = ({ payments,
                         <IconFA icon="calendar-plus" style="duotone" />
                     </button>
                 </div>
-            ) 
-        }
+            ),
+        },
     ];
 
     return (
@@ -70,7 +73,7 @@ const UpcomingPaymentsTable: React.FC<UpcomingPaymentsTableProps> = ({ payments,
             <DataTable
                 data={payments}
                 columns={paymentsColumns}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={item => item.id.toString()}
                 isLoading={isLoading}
                 searchable
                 searchPlaceholder="Buscar vencimientos..."

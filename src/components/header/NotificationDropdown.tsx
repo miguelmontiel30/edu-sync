@@ -7,7 +7,14 @@ import ProfileAvatar from '../ui/ProfileAvatar';
 import IconFA from '../ui/IconFA';
 
 // Tipos de notificación
-type NotificationType = 'student_alert' | 'teacher_alert' | 'payment_alert' | 'system_info' | 'system_warning' | 'system_error' | 'confirmation';
+type NotificationType =
+    | 'student_alert'
+    | 'teacher_alert'
+    | 'payment_alert'
+    | 'system_info'
+    | 'system_warning'
+    | 'system_error'
+    | 'confirmation';
 type UserRole = 'student' | 'teacher' | 'admin';
 
 interface NotificationData {
@@ -36,10 +43,10 @@ export default function NotificationDropdown() {
     useEffect(() => {
         // Verificar al montar
         handleResize();
-        
+
         // Agregar el event listener
         globalThis.addEventListener('resize', handleResize);
-        
+
         // Limpiar el event listener al desmontar
         return () => {
             globalThis.removeEventListener('resize', handleResize);
@@ -71,7 +78,7 @@ export default function NotificationDropdown() {
             isRead: false,
             priority: 'high',
             userRole: 'student',
-            userName: 'Ana María González Pérez'
+            userName: 'Ana María González Pérez',
         },
         {
             id: '2',
@@ -82,9 +89,9 @@ export default function NotificationDropdown() {
             isRead: false,
             priority: 'medium',
             userRole: 'student',
-            userName: 'Carlos Eduardo Martínez'
+            userName: 'Carlos Eduardo Martínez',
         },
-        
+
         // Notificaciones de maestros
         {
             id: '3',
@@ -95,7 +102,7 @@ export default function NotificationDropdown() {
             isRead: false,
             priority: 'medium',
             userRole: 'teacher',
-            userName: 'Prof. María Elena Rodríguez'
+            userName: 'Prof. María Elena Rodríguez',
         },
         {
             id: '4',
@@ -106,7 +113,7 @@ export default function NotificationDropdown() {
             isRead: true,
             priority: 'medium',
             userRole: 'teacher',
-            userName: 'Prof. Roberto Silva Mendoza'
+            userName: 'Prof. Roberto Silva Mendoza',
         },
 
         // Notificaciones de pagos
@@ -119,7 +126,7 @@ export default function NotificationDropdown() {
             isRead: false,
             priority: 'high',
             userRole: 'student',
-            userName: 'Luis Fernando Castro'
+            userName: 'Luis Fernando Castro',
         },
         {
             id: '6',
@@ -130,7 +137,7 @@ export default function NotificationDropdown() {
             isRead: true,
             priority: 'low',
             userRole: 'student',
-            userName: 'Sandra Patricia Morales'
+            userName: 'Sandra Patricia Morales',
         },
 
         // Notificaciones del sistema
@@ -138,29 +145,32 @@ export default function NotificationDropdown() {
             id: '7',
             type: 'system_info',
             title: 'Actualización del Sistema',
-            message: 'El sistema se actualizará el próximo domingo. Guarda tus cambios antes de las 2:00 AM.',
+            message:
+                'El sistema se actualizará el próximo domingo. Guarda tus cambios antes de las 2:00 AM.',
             timestamp: '3 hrs ago',
             isRead: false,
-            priority: 'medium'
+            priority: 'medium',
         },
         {
             id: '8',
             type: 'system_warning',
             title: 'Mantenimiento Programado',
-            message: 'Habrá mantenimiento de 12:00 AM a 4:00 AM. Algunas funciones pueden no estar disponibles.',
+            message:
+                'Habrá mantenimiento de 12:00 AM a 4:00 AM. Algunas funciones pueden no estar disponibles.',
             timestamp: '4 hrs ago',
             isRead: true,
-            priority: 'medium'
+            priority: 'medium',
         },
         {
             id: '9',
             type: 'system_error',
             title: 'Incidente Técnico',
-            message: 'Se ha detectado un problema en el módulo de reportes. El equipo técnico está trabajando en solucionarlo.',
+            message:
+                'Se ha detectado un problema en el módulo de reportes. El equipo técnico está trabajando en solucionarlo.',
             timestamp: '6 hrs ago',
             isRead: false,
-            priority: 'high'
-        }
+            priority: 'high',
+        },
     ];
 
     // Función para obtener el icono según el tipo de notificación
@@ -172,7 +182,7 @@ export default function NotificationDropdown() {
             system_info: 'info-circle',
             system_warning: 'exclamation-triangle',
             system_error: 'times-circle',
-            confirmation: 'question-circle'
+            confirmation: 'question-circle',
         };
         return icons[type];
     };
@@ -190,7 +200,8 @@ export default function NotificationDropdown() {
     // Función para obtener el color de fondo del icono
     const getNotificationBgColor = (type: NotificationType, priority: string): string => {
         if (priority === 'high') return 'bg-error-100 dark:bg-error-900/20';
-        if (priority === 'medium' && type.includes('alert')) return 'bg-warning-100 dark:bg-warning-900/20';
+        if (priority === 'medium' && type.includes('alert'))
+            return 'bg-warning-100 dark:bg-warning-900/20';
         if (type === 'system_info') return 'bg-info-100 dark:bg-info-900/20';
         if (type === 'system_warning') return 'bg-warning-100 dark:bg-warning-900/20';
         if (type === 'system_error') return 'bg-error-100 dark:bg-error-900/20';
@@ -201,21 +212,24 @@ export default function NotificationDropdown() {
     const renderNotificationContent = (notification: NotificationData) => {
         if (notification.userRole && notification.userName) {
             return (
-                <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-800 dark:text-white/90 font-medium mb-1 break-words">
+                <div className="min-w-0 flex-1">
+                    <p className="mb-1 break-words text-sm font-medium text-gray-800 dark:text-white/90">
                         <span className="font-semibold">{notification.userName}</span>
-                         {notification.message}
+                        {notification.message}
                     </p>
                     <div className="flex flex-wrap items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                         <span className="capitalize">
-                            {notification.userRole === 'student' ? 'Estudiante' : 
-                             notification.userRole === 'teacher' ? 'Profesor' : 'Administrador'}
+                            {notification.userRole === 'student'
+                                ? 'Estudiante'
+                                : notification.userRole === 'teacher'
+                                  ? 'Profesor'
+                                  : 'Administrador'}
                         </span>
-                        <span className="h-1 w-1 rounded-full bg-gray-400 hidden sm:block"></span>
+                        <span className="hidden h-1 w-1 rounded-full bg-gray-400 sm:block"></span>
                         <span>{notification.timestamp}</span>
                         {!notification.isRead && (
                             <>
-                                <span className="h-1 w-1 rounded-full bg-gray-400 hidden sm:block"></span>
+                                <span className="hidden h-1 w-1 rounded-full bg-gray-400 sm:block"></span>
                                 <span className="text-info-500 font-medium">Nuevo</span>
                             </>
                         )}
@@ -224,20 +238,20 @@ export default function NotificationDropdown() {
             );
         } else {
             return (
-                <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-800 dark:text-white/90 font-medium mb-1 break-words">
+                <div className="min-w-0 flex-1">
+                    <p className="mb-1 break-words text-sm font-medium text-gray-800 dark:text-white/90">
                         {notification.title}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 break-words">
+                    <p className="mb-2 break-words text-sm text-gray-500 dark:text-gray-400">
                         {notification.message}
                     </p>
                     <div className="flex flex-wrap items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                         <span>Sistema</span>
-                        <span className="h-1 w-1 rounded-full bg-gray-400 hidden sm:block"></span>
+                        <span className="hidden h-1 w-1 rounded-full bg-gray-400 sm:block"></span>
                         <span>{notification.timestamp}</span>
                         {!notification.isRead && (
                             <>
-                                <span className="h-1 w-1 rounded-full bg-gray-400 hidden sm:block"></span>
+                                <span className="hidden h-1 w-1 rounded-full bg-gray-400 sm:block"></span>
                                 <span className="text-info-500 font-medium">Nuevo</span>
                             </>
                         )}
@@ -253,18 +267,18 @@ export default function NotificationDropdown() {
         <div className="relative">
             <button
                 type="button"
-                className="dropdown-toggle relative flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                className="dropdown-toggle relative flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white sm:h-11 sm:w-11"
                 onClick={handleClick}
                 aria-label="Abrir notificaciones"
             >
                 {unreadCount > 0 && (
-                    <span className="absolute -right-1 -top-1 z-10 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white">
+                    <span className="absolute -right-1 -top-1 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-error-500 text-xs font-bold text-white sm:h-5 sm:w-5">
                         {unreadCount > 9 ? '9+' : unreadCount}
                     </span>
                 )}
-                <IconFA icon="bell" style="duotone" size={isMobile ? "sm" : "lg"} />
+                <IconFA icon="bell" style="duotone" size={isMobile ? 'sm' : 'lg'} />
             </button>
-            
+
             <Dropdown
                 isOpen={isOpen}
                 onClose={closeDropdown}
@@ -272,7 +286,7 @@ export default function NotificationDropdown() {
                 className="notifications-dropdown"
             >
                 {/* Header */}
-                <div className="flex-shrink-0 flex items-center justify-between border-b border-gray-100 p-4 dark:border-gray-700">
+                <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-100 p-4 dark:border-gray-700">
                     <div className="flex items-center gap-2">
                         <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                             Notificaciones
@@ -292,42 +306,51 @@ export default function NotificationDropdown() {
                         <IconFA icon="times" style="duotone" size="sm" />
                     </button>
                 </div>
-                
+
                 {/* Lista de notificaciones con scroll */}
-                <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+                <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto">
                     {notifications.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
-                            <IconFA icon="bell-slash" className="h-8 w-8 text-gray-400 mb-2" />
+                        <div className="flex flex-col items-center justify-center px-4 py-8 text-center">
+                            <IconFA icon="bell-slash" className="mb-2 h-8 w-8 text-gray-400" />
                             <p className="text-sm text-gray-500 dark:text-gray-400">
                                 No hay notificaciones
                             </p>
                         </div>
                     ) : (
                         <ul className="divide-y divide-gray-100 dark:divide-gray-800">
-                            {notifications.map((notification) => (
+                            {notifications.map(notification => (
                                 <li key={notification.id}>
                                     <DropdownItem
                                         onItemClick={closeDropdown}
-                                        className={`flex gap-3 p-3 sm:p-4 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors ${
-                                            !notification.isRead ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''
+                                        className={`flex gap-3 p-3 transition-colors hover:bg-gray-100 dark:hover:bg-white/5 sm:p-4 ${
+                                            !notification.isRead
+                                                ? 'bg-blue-50/50 dark:bg-blue-900/10'
+                                                : ''
                                         }`}
                                     >
                                         {/* Avatar o Icono */}
                                         <div className="flex-shrink-0">
                                             {notification.userRole && notification.userName ? (
-                                                <ProfileAvatar 
-                                                    size="sm" 
+                                                <ProfileAvatar
+                                                    size="sm"
                                                     name={notification.userName}
                                                     showStatus
                                                     status="online"
                                                 />
                                             ) : (
-                                                <div className={`flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full ${getNotificationBgColor(notification.type, notification.priority)}`}>
-                                                    <IconFA 
-                                                        icon={getNotificationIcon(notification.type)} 
-                                                        style="duotone" 
+                                                <div
+                                                    className={`flex h-8 w-8 items-center justify-center rounded-full sm:h-10 sm:w-10 ${getNotificationBgColor(notification.type, notification.priority)}`}
+                                                >
+                                                    <IconFA
+                                                        icon={getNotificationIcon(
+                                                            notification.type,
+                                                        )}
+                                                        style="duotone"
                                                         size="sm"
-                                                        className={getNotificationIconColor(notification.type, notification.priority)}
+                                                        className={getNotificationIconColor(
+                                                            notification.type,
+                                                            notification.priority,
+                                                        )}
                                                     />
                                                 </div>
                                             )}
@@ -339,7 +362,7 @@ export default function NotificationDropdown() {
                                         {/* Indicador de no leída */}
                                         {!notification.isRead && (
                                             <div className="flex-shrink-0 self-start pt-2">
-                                                <div className="h-2 w-2 rounded-full bg-info-500"></div>
+                                                <div className="bg-info-500 h-2 w-2 rounded-full"></div>
                                             </div>
                                         )}
                                     </DropdownItem>
@@ -348,20 +371,20 @@ export default function NotificationDropdown() {
                         </ul>
                     )}
                 </div>
-                
+
                 {/* Footer con acciones */}
-                <div className="flex-shrink-0 border-t border-gray-100 p-3 sm:p-4 dark:border-gray-700">
+                <div className="flex-shrink-0 border-t border-gray-100 p-3 dark:border-gray-700 sm:p-4">
                     <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
                         <Link
                             href="/notifications"
                             onClick={closeDropdown}
-                            className="flex-1 block rounded-lg border border-gray-300 bg-white px-3 py-2 text-center text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+                            className="block flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-center text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
                         >
                             Ver Todas
                         </Link>
                         <button
                             type="button"
-                            className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+                            className="flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
                         >
                             <IconFA icon="check-double" style="duotone" size="sm" />
                             <span className="hidden sm:inline">Marcar como leídas</span>

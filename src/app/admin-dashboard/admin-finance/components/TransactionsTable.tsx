@@ -22,43 +22,47 @@ interface TransactionsTableProps {
 const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactions, isLoading }) => {
     // Columnas para la tabla de transacciones
     const transactionsColumns: Column<Transaction>[] = [
-        { 
-            key: 'date', 
-            header: 'Fecha', 
-            width: '120px', 
-            render: (row: Transaction) => new Date(row.date).toLocaleDateString('es-MX') 
+        {
+            key: 'date',
+            header: 'Fecha',
+            width: '120px',
+            render: (row: Transaction) => new Date(row.date).toLocaleDateString('es-MX'),
         },
         { key: 'type', header: 'Tipo', width: '130px' },
         { key: 'concept', header: 'Concepto' },
-        { 
-            key: 'amount', 
-            header: 'Monto', 
+        {
+            key: 'amount',
+            header: 'Monto',
             width: '150px',
             render: (row: Transaction) => {
-                const formattedAmount = new Intl.NumberFormat('es-MX', { 
-                    style: 'currency', 
-                    currency: 'MXN' 
+                const formattedAmount = new Intl.NumberFormat('es-MX', {
+                    style: 'currency',
+                    currency: 'MXN',
                 }).format(row.amount);
-                return <span className={row.amount < 0 ? 'text-red-500' : 'text-green-500'}>{formattedAmount}</span>;
-            } 
+                return (
+                    <span className={row.amount < 0 ? 'text-red-500' : 'text-green-500'}>
+                        {formattedAmount}
+                    </span>
+                );
+            },
         },
-        { 
-            key: 'status', 
-            header: 'Estado', 
+        {
+            key: 'status',
+            header: 'Estado',
             width: '120px',
             render: (row: Transaction) => {
                 let color: 'primary' | 'success' | 'error' | 'warning' = 'primary';
-                
+
                 if (row.status === 'Pagado' || row.status === 'Procesado') color = 'success';
                 else if (row.status === 'Pendiente') color = 'warning';
                 else if (row.status === 'Cancelado') color = 'error';
-                
+
                 return <Badge color={color}>{row.status}</Badge>;
-            } 
+            },
         },
-        { 
-            key: 'actions', 
-            header: 'Acciones', 
+        {
+            key: 'actions',
+            header: 'Acciones',
             width: '100px',
             render: () => (
                 <div className="flex space-x-2">
@@ -69,8 +73,8 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactions, isL
                         <IconFA icon="print" style="duotone" />
                     </button>
                 </div>
-            ) 
-        }
+            ),
+        },
     ];
 
     return (
@@ -78,7 +82,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactions, isL
             <DataTable
                 data={transactions}
                 columns={transactionsColumns}
-                keyExtractor={(item) => item.id.toString()}
+                keyExtractor={item => item.id.toString()}
                 isLoading={isLoading}
                 searchable
                 searchPlaceholder="Buscar transacciones..."
@@ -87,4 +91,4 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({ transactions, isL
     );
 };
 
-export default TransactionsTable; 
+export default TransactionsTable;

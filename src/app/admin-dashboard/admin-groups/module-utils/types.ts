@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Enumeración de estados posibles para un grupo
  */
@@ -120,7 +121,7 @@ export interface DatabaseGroup {
         mother_last_name?: string;
         image_url?: string;
     };
-    student_groups?: Array<{students: any}>;
+    student_groups?: Array<{ students: any }>;
 }
 
 /**
@@ -130,7 +131,7 @@ export interface GroupManagementHook {
     // Datos
     groups: Group[];
     deletedGroups: Group[];
-    schoolYears: Array<{id: number; name: string; status: string}>;
+    schoolYears: Array<{ id: number; name: string; status: string }>;
 
     // Estados de UI
     isModalOpen: boolean;

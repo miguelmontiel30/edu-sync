@@ -1,8 +1,8 @@
 // Repository
-import {calendarRepository, ICalendarRepository} from './repository';
+import { calendarRepository, ICalendarRepository } from './repository';
 
 // Types
-import {CalendarData, EventData, EventRecipient, RepositoryResponse} from './types';
+import { CalendarData, EventData, EventRecipient, RepositoryResponse } from './types';
 
 // Instancia compartida del repositorio
 const repository: ICalendarRepository = calendarRepository;

@@ -1,5 +1,5 @@
-import {Student, StudentFormData, StudentGroup} from './types';
-import {studentRepository} from './repository';
+import { Student, StudentFormData, StudentGroup } from './types';
+import { studentRepository } from './repository';
 
 /**
  * Carga todos los datos de estudiantes (activos y eliminados)
@@ -15,7 +15,7 @@ export async function loadAllStudentsData(schoolId: number): Promise<{
     const deleted = await studentRepository.getDeletedStudents();
 
     // Retornar los datos
-    return {active, deleted};
+    return { active, deleted };
 }
 
 /**

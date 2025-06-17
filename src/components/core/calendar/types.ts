@@ -1,4 +1,5 @@
-import {EventInput} from '@fullcalendar/core';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { EventInput } from '@fullcalendar/core';
 
 /**
  * Interfaz para representar un rol dentro del sistema

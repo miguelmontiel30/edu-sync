@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo } from 'react';
 import { ApexOptions } from 'apexcharts';
 
@@ -31,41 +32,41 @@ export function useChartConfig(financialData: any) {
                 },
                 labels: {
                     formatter: (value: number) => {
-                        return new Intl.NumberFormat('es-MX', { 
-                            style: 'currency', 
+                        return new Intl.NumberFormat('es-MX', {
+                            style: 'currency',
                             currency: 'MXN',
-                            maximumFractionDigits: 0 
+                            maximumFractionDigits: 0,
                         }).format(value);
-                    }
-                }
+                    },
+                },
             },
             tooltip: {
                 y: {
                     formatter: (value: number) => {
-                        return new Intl.NumberFormat('es-MX', { 
-                            style: 'currency', 
-                            currency: 'MXN' 
+                        return new Intl.NumberFormat('es-MX', {
+                            style: 'currency',
+                            currency: 'MXN',
                         }).format(value);
-                    }
-                }
+                    },
+                },
             },
             legend: {
                 position: 'top',
             },
             grid: {
                 borderColor: '#E2E8F0',
-            }
+            },
         };
 
         const series = [
             {
                 name: 'Ingresos',
-                data: financialData.cashFlowData.map((item: any) => item.income)
+                data: financialData.cashFlowData.map((item: any) => item.income),
             },
             {
                 name: 'Egresos',
-                data: financialData.cashFlowData.map((item: any) => item.expenses)
-            }
+                data: financialData.cashFlowData.map((item: any) => item.expenses),
+            },
         ];
 
         return { options, series };
@@ -95,7 +96,7 @@ export function useChartConfig(financialData: any) {
             stroke: {
                 show: true,
                 width: 2,
-                colors: ['transparent']
+                colors: ['transparent'],
             },
             colors: ['#4F46E5', '#F97316'],
             xaxis: {
@@ -103,45 +104,45 @@ export function useChartConfig(financialData: any) {
             },
             yaxis: {
                 title: {
-                    text: 'Monto (MXN)'
+                    text: 'Monto (MXN)',
                 },
                 labels: {
                     formatter: (value: number) => {
-                        return new Intl.NumberFormat('es-MX', { 
-                            style: 'currency', 
+                        return new Intl.NumberFormat('es-MX', {
+                            style: 'currency',
                             currency: 'MXN',
-                            maximumFractionDigits: 0 
+                            maximumFractionDigits: 0,
                         }).format(value);
-                    }
-                }
+                    },
+                },
             },
             fill: {
-                opacity: 1
+                opacity: 1,
             },
             tooltip: {
                 y: {
                     formatter: (value: number) => {
-                        return new Intl.NumberFormat('es-MX', { 
-                            style: 'currency', 
-                            currency: 'MXN' 
+                        return new Intl.NumberFormat('es-MX', {
+                            style: 'currency',
+                            currency: 'MXN',
                         }).format(value);
-                    }
-                }
+                    },
+                },
             },
             legend: {
                 position: 'top',
-            }
+            },
         };
 
         const series = [
             {
                 name: 'Ingresos',
-                data: financialData.cashFlowData.map((item: any) => item.income)
+                data: financialData.cashFlowData.map((item: any) => item.income),
             },
             {
                 name: 'Egresos',
-                data: financialData.cashFlowData.map((item: any) => item.expenses)
-            }
+                data: financialData.cashFlowData.map((item: any) => item.expenses),
+            },
         ];
 
         return { options, series };
@@ -173,39 +174,39 @@ export function useChartConfig(financialData: any) {
                 categories: financialData.agingReceivables.map((item: any) => item.range),
                 labels: {
                     formatter: (value: string) => {
-                        return new Intl.NumberFormat('es-MX', { 
-                            style: 'currency', 
+                        return new Intl.NumberFormat('es-MX', {
+                            style: 'currency',
                             currency: 'MXN',
-                            maximumFractionDigits: 0 
+                            maximumFractionDigits: 0,
                         }).format(Number(value));
-                    }
-                }
+                    },
+                },
             },
             yaxis: {
                 title: {
-                    text: 'Rango de días'
-                }
+                    text: 'Rango de días',
+                },
             },
             tooltip: {
                 y: {
                     formatter: (value: number) => {
-                        return new Intl.NumberFormat('es-MX', { 
-                            style: 'currency', 
-                            currency: 'MXN' 
+                        return new Intl.NumberFormat('es-MX', {
+                            style: 'currency',
+                            currency: 'MXN',
                         }).format(value);
-                    }
-                }
+                    },
+                },
             },
             legend: {
-                show: false
-            }
+                show: false,
+            },
         };
 
         const series = [
             {
                 name: 'Monto',
-                data: financialData.agingReceivables.map((item: any) => item.amount)
-            }
+                data: financialData.agingReceivables.map((item: any) => item.amount),
+            },
         ];
 
         return { options, series };
@@ -214,6 +215,6 @@ export function useChartConfig(financialData: any) {
     return {
         cashFlowConfig,
         monthlyComparisonConfig,
-        agingReceivablesConfig
+        agingReceivablesConfig,
     };
-} 
+}

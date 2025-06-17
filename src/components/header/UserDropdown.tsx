@@ -59,7 +59,7 @@ export default function UserDropdown() {
                 <span className="mr-1 block text-theme-sm font-medium">{session.first_name}</span>
 
                 <IconFA
-                    icon={isOpen ? "chevron-up" : "chevron-down"}
+                    icon={isOpen ? 'chevron-up' : 'chevron-down'}
                     style="duotone"
                     className="text-gray-500 transition-transform duration-200 dark:text-gray-400"
                 />
@@ -87,7 +87,11 @@ export default function UserDropdown() {
                             href="/profile"
                             className="group flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                         >
-                            <IconFA icon="user" style="duotone" className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300" />
+                            <IconFA
+                                icon="user"
+                                style="duotone"
+                                className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300"
+                            />
                             Editar perfil
                         </DropdownItem>
                     </li>
@@ -98,7 +102,11 @@ export default function UserDropdown() {
                             href="/profile"
                             className="group flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                         >
-                            <IconFA icon="gear" style="duotone" className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300" />
+                            <IconFA
+                                icon="gear"
+                                style="duotone"
+                                className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300"
+                            />
                             Configuración de cuenta
                         </DropdownItem>
                     </li>
@@ -109,7 +117,11 @@ export default function UserDropdown() {
                             href="/profile"
                             className="group flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                         >
-                            <IconFA icon="circle-info" style="duotone" className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300" />
+                            <IconFA
+                                icon="circle-info"
+                                style="duotone"
+                                className="text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300"
+                            />
                             Soporte
                         </DropdownItem>
                     </li>
@@ -119,7 +131,11 @@ export default function UserDropdown() {
                     onClick={handleLogout}
                     className="group mt-3 flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                 >
-                    <IconFA icon="right-from-bracket" style="duotone" className="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300" />
+                    <IconFA
+                        icon="right-from-bracket"
+                        style="duotone"
+                        className="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300"
+                    />
                     Cerrar sesión
                 </button>
             </Dropdown>

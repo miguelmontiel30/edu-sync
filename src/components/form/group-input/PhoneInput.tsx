@@ -1,5 +1,5 @@
 'use client';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
 interface CountryCode {
     code: string;
@@ -23,7 +23,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
     const [phoneNumber, setPhoneNumber] = useState<string>('+1');
 
     const countryCodes: Record<string, string> = countries.reduce(
-        (acc, {code, label}) => ({...acc, [code]: label}),
+        (acc, { code, label }) => ({ ...acc, [code]: label }),
         {},
     );
 

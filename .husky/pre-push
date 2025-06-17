@@ -1,0 +1,12 @@
+echo "🧪 Ejecutando verificaciones previas al push..."
+
+# Verifica que no haya errores de lint (más estricto que en pre-commit)
+npm run lint:strict && echo "\n\n\n✅ Verificación de lint completada exitosamente\n\n\n" || (echo -e "\n\n\n❌ ¡Ups! Encontramos algunos problemas de estilo y calidad en el código. Por favor, revisa los errores de ESLint antes de continuar. \n\n\n" && exit 1)
+
+# TODO:Descomentar cuando haya archivos de testing
+# npm test && echo "✅ Pruebas completadas exitosamente" || (echo -e "\n\n\n\n❌ Las pruebas han fallado" && exit 1)
+
+# Verifica tipos de TypeScript
+npm run type-check && echo "\n\n\n\n✅ Verificación de tipos completada exitosamente\n\n\n\n" || (echo -e "\n\n\n❌ Hay errores de tipado en TypeScript\n\n\n" && exit 1)
+
+echo "\n\n\n✅ Todas las verificaciones pasaron correctamente\n\n\n" 

@@ -1,5 +1,5 @@
-import {useState, useEffect} from 'react';
-import sessionService, {UserSession} from '@/services/auth/sessionService';
+import { useState, useEffect } from 'react';
+import sessionService, { UserSession } from '@/services/auth/sessionService';
 
 /**
  * Hook personalizado para acceder a la sesión del usuario en memoria

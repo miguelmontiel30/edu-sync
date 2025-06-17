@@ -6,7 +6,14 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint"
+        "lint": "next lint",
+        "lint:fix": "next lint --fix",
+        "lint:strict": "next lint --max-warnings 9999",
+        "type-check": "tsc --noEmit",
+        "prepare": "husky",
+        "format": "prettier --write .",
+        "check-format": "prettier --check .",
+        "check-all": "npm run lint:strict && npm run type-check && npm run check-format"
     },
     "dependencies": {
         "@fullcalendar/core": "^6.1.17",
@@ -28,6 +35,8 @@
         "zustand": "^5.0.3"
     },
     "devDependencies": {
+        "@commitlint/cli": "^19.8.1",
+        "@commitlint/config-conventional": "^19.8.1",
         "@eslint/eslintrc": "^3",
         "@fullcalendar/list": "^6.1.17",
         "@svgr/webpack": "^8.1.0",
@@ -39,10 +48,21 @@
         "eslint": "^9",
         "eslint-config-next": "15.2.3",
         "eslint-plugin-unused-imports": "^4.1.4",
+        "husky": "^9.1.7",
+        "lint-staged": "^15.5.2",
         "postcss": "^8",
         "prettier": "^3.5.2",
         "prettier-plugin-tailwindcss": "^0.6.11",
         "tailwindcss": "^3.4.1",
         "typescript": "^5"
+    },
+    "lint-staged": {
+        "*.{js,jsx,ts,tsx}": [
+            "prettier --write",
+            "eslint --fix"
+        ],
+        "*.{json,css,scss,md}": [
+            "prettier --write"
+        ]
     }
 }

@@ -49,7 +49,7 @@ export default function ProtectedRoute({
 
                 // Marcar que ya verificamos
                 setAuthVerified(true);
-            } catch (error) {
+            } catch (error: unknown) {
                 console.error('Error verificando autenticación:', error);
                 setConnectionError(true);
                 setAuthVerified(true);
@@ -103,7 +103,7 @@ export default function ProtectedRoute({
         teacherOnly,
         studentOnly,
         hasRole,
-        router
+        router,
     ]);
 
     // Si hay error de conexión
@@ -111,17 +111,20 @@ export default function ProtectedRoute({
         return (
             <div className="flex h-screen w-full items-center justify-center">
                 <div className="text-center">
-                    <div className="flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mx-auto mb-4">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
                         <IconFA icon="triangle-exclamation" className="text-red-600" />
                     </div>
-                    <p className="text-lg font-medium text-gray-900 dark:text-white">Error de conexión</p>
+                    <p className="text-lg font-medium text-gray-900 dark:text-white">
+                        Error de conexión
+                    </p>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">
-                        No se pudo establecer conexión con el servidor. Por favor, verifica tu conexión a internet e intenta nuevamente.
+                        No se pudo establecer conexión con el servidor. Por favor, verifica tu
+                        conexión a internet e intenta nuevamente.
                     </p>
                     <button
                         type="button"
                         onClick={() => globalThis.location.reload()}
-                        className="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        className="mt-4 inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
                         <IconFA icon="arrow-rotate-right" className="mr-2" />
                         Reintentar

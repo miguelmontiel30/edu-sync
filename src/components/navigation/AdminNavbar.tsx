@@ -96,7 +96,9 @@ const AdminNavbar: React.FC = () => {
                                 size="xl"
                                 className="text-indigo-600 dark:text-indigo-400"
                             />
-                            <h1 className="ml-2 text-xl font-semibold text-gray-800 dark:text-white">EduSync</h1>
+                            <h1 className="ml-2 text-xl font-semibold text-gray-800 dark:text-white">
+                                EduSync
+                            </h1>
                         </div>
                     </Link>
 
@@ -164,8 +166,9 @@ const AdminNavbar: React.FC = () => {
 
                 {/* Sección derecha: menús de notificación y usuario */}
                 <div
-                    className={`${isApplicationMenuOpen ? 'flex' : 'hidden'
-                        } w-full items-center justify-between gap-4 px-5 py-4 shadow-theme-md lg:flex lg:justify-end lg:px-0 lg:shadow-none`}
+                    className={`${
+                        isApplicationMenuOpen ? 'flex' : 'hidden'
+                    } w-full items-center justify-between gap-4 px-5 py-4 shadow-theme-md lg:flex lg:justify-end lg:px-0 lg:shadow-none`}
                 >
                     <div className="flex items-center gap-2 2xsm:gap-3">
                         {/* Botón de modo oscuro */}

@@ -27,22 +27,22 @@ export default function FiltersBar({ filters, onFilterChange, isLoading }: Filte
     const handleStatusChange = (value: string) => {
         onFilterChange('paymentStatus', value);
     };
-    
+
     const dateOptions = [
         {
-            label: "Períodos",
+            label: 'Períodos',
             options: [
                 { value: 'all', label: 'Todos los períodos' },
                 { value: 'current', label: 'Período actual' },
                 { value: 'lastMonth', label: 'Último mes' },
                 { value: 'lastTrimester', label: 'Último trimestre' },
-            ]
-        }
+            ],
+        },
     ];
 
     const conceptOptions = [
         {
-            label: "Conceptos de pago",
+            label: 'Conceptos de pago',
             options: [
                 { value: 'all', label: 'Todos los conceptos' },
                 { value: 'inscription', label: 'Inscripción' },
@@ -50,20 +50,20 @@ export default function FiltersBar({ filters, onFilterChange, isLoading }: Filte
                 { value: 'materials', label: 'Materiales' },
                 { value: 'transport', label: 'Transporte' },
                 { value: 'events', label: 'Eventos' },
-            ]
-        }
+            ],
+        },
     ];
 
     const statusOptions = [
         {
-            label: "Estados de pago",
+            label: 'Estados de pago',
             options: [
                 { value: 'all', label: 'Todos los estados' },
                 { value: 'paid', label: 'Pagado' },
                 { value: 'pending', label: 'Pendiente' },
                 { value: 'overdue', label: 'Vencido' },
-            ]
-        }
+            ],
+        },
     ];
 
     return (
@@ -76,7 +76,7 @@ export default function FiltersBar({ filters, onFilterChange, isLoading }: Filte
                     placeholder="Período"
                 />
             </div>
-            
+
             <div className="w-full md:w-1/4">
                 <SelectWithCategories
                     options={conceptOptions}
@@ -85,7 +85,7 @@ export default function FiltersBar({ filters, onFilterChange, isLoading }: Filte
                     placeholder="Concepto"
                 />
             </div>
-            
+
             <div className="w-full md:w-1/4">
                 <SelectWithCategories
                     options={statusOptions}
@@ -94,24 +94,17 @@ export default function FiltersBar({ filters, onFilterChange, isLoading }: Filte
                     placeholder="Estado"
                 />
             </div>
-            
+
             <div className="flex justify-end md:ml-auto">
-                <Button 
-                    variant="outline" 
-                    className="mr-2"
-                    disabled={isLoading}
-                >
+                <Button variant="outline" className="mr-2" disabled={isLoading}>
                     <IconFA icon="sync" className="mr-2" />
                     Restablecer
                 </Button>
-                <Button 
-                    variant="primary" 
-                    disabled={isLoading}
-                >
+                <Button variant="primary" disabled={isLoading}>
                     <IconFA icon="search" className="mr-2" />
                     Aplicar filtros
                 </Button>
             </div>
         </div>
     );
-} 
+}

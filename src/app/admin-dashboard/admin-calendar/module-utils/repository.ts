@@ -15,7 +15,13 @@ import {
     prepareEventRecipients,
     handleRepositoryError,
 } from './utils';
-import {CalendarData, DatabaseEvent, EventData, EventRecipient, RepositoryResponse} from './types';
+import {
+    CalendarData,
+    DatabaseEvent,
+    EventData,
+    EventRecipient,
+    RepositoryResponse,
+} from './types';
 
 // Interfaz del repositorio
 export interface ICalendarRepository {
@@ -70,7 +76,7 @@ class SupabaseCalendarRepository implements ICalendarRepository {
             };
         } catch (error) {
             console.error('Error en getCalendarData:', error);
-            return {events: [], eventTypes: [], roles: []};
+            return { events: [], eventTypes: [], roles: [] };
         }
     }
 
@@ -79,12 +85,12 @@ class SupabaseCalendarRepository implements ICalendarRepository {
      */
     async getActiveRoles(_schoolId: number): Promise<RepositoryResponse> {
         try {
-            const {data, error} = await getActiveRoles();
+            const { data, error } = await getActiveRoles();
 
-            if (error) return {success: false, error};
+            if (error) return { success: false, error };
 
             const transformedRoles = transformRolesData(data || []);
-            return {success: true, data: transformedRoles};
+            return { success: true, data: transformedRoles };
         } catch (error) {
             console.error('Error en getActiveRoles:', error);
             return handleRepositoryError(error);
@@ -96,9 +102,9 @@ class SupabaseCalendarRepository implements ICalendarRepository {
      */
     async saveEvent(eventData: EventData): Promise<RepositoryResponse> {
         try {
-            const {data, error} = await saveEvent(eventData);
-            if (error) return {success: false, error};
-            return {success: true, data};
+            const { data, error } = await saveEvent(eventData);
+            if (error) return { success: false, error };
+            return { success: true, data };
         } catch (error) {
             console.error('Error en saveEvent:', error);
             return handleRepositoryError(error);
@@ -110,9 +116,9 @@ class SupabaseCalendarRepository implements ICalendarRepository {
      */
     async updateEvent(eventId: number, eventData: Partial<EventData>): Promise<RepositoryResponse> {
         try {
-            const {data, error} = await updateEvent(eventId, eventData);
-            if (error) return {success: false, error};
-            return {success: true, data};
+            const { data, error } = await updateEvent(eventId, eventData);
+            if (error) return { success: false, error };
+            return { success: true, data };
         } catch (error) {
             console.error('Error en updateEvent:', error);
             return handleRepositoryError(error);
@@ -124,9 +130,9 @@ class SupabaseCalendarRepository implements ICalendarRepository {
      */
     async deleteEvent(eventId: number): Promise<RepositoryResponse> {
         try {
-            const {error} = await deleteEvent(eventId);
-            if (error) return {success: false, error};
-            return {success: true};
+            const { error } = await deleteEvent(eventId);
+            if (error) return { success: false, error };
+            return { success: true };
         } catch (error) {
             console.error('Error en deleteEvent:', error);
             return handleRepositoryError(error);
@@ -138,9 +144,9 @@ class SupabaseCalendarRepository implements ICalendarRepository {
      */
     async saveEventRecipients(recipients: EventRecipient[]): Promise<RepositoryResponse> {
         try {
-            const {error} = await saveEventRecipients(recipients);
-            if (error) return {success: false, error};
-            return {success: true};
+            const { error } = await saveEventRecipients(recipients);
+            if (error) return { success: false, error };
+            return { success: true };
         } catch (error) {
             console.error('Error en saveEventRecipients:', error);
             return handleRepositoryError(error);
@@ -152,9 +158,9 @@ class SupabaseCalendarRepository implements ICalendarRepository {
      */
     async deleteEventRecipients(eventId: number): Promise<RepositoryResponse> {
         try {
-            const {error} = await deleteEventRecipients(eventId);
-            if (error) return {success: false, error};
-            return {success: true};
+            const { error } = await deleteEventRecipients(eventId);
+            if (error) return { success: false, error };
+            return { success: true };
         } catch (error) {
             console.error('Error en deleteEventRecipients:', error);
             return handleRepositoryError(error);
@@ -184,7 +190,7 @@ class SupabaseCalendarRepository implements ICalendarRepository {
                 if (!recipientsResult.success) return recipientsResult;
             }
 
-            return {success: true, data: result.data};
+            return { success: true, data: result.data };
         } catch (error) {
             console.error('Error en createEventWithRecipients:', error);
             return handleRepositoryError(error);
@@ -216,7 +222,7 @@ class SupabaseCalendarRepository implements ICalendarRepository {
                 if (!recipientsResult.success) return recipientsResult;
             }
 
-            return {success: true, data: result.data};
+            return { success: true, data: result.data };
         } catch (error) {
             console.error('Error en updateEventWithRecipients:', error);
             return handleRepositoryError(error);

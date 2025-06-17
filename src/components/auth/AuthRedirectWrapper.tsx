@@ -25,7 +25,6 @@ export function AuthRedirectWrapper({ children }: AuthRedirectWrapperProps) {
 
         // Solo ejecutar cuando la carga termine
         if (!isLoading) {
-
             // Marcar como verificado para no repetir
             setRedirectChecked(true);
 
@@ -61,7 +60,7 @@ export function AuthRedirectWrapper({ children }: AuthRedirectWrapperProps) {
 
     // Obtener la ruta actual
     const isPublicPath = ['/login', '/register', '/unauthorized', '/not-found'].some(pp =>
-        pathname.includes(pp)
+        pathname.includes(pp),
     );
 
     // Mostrar el contenido si el usuario está autenticado o es una página pública
@@ -83,4 +82,4 @@ export function AuthRedirectWrapper({ children }: AuthRedirectWrapperProps) {
 
     // Mostrar el contenido mientras se procesa (caso extraordinario)
     return <>{children}</>;
-} 
+}

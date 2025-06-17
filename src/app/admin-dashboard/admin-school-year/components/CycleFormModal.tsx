@@ -27,7 +27,13 @@ interface CycleFormModalProps {
     readonly currentCycles: SchoolCycle[];
 }
 
-export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle, isSaving }: CycleFormModalProps) {
+export default function CycleFormModal({
+    isOpen,
+    onClose,
+    onSave,
+    selectedCycle,
+    isSaving,
+}: CycleFormModalProps) {
     // Obtener estados de ciclo escolar usando nuestro hook
     const { options: statusOptions, isLoading: isLoadingStatus } = useStatusOptions('school_year');
 
@@ -35,14 +41,14 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
         name: '',
         startDate: '',
         endDate: '',
-        status: ''
+        status: '',
     });
 
     const [alertState, setAlertState] = useState<AlertState>({
         show: false,
         variant: 'warning',
         title: '',
-        message: ''
+        message: '',
     });
 
     // Efecto para cerrar automáticamente la alerta después de 5 segundos
@@ -62,14 +68,17 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                 name: selectedCycle.name,
                 startDate: selectedCycle.startDate,
                 endDate: selectedCycle.endDate,
-                status: selectedCycle.status.toString()
+                status: selectedCycle.status.toString(),
             });
         } else {
             setCycleForm({
                 name: '',
                 startDate: new Date().toISOString().split('T')[0],
-                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-                status: statusOptions.find(option => option.value === CYCLE_STATUS.ACTIVE)?.value || ''
+                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+                    .toISOString()
+                    .split('T')[0],
+                status:
+                    statusOptions.find(option => option.value === CYCLE_STATUS.ACTIVE)?.value || '',
             });
         }
     }
@@ -89,7 +98,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
             name: '',
             startDate: '',
             endDate: '',
-            status: ''
+            status: '',
         });
     }
 
@@ -97,14 +106,14 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
         const { name, value } = e.target;
         setCycleForm(prev => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
     }
 
     function handleSelectChange(value: string) {
         setCycleForm(prev => ({
             ...prev,
-            status: value
+            status: value,
         }));
     }
 
@@ -115,7 +124,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                 show: true,
                 variant: 'error',
                 title: 'Error',
-                message: 'Por favor, complete todos los campos requeridos.'
+                message: 'Por favor, complete todos los campos requeridos.',
             });
             return;
         }
@@ -126,7 +135,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                 show: true,
                 variant: 'error',
                 title: 'Error',
-                message: 'La fecha de inicio debe ser anterior a la fecha de fin.'
+                message: 'La fecha de inicio debe ser anterior a la fecha de fin.',
             });
             return;
         }
@@ -136,7 +145,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
             name: cycleForm.name,
             startDate: cycleForm.startDate,
             endDate: cycleForm.endDate,
-            status: cycleForm.status
+            status: cycleForm.status,
         };
 
         // Si es una edición, incluimos el ID
@@ -153,25 +162,23 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                 show: true,
                 variant: 'error',
                 title: 'Error',
-                message: result.errorMessage
+                message: result.errorMessage,
             });
         }
     }
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            className="max-w-[700px] p-6 lg:p-10"
-        >
-            <div className="flex flex-col px-2 overflow-y-auto custom-scrollbar">
+        <Modal isOpen={isOpen} onClose={onClose} className="max-w-[700px] p-6 lg:p-10">
+            <div className="custom-scrollbar flex flex-col overflow-y-auto px-2">
                 <div className="mb-4">
-                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
-                        {selectedCycle ? "Editar ciclo escolar" : "Define un nuevo ciclo escolar"}
+                    <h5 className="modal-title mb-2 font-outfit text-theme-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
+                        {selectedCycle ? 'Editar ciclo escolar' : 'Define un nuevo ciclo escolar'}
                     </h5>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                        El conjunto de fechas clave que delimitan el periodo académico, en el que se asignan grupos, materias y alumnos para organizar eficazmente el año escolar.
+                    <p className="font-outfit text-sm text-gray-500 dark:text-gray-400">
+                        El conjunto de fechas clave que delimitan el periodo académico, en el que se
+                        asignan grupos, materias y alumnos para organizar eficazmente el año
+                        escolar.
                     </p>
                 </div>
 
@@ -193,7 +200,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                                 id="cycle-name"
                                 type="text"
                                 placeholder={`Ej. Ciclo ${new Date().getFullYear()}-${new Date().getFullYear() + 1}`}
-                                onChange={(e) => handleInputChange(e)}
+                                onChange={e => handleInputChange(e)}
                                 name="name"
                                 value={cycleForm.name}
                             />
@@ -201,12 +208,10 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                     </div>
 
                     <div className="mt-6">
-                        <Label className="font-outfit">
-                            Estado del Ciclo
-                        </Label>
+                        <Label className="font-outfit">Estado del Ciclo</Label>
 
                         {isLoadingStatus ? (
-                            <div className="flex items-center justify-center h-[38px] bg-gray-50 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
+                            <div className="flex h-[38px] items-center justify-center rounded border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
                                 <IconFA icon="spinner" spin className="text-gray-400" />
                             </div>
                         ) : (
@@ -214,7 +219,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                                 key={`status-select-${selectedCycle?.id || 'new'}-${cycleForm.status}`}
                                 options={statusOptions}
                                 placeholder="Seleccione un estado"
-                                onChange={(value) => handleSelectChange(value)}
+                                onChange={value => handleSelectChange(value)}
                                 defaultValue={cycleForm.status}
                             />
                         )}
@@ -230,7 +235,7 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                             type="date"
                             name="startDate"
                             placeholder="Fecha de inicio"
-                            onChange={(e) => handleInputChange(e)}
+                            onChange={e => handleInputChange(e)}
                             value={cycleForm.startDate}
                         />
                     </div>
@@ -245,21 +250,16 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                             type="date"
                             name="endDate"
                             placeholder="Fecha de fin"
-                            onChange={(e) => handleInputChange(e)}
+                            onChange={e => handleInputChange(e)}
                             value={cycleForm.endDate}
                         />
                     </div>
                 </div>
 
-                <div className="flex flex-col-reverse items-center gap-4 mt-8 md:flex-row md:justify-end">
-                    <Button
-                        variant="outline"
-                        onClick={onClose}
-                        className="w-full md:w-auto"
-                    >
+                <div className="mt-8 flex flex-col-reverse items-center gap-4 md:flex-row md:justify-end">
+                    <Button variant="outline" onClick={onClose} className="w-full md:w-auto">
                         Cancelar
                     </Button>
-
 
                     <Button
                         onClick={handleSaveCycle}
@@ -274,8 +274,11 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
                             </>
                         ) : (
                             <span className="font-outfit">
-                                <IconFA icon={selectedCycle ? "sync" : "calendar-plus"} className="mr-2" />
-                                {selectedCycle ? "Actualizar Ciclo" : "Crear Ciclo"}
+                                <IconFA
+                                    icon={selectedCycle ? 'sync' : 'calendar-plus'}
+                                    className="mr-2"
+                                />
+                                {selectedCycle ? 'Actualizar Ciclo' : 'Crear Ciclo'}
                             </span>
                         )}
                     </Button>
@@ -283,4 +286,4 @@ export default function CycleFormModal({ isOpen, onClose, onSave, selectedCycle,
             </div>
         </Modal>
     );
-} 
+}

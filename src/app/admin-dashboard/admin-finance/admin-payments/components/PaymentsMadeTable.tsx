@@ -29,7 +29,7 @@ const mockPayments: Payment[] = [
         amount: 2500,
         paymentDate: '2023-08-05',
         paymentMethod: 'Transferencia',
-        status: 'paid'
+        status: 'paid',
     },
     {
         id: 'p002',
@@ -38,7 +38,7 @@ const mockPayments: Payment[] = [
         amount: 750,
         paymentDate: '2023-08-03',
         paymentMethod: 'Efectivo',
-        status: 'paid'
+        status: 'paid',
     },
     {
         id: 'p003',
@@ -47,7 +47,7 @@ const mockPayments: Payment[] = [
         amount: 2500,
         paymentDate: '2023-08-01',
         paymentMethod: 'Tarjeta',
-        status: 'paid'
+        status: 'paid',
     },
     {
         id: 'p004',
@@ -56,7 +56,7 @@ const mockPayments: Payment[] = [
         amount: 5000,
         paymentDate: '2023-07-28',
         paymentMethod: 'Transferencia',
-        status: 'paid'
+        status: 'paid',
     },
     {
         id: 'p005',
@@ -65,16 +65,20 @@ const mockPayments: Payment[] = [
         amount: 800,
         paymentDate: '2023-08-02',
         paymentMethod: 'Efectivo',
-        status: 'paid'
-    }
+        status: 'paid',
+    },
 ];
 
-export default function PaymentsMadeTable({ payments = mockPayments, groupId: _groupId, isLoading }: PaymentsMadeTableProps) {
+export default function PaymentsMadeTable({
+    payments = mockPayments,
+    groupId: _groupId,
+    isLoading,
+}: PaymentsMadeTableProps) {
     // Formato de moneda para cantidades
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('es-MX', {
             style: 'currency',
-            currency: 'MXN'
+            currency: 'MXN',
         }).format(amount);
     };
 
@@ -84,12 +88,12 @@ export default function PaymentsMadeTable({ payments = mockPayments, groupId: _g
         return new Intl.DateTimeFormat('es-MX', {
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
         }).format(date);
     };
 
     const tableHeader = (
-        <div className="flex justify-between items-center w-full">
+        <div className="flex w-full items-center justify-between">
             <div className="text-lg font-semibold">
                 Pagos realizados - {mockPayments.length} registros
             </div>
@@ -101,74 +105,98 @@ export default function PaymentsMadeTable({ payments = mockPayments, groupId: _g
     );
 
     return (
-        <ComponentCard
-            title={tableHeader}
-            className="shadow-md"
-        >
+        <ComponentCard title={tableHeader} className="shadow-md">
             <div className="overflow-x-auto">
                 <table className="w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead className="bg-gray-50 dark:bg-gray-800">
                         <tr>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                            >
                                 Estudiante
                             </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                            >
                                 Concepto
                             </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                            >
                                 Importe
                             </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                            >
                                 Fecha de pago
                             </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                            >
                                 Método de pago
                             </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                            >
                                 Estado
                             </th>
-                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            <th
+                                scope="col"
+                                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                            >
                                 Acciones
                             </th>
                         </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+                    <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
                         {isLoading ? (
                             <tr>
-                                <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <td
+                                    colSpan={7}
+                                    className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400"
+                                >
                                     Cargando...
                                 </td>
                             </tr>
                         ) : payments.length === 0 ? (
                             <tr>
-                                <td colSpan={7} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <td
+                                    colSpan={7}
+                                    className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400"
+                                >
                                     No hay pagos registrados para este grupo
                                 </td>
                             </tr>
                         ) : (
-                            payments.map((payment) => (
+                            payments.map(payment => (
                                 <tr key={payment.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                    <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                                         {payment.studentName}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                         {payment.concept}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                         {formatCurrency(payment.amount)}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                         {formatDate(payment.paymentDate)}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                         {payment.paymentMethod}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                    <td className="whitespace-nowrap px-6 py-4">
+                                        <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800 dark:bg-green-900 dark:text-green-200">
                                             Pagado
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
                                         <div className="flex space-x-2">
                                             <Button
                                                 variant="outline"
@@ -194,4 +222,4 @@ export default function PaymentsMadeTable({ payments = mockPayments, groupId: _g
             </div>
         </ComponentCard>
     );
-} 
+}

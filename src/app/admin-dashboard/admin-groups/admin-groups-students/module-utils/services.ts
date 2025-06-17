@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Repositorio
-import {groupStudentsRepository} from './repository';
+import { groupStudentsRepository } from './repository';
 
 // Tipos
-import {Student} from '@/app/admin-dashboard/admin-students/module-utils/types';
+import { Student } from '@/app/admin-dashboard/admin-students/module-utils/types';
 
 /**
  * Obtiene todos los estudiantes que no han sido eliminados del grupo.
@@ -34,7 +35,7 @@ export function fetchDeletedStudentsByGroup(groupId: number, schoolId: number): 
 export function assignStudentsToGroup(
     groupId: number,
     studentIds: number[],
-): Promise<{success: boolean; error?: any}> {
+): Promise<{ success: boolean; error?: any }> {
     return groupStudentsRepository.assignStudentsToGroup(groupId, studentIds);
 }
 
@@ -43,7 +44,7 @@ export function assignStudentsToGroup(
  */
 export function removeStudentFromGroup(
     studentGroupId: number,
-): Promise<{success: boolean; error?: any}> {
+): Promise<{ success: boolean; error?: any }> {
     return groupStudentsRepository.removeStudentFromGroup(studentGroupId);
 }
 
@@ -52,7 +53,7 @@ export function removeStudentFromGroup(
  */
 export function restoreStudentToGroup(
     studentGroupId: number,
-): Promise<{success: boolean; error?: any}> {
+): Promise<{ success: boolean; error?: any }> {
     return groupStudentsRepository.restoreStudentToGroup(studentGroupId);
 }
 
@@ -62,7 +63,7 @@ export function restoreStudentToGroup(
 export function updateStudentGroupStatus(
     studentGroupId: number,
     statusId: number,
-): Promise<{success: boolean; error?: any}> {
+): Promise<{ success: boolean; error?: any }> {
     return groupStudentsRepository.updateStudentGroupStatus(studentGroupId, statusId);
 }
 

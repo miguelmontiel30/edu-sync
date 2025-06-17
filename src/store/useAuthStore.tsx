@@ -1,8 +1,8 @@
 // Global state management
-import {create} from 'zustand';
+import { create } from 'zustand';
 
 // Controllers
-import {login, logout, getUser} from '@/services/auth/auth.service';
+import { login, logout, getUser } from '@/services/auth/auth.service';
 
 interface AuthState {
     // deno-lint-ignore no-explicit-any
@@ -20,16 +20,16 @@ export const useAuthStore = create<AuthState>(set => ({
 
     login: async (email, password) => {
         const user = await login(email, password);
-        set({user, isAuthenticated: !!user});
+        set({ user, isAuthenticated: !!user });
     },
 
     logout: async () => {
         await logout();
-        set({user: null, isAuthenticated: false});
+        set({ user: null, isAuthenticated: false });
     },
 
     fetchUser: async () => {
         const user = await getUser();
-        set({user, isAuthenticated: !!user});
+        set({ user, isAuthenticated: !!user });
     },
 }));

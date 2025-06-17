@@ -1,5 +1,5 @@
 // React
-import {useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 // Types and Services
 import {
@@ -15,10 +15,10 @@ import {
     deleteCycle,
     restoreCycle,
 } from '../module-utils/services';
-import {validateCycleData} from '../module-utils/utils';
+import { validateCycleData } from '../module-utils/utils';
 
 // Hooks
-import {useSession} from '@/hooks/useSession';
+import { useSession } from '@/hooks/useSession';
 
 export function useCycleManagement(): CycleManagementHook {
     // Estados de datos
@@ -41,7 +41,7 @@ export function useCycleManagement(): CycleManagementHook {
     });
 
     // Obtener datos de sesión
-    const {session} = useSession();
+    const { session } = useSession();
 
     // Cargar datos al montar el componente
     useEffect(() => {
@@ -66,7 +66,7 @@ export function useCycleManagement(): CycleManagementHook {
             }
 
             // Cargar todos los ciclos en una sola llamada
-            const {active, deleted} = await loadAllSchoolYearData(session.school_id);
+            const { active, deleted } = await loadAllSchoolYearData(session.school_id);
 
             // Actualizar los estados
             setCycles(active);
@@ -116,7 +116,7 @@ export function useCycleManagement(): CycleManagementHook {
     async function confirmDelete() {
         if (!cycleToDelete) return;
 
-        setLoadingState(prev => ({...prev, processing: true}));
+        setLoadingState(prev => ({ ...prev, processing: true }));
 
         try {
             // Eliminar el ciclo
@@ -137,7 +137,7 @@ export function useCycleManagement(): CycleManagementHook {
                 message: 'No se pudo eliminar el ciclo. Por favor intenta nuevamente.',
             });
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     }
 
@@ -156,15 +156,15 @@ export function useCycleManagement(): CycleManagementHook {
     // Guardar ciclo (crear o actualizar)
     async function handleSaveCycle(
         cycleData: CycleData,
-    ): Promise<{success: boolean; errorMessage?: string}> {
-        setLoadingState(prev => ({...prev, processing: true}));
+    ): Promise<{ success: boolean; errorMessage?: string }> {
+        setLoadingState(prev => ({ ...prev, processing: true }));
 
         try {
             // Validar datos
             const validation = validateCycleData(cycleData, cycles, selectedCycle?.id);
 
             if (!validation.isValid) {
-                setLoadingState(prev => ({...prev, processing: false}));
+                setLoadingState(prev => ({ ...prev, processing: false }));
                 // Retornamos el error para que se muestre en el formulario
                 return {
                     success: false,
@@ -182,7 +182,7 @@ export function useCycleManagement(): CycleManagementHook {
             // Cerrar modal
             closeModal();
 
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al guardar el ciclo:', error);
 
@@ -192,13 +192,13 @@ export function useCycleManagement(): CycleManagementHook {
                 errorMessage: 'No se pudo guardar el ciclo. Por favor intenta nuevamente.',
             };
         } finally {
-            setLoadingState(prev => ({...prev, processing: false}));
+            setLoadingState(prev => ({ ...prev, processing: false }));
         }
     }
 
     // Restaurar ciclo eliminado
     async function handleRestore(id: number) {
-        setLoadingState(prev => ({...prev, deleted: true}));
+        setLoadingState(prev => ({ ...prev, deleted: true }));
 
         try {
             // Restaurar ciclo
@@ -215,7 +215,7 @@ export function useCycleManagement(): CycleManagementHook {
                 message: 'No se pudo restaurar el ciclo. Por favor intenta nuevamente.',
             });
         } finally {
-            setLoadingState(prev => ({...prev, deleted: false}));
+            setLoadingState(prev => ({ ...prev, deleted: false }));
         }
     }
 

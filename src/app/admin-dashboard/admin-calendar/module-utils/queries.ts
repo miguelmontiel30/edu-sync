@@ -1,4 +1,4 @@
-import {supabaseClient} from '@/services/config/supabaseClient';
+import { supabaseClient } from '@/services/config/supabaseClient';
 
 /**
  * Consulta base para obtener eventos
@@ -36,7 +36,7 @@ export function getActiveEvents(schoolId: number, schoolYearId?: number) {
         query = query.eq('school_year_id', schoolYearId);
     }
 
-    return query.order('start_time', {ascending: true});
+    return query.order('start_time', { ascending: true });
 }
 
 /**
@@ -47,7 +47,7 @@ export function getEventTypes() {
         .from('event_types')
         .select('*')
         .eq('delete_flag', false)
-        .order('name', {ascending: true});
+        .order('name', { ascending: true });
 }
 
 /**
@@ -58,7 +58,7 @@ export function getActiveRoles() {
         .from('roles')
         .select('role_id, name')
         .eq('delete_flag', false)
-        .order('name', {ascending: true});
+        .order('name', { ascending: true });
 }
 
 /**
@@ -71,6 +71,7 @@ export function getEventById(eventId: number) {
 /**
  * Guardar un nuevo evento
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function saveEvent(eventData: any) {
     return supabaseClient.from('events').insert(eventData).select().single();
 }
@@ -78,6 +79,7 @@ export function saveEvent(eventData: any) {
 /**
  * Actualizar un evento existente
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function updateEvent(eventId: number, eventData: any) {
     return supabaseClient
         .from('events')
@@ -91,12 +93,13 @@ export function updateEvent(eventId: number, eventData: any) {
  * Eliminar un evento (soft delete)
  */
 export function deleteEvent(eventId: number) {
-    return supabaseClient.from('events').update({delete_flag: true}).eq('event_id', eventId);
+    return supabaseClient.from('events').update({ delete_flag: true }).eq('event_id', eventId);
 }
 
 /**
  * Guardar destinatarios de eventos
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function saveEventRecipients(recipients: any[]) {
     return supabaseClient.from('event_recipients').insert(recipients);
 }

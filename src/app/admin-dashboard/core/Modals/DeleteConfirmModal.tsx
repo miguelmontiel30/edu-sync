@@ -64,26 +64,30 @@ export default function DeleteConfirmModal({
     isActiveItem = false,
     customMessages,
     customColors,
-    customIcons
+    customIcons,
 }: DeleteConfirmModalProps) {
     const [alertState, setAlertState] = useState<AlertState>({
         show: false,
         variant: 'warning',
         title: '',
-        message: ''
+        message: '',
     });
 
     // Valores por defecto
     const title = customMessages?.title || 'Confirmar eliminación';
-    const confirmation = customMessages?.confirmation ||
+    const confirmation =
+        customMessages?.confirmation ||
         `¿Estás seguro de que deseas eliminar ${getArticle(itemType)} ${itemType} `;
     const warningTitle = customMessages?.warningTitle || '¡Atención!';
-    const warningMessage = customMessages?.warningMessage ||
+    const warningMessage =
+        customMessages?.warningMessage ||
         `Estás a punto de eliminar un ${itemType} ACTIVO. Esta acción podría afectar negativamente al funcionamiento del sistema.`;
     const errorTitle = customMessages?.errorTitle || 'Error';
-    const errorMessage = customMessages?.errorMessage ||
+    const errorMessage =
+        customMessages?.errorMessage ||
         `Ocurrió un error al intentar eliminar ${getArticle(itemType)} ${itemType}. Por favor, intenta nuevamente.`;
-    const recoveryInfo = customMessages?.recoveryInfo ||
+    const recoveryInfo =
+        customMessages?.recoveryInfo ||
         `Esta acción puede ser revertida más adelante desde la sección de ${itemType}s eliminados.`;
 
     // Colores y clases
@@ -91,7 +95,9 @@ export default function DeleteConfirmModal({
     const inactiveItemClass = customColors?.inactiveItemClass || 'bg-error-50 dark:bg-error-500/15';
     const activeIconColor = customColors?.activeIconColor || 'text-warning-500';
     const inactiveIconColor = customColors?.inactiveIconColor || 'text-error-500';
-    const buttonClass = customColors?.buttonClass || `${isActiveItem ? 'bg-warning-500 hover:bg-warning-600' : 'bg-error-500 hover:bg-error-600'}`;
+    const buttonClass =
+        customColors?.buttonClass ||
+        `${isActiveItem ? 'bg-warning-500 hover:bg-warning-600' : 'bg-error-500 hover:bg-error-600'}`;
 
     // Iconos
     const activeItemIcon = customIcons?.activeItemIcon || 'circle-exclamation';
@@ -119,21 +125,19 @@ export default function DeleteConfirmModal({
                 show: true,
                 variant: 'error',
                 title: errorTitle,
-                message: errorMessage
+                message: errorMessage,
             });
         }
     }
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onClose={onClose}
-            className="max-w-[500px] p-6"
-        >
+        <Modal isOpen={isOpen} onClose={onClose} className="max-w-[500px] p-6">
             <div className="flex flex-col px-2">
                 <div className="mb-4 text-center">
-                    <div className="flex justify-center mb-4">
-                        <div className={`flex items-center justify-center w-16 h-16 ${isActiveItem ? activeItemClass : inactiveItemClass} rounded-full`}>
+                    <div className="mb-4 flex justify-center">
+                        <div
+                            className={`flex h-16 w-16 items-center justify-center ${isActiveItem ? activeItemClass : inactiveItemClass} rounded-full`}
+                        >
                             <IconFA
                                 icon={isActiveItem ? activeItemIcon : inactiveItemIcon}
                                 size="2xl"
@@ -142,12 +146,13 @@ export default function DeleteConfirmModal({
                         </div>
                     </div>
 
-                    <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl font-outfit">
+                    <h5 className="modal-title mb-2 font-outfit text-theme-xl font-semibold text-gray-800 dark:text-white/90 lg:text-2xl">
                         {title}
                     </h5>
 
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-outfit">
-                        {confirmation}<span className="font-semibold">{itemName}</span>?
+                    <p className="font-outfit text-sm text-gray-500 dark:text-gray-400">
+                        {confirmation}
+                        <span className="font-semibold">{itemName}</span>?
                         {recoveryInfo && ` ${recoveryInfo}`}
                     </p>
 
@@ -170,7 +175,7 @@ export default function DeleteConfirmModal({
                     />
                 )}
 
-                <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-center">
+                <div className="modal-footer mt-6 flex items-center gap-3 sm:justify-center">
                     <Button
                         onClick={onClose}
                         variant="outline"

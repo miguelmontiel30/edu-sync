@@ -1,9 +1,9 @@
 // React
-import {useMemo} from 'react';
+import { useMemo } from 'react';
 
 // Types
-import {Subject} from '../module-utils/types';
-import {MetricConfig} from '../../core/Metrics/types';
+import { Subject } from '../module-utils/types';
+import { MetricConfig } from '../../core/Metrics/types';
 
 interface ChartConfig {
     title: string;

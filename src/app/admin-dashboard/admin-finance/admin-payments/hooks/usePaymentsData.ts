@@ -30,23 +30,23 @@ interface PaymentsData {
 export function usePaymentsData() {
     // Estado para el grupo seleccionado
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-    
+
     // Estado para los filtros
     const [filters, setFilters] = useState({
         date: 'all',
         concept: 'all',
-        paymentStatus: 'all'
+        paymentStatus: 'all',
     });
-    
+
     // Estado para los datos de pagos
     const [paymentsData, setPaymentsData] = useState<PaymentsData>({
         paymentsMade: [],
-        paymentsOwed: []
+        paymentsOwed: [],
     });
-    
+
     // Estado para indicar carga
     const [isLoading, setIsLoading] = useState(false);
-    
+
     // Datos de ejemplo para pagos realizados
     const mockPaymentsMade: Payment[] = [
         {
@@ -56,7 +56,7 @@ export function usePaymentsData() {
             amount: 2500,
             paymentDate: '2023-08-05',
             paymentMethod: 'Transferencia',
-            status: 'paid'
+            status: 'paid',
         },
         {
             id: 'p002',
@@ -65,7 +65,7 @@ export function usePaymentsData() {
             amount: 750,
             paymentDate: '2023-08-03',
             paymentMethod: 'Efectivo',
-            status: 'paid'
+            status: 'paid',
         },
         {
             id: 'p003',
@@ -74,7 +74,7 @@ export function usePaymentsData() {
             amount: 2500,
             paymentDate: '2023-08-01',
             paymentMethod: 'Tarjeta',
-            status: 'paid'
+            status: 'paid',
         },
         {
             id: 'p004',
@@ -83,7 +83,7 @@ export function usePaymentsData() {
             amount: 5000,
             paymentDate: '2023-07-28',
             paymentMethod: 'Transferencia',
-            status: 'paid'
+            status: 'paid',
         },
         {
             id: 'p005',
@@ -92,10 +92,10 @@ export function usePaymentsData() {
             amount: 800,
             paymentDate: '2023-08-02',
             paymentMethod: 'Efectivo',
-            status: 'paid'
-        }
+            status: 'paid',
+        },
     ];
-    
+
     // Datos de ejemplo para pagos adeudados
     const mockPaymentsOwed: PaymentOwed[] = [
         {
@@ -104,7 +104,7 @@ export function usePaymentsData() {
             concept: 'Colegiatura Septiembre',
             amount: 2500,
             dueDate: '2023-09-10',
-            status: 'pending'
+            status: 'pending',
         },
         {
             id: 'po002',
@@ -113,7 +113,7 @@ export function usePaymentsData() {
             amount: 2500,
             dueDate: '2023-08-10',
             status: 'overdue',
-            daysOverdue: 25
+            daysOverdue: 25,
         },
         {
             id: 'po003',
@@ -122,7 +122,7 @@ export function usePaymentsData() {
             amount: 5000,
             dueDate: '2023-08-20',
             status: 'overdue',
-            daysOverdue: 15
+            daysOverdue: 15,
         },
         {
             id: 'po004',
@@ -130,29 +130,29 @@ export function usePaymentsData() {
             concept: 'Materiales escolares',
             amount: 750,
             dueDate: '2023-09-05',
-            status: 'pending'
-        }
+            status: 'pending',
+        },
     ];
-    
+
     // Función para cargar datos (simulada)
     const fetchData = async (_groupId: string) => {
         setIsLoading(true);
-        
+
         // Simulamos una petición a API
         await new Promise(resolve => setTimeout(resolve, 800));
-        
+
         // En un caso real, aquí realizaríamos la llamada a la API
         // con el ID del grupo y los filtros aplicados
-        
+
         // Por ahora, retornamos datos mock
         setPaymentsData({
             paymentsMade: mockPaymentsMade,
-            paymentsOwed: mockPaymentsOwed
+            paymentsOwed: mockPaymentsOwed,
         });
-        
+
         setIsLoading(false);
     };
-    
+
     // Efecto para cargar datos cuando cambia el grupo seleccionado
     useEffect(() => {
         if (selectedGroup) {
@@ -161,30 +161,30 @@ export function usePaymentsData() {
             // Reiniciar datos si no hay grupo seleccionado
             setPaymentsData({
                 paymentsMade: [],
-                paymentsOwed: []
+                paymentsOwed: [],
             });
         }
     }, [selectedGroup, filters]);
-    
+
     // Manejador para cambio de grupo
     const handleGroupChange = (groupId: string) => {
         setSelectedGroup(groupId);
     };
-    
+
     // Manejador para cambio de filtros
     const handleFilterChange = (field: string, value: string) => {
         setFilters(prev => ({
             ...prev,
-            [field]: value
+            [field]: value,
         }));
     };
-    
+
     return {
         selectedGroup,
         filters,
         paymentsData,
         isLoading,
         handleGroupChange,
-        handleFilterChange
+        handleFilterChange,
     };
-} 
+}

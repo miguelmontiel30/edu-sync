@@ -26,7 +26,7 @@ export default function ThemeInitializer() {
                     '700': '#2a31d8',
                     '800': '#252dae',
                     '900': '#262e89',
-                    '950': '#161950'
+                    '950': '#161950',
                 };
 
                 // Aplicar color principal predeterminado inmediatamente
@@ -45,26 +45,33 @@ export default function ThemeInitializer() {
                         const parsedTheme = JSON.parse(cachedTheme);
 
                         // Aplicar color desde caché
-                        const colorToApply = parsedTheme.use_custom_color && parsedTheme.custom_color
-                            ? parsedTheme.custom_color
-                            : parsedTheme.primary_color || defaultPrimaryColor;
+                        const colorToApply =
+                            parsedTheme.use_custom_color && parsedTheme.custom_color
+                                ? parsedTheme.custom_color
+                                : parsedTheme.primary_color || defaultPrimaryColor;
 
                         document.documentElement.style.setProperty('--primary-color', colorToApply);
 
                         // Aplicar paleta desde caché si está disponible
                         if (parsedTheme.palette) {
                             Object.entries(parsedTheme.palette).forEach(([shade, color]) => {
-                                document.documentElement.style.setProperty(`--brand-${shade}`, color as string);
+                                document.documentElement.style.setProperty(
+                                    `--brand-${shade}`,
+                                    color as string,
+                                );
                             });
                         }
                     } else {
                         // Si no hay caché, guardar los valores predeterminados
-                        localStorage.setItem('eduSync.theme', JSON.stringify({
-                            primary_color: defaultPrimaryColor,
-                            custom_color: '',
-                            use_custom_color: false,
-                            palette: defaultPalette
-                        }));
+                        localStorage.setItem(
+                            'eduSync.theme',
+                            JSON.stringify({
+                                primary_color: defaultPrimaryColor,
+                                custom_color: '',
+                                use_custom_color: false,
+                                palette: defaultPalette,
+                            }),
+                        );
                     }
                 }
             } catch (error) {
@@ -78,4 +85,4 @@ export default function ThemeInitializer() {
 
     // Este componente no renderiza nada visible
     return null;
-} 
+}

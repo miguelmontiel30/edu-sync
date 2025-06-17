@@ -1,4 +1,4 @@
-import {DatabaseSubject, Subject} from './types';
+import { DatabaseSubject, Subject } from './types';
 
 /**
  * Formatea los datos de una materia desde la base de datos para usar en la interfaz

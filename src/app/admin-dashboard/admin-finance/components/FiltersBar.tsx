@@ -9,7 +9,11 @@ interface FiltersBarProps {
     isLoading: boolean;
 }
 
-const FiltersBar: React.FC<FiltersBarProps> = ({ filters, onFilterChange, isLoading: _isLoading }) => {
+const FiltersBar: React.FC<FiltersBarProps> = ({
+    filters,
+    onFilterChange,
+    isLoading: _isLoading,
+}) => {
     // Opciones para selectores
     const dateRangeOptions = [
         {
@@ -18,9 +22,9 @@ const FiltersBar: React.FC<FiltersBarProps> = ({ filters, onFilterChange, isLoad
                 { value: 'today', label: 'Hoy' },
                 { value: 'week', label: 'Últimos 7 días' },
                 { value: 'month', label: 'Mes en curso' },
-                { value: 'custom', label: 'Personalizado' }
-            ]
-        }
+                { value: 'custom', label: 'Personalizado' },
+            ],
+        },
     ];
 
     const schoolYearOptions = [
@@ -30,9 +34,9 @@ const FiltersBar: React.FC<FiltersBarProps> = ({ filters, onFilterChange, isLoad
                 { value: 'all', label: 'Todos los ciclos' },
                 { value: '2023-2024', label: 'Ciclo 2023-2024' },
                 { value: '2022-2023', label: 'Ciclo 2022-2023' },
-                { value: '2021-2022', label: 'Ciclo 2021-2022' }
-            ]
-        }
+                { value: '2021-2022', label: 'Ciclo 2021-2022' },
+            ],
+        },
     ];
 
     const transactionTypeOptions = [
@@ -45,9 +49,9 @@ const FiltersBar: React.FC<FiltersBarProps> = ({ filters, onFilterChange, isLoad
                 { value: 'payroll', label: 'Nómina' },
                 { value: 'supplies', label: 'Material escolar' },
                 { value: 'services', label: 'Servicios' },
-                { value: 'other', label: 'Otros' }
-            ]
-        }
+                { value: 'other', label: 'Otros' },
+            ],
+        },
     ];
 
     return (
@@ -60,7 +64,7 @@ const FiltersBar: React.FC<FiltersBarProps> = ({ filters, onFilterChange, isLoad
                     <SelectWithCategories
                         options={dateRangeOptions}
                         placeholder="Seleccione un rango"
-                        onChange={(value) => onFilterChange('dateRange', value)}
+                        onChange={value => onFilterChange('dateRange', value)}
                         defaultValue={filters.dateRange}
                     />
                 </div>
@@ -71,7 +75,7 @@ const FiltersBar: React.FC<FiltersBarProps> = ({ filters, onFilterChange, isLoad
                     <SelectWithCategories
                         options={schoolYearOptions}
                         placeholder="Seleccione un ciclo"
-                        onChange={(value) => onFilterChange('schoolYear', value)}
+                        onChange={value => onFilterChange('schoolYear', value)}
                         defaultValue={filters.schoolYear}
                     />
                 </div>
@@ -82,7 +86,7 @@ const FiltersBar: React.FC<FiltersBarProps> = ({ filters, onFilterChange, isLoad
                     <SelectWithCategories
                         options={transactionTypeOptions}
                         placeholder="Seleccione un tipo"
-                        onChange={(value) => onFilterChange('transactionType', value)}
+                        onChange={value => onFilterChange('transactionType', value)}
                         defaultValue={filters.transactionType}
                     />
                 </div>
@@ -91,4 +95,4 @@ const FiltersBar: React.FC<FiltersBarProps> = ({ filters, onFilterChange, isLoad
     );
 };
 
-export default FiltersBar; 
+export default FiltersBar;

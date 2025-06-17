@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // React
 import { useState, useEffect } from 'react';
 
@@ -39,7 +40,10 @@ export interface ItemsListConfig<T extends BaseItem> {
     defaultSortDirection?: SortDirection;
     idField?: keyof T;
     searchableFields?: (keyof T | string)[];
-    statusColorMap?: Record<string, 'primary' | 'success' | 'error' | 'warning' | 'info' | 'light' | 'dark'>;
+    statusColorMap?: Record<
+        string,
+        'primary' | 'success' | 'error' | 'warning' | 'info' | 'light' | 'dark'
+    >;
 }
 
 export interface ItemsListProps<T extends BaseItem> {
@@ -57,7 +61,7 @@ export default function ItemsList<T extends BaseItem>({
     actionButtons = [],
     isLoading,
     onAddNew,
-    config
+    config,
 }: ItemsListProps<T>) {
     const {
         title,
@@ -71,7 +75,7 @@ export default function ItemsList<T extends BaseItem>({
         defaultSortField = 'id',
         defaultSortDirection = 'asc',
         idField = 'id' as keyof T,
-        searchableFields
+        searchableFields,
     } = config;
 
     // States
@@ -108,20 +112,22 @@ export default function ItemsList<T extends BaseItem>({
             header: 'Acciones',
             sortable: false,
             render: (item: T) => (
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                    {actionButtons.map((button) => (
+                <div className="flex flex-col justify-center gap-2 sm:flex-row">
+                    {actionButtons.map(button => (
                         <Button
                             key={`${item[idField]}-${button.label}`}
                             variant={button.variant || 'outline'}
                             size="sm"
-                            startIcon={<IconFA icon={button.icon} style={button.iconStyle || 'duotone'} />}
+                            startIcon={
+                                <IconFA icon={button.icon} style={button.iconStyle || 'duotone'} />
+                            }
                             onClick={() => button.onClick(item[idField])}
                         >
                             <span className="font-outfit">{button.label}</span>
                         </Button>
                     ))}
                 </div>
-            )
+            ),
         });
     }
 
@@ -142,7 +148,7 @@ export default function ItemsList<T extends BaseItem>({
             <DataTable
                 data={filteredItems}
                 columns={tableColumns}
-                keyExtractor={(item) => String(item[idField])}
+                keyExtractor={item => String(item[idField])}
                 searchable
                 searchPlaceholder={searchPlaceholder}
                 defaultSortField={defaultSortField}
@@ -156,4 +162,4 @@ export default function ItemsList<T extends BaseItem>({
             />
         </ComponentCard>
     );
-} 
+}

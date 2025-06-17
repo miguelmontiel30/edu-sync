@@ -18,11 +18,16 @@ import DeletedItemsList, { DeletedItemsListConfig } from '../core/Tables/Deleted
 // Types and Services
 import { MetricConfig } from '../core/Metrics/types';
 import { Teacher, TeacherForm } from './components/types';
-import { loadTeachers, loadDeletedTeachers, saveTeacher, deleteTeacher, restoreTeacher } from './components/services';
+import {
+    loadTeachers,
+    loadDeletedTeachers,
+    saveTeacher,
+    deleteTeacher,
+    restoreTeacher,
+} from './components/services';
 
 // Hooks
 import { useSession } from '@/hooks/useSession';
-
 
 export default function TeachersDashboard() {
     // Estados
@@ -54,7 +59,7 @@ export default function TeachersDashboard() {
             fetchTeachers(),
 
             // Cargar profesores eliminados
-            fetchDeletedTeachers()
+            fetchDeletedTeachers(),
         ]);
     }
 
@@ -146,7 +151,12 @@ export default function TeachersDashboard() {
         setIsSaving(true);
         try {
             // Validar datos básicos
-            if (!teacherData.first_name || !teacherData.father_last_name || !teacherData.birth_date || !teacherData.gender_id) {
+            if (
+                !teacherData.first_name ||
+                !teacherData.father_last_name ||
+                !teacherData.birth_date ||
+                !teacherData.gender_id
+            ) {
                 alert('Por favor completa todos los campos requeridos');
                 setIsSaving(false);
                 return;
@@ -183,38 +193,39 @@ export default function TeachersDashboard() {
     const totalTeachers = teachers.length;
     const activeTeachers = teachers.filter(teacher => teacher.groupsCount > 0).length;
     const multiSubjectTeachers = teachers.filter(teacher => teacher.subjectsCount > 1).length;
-    const avgSubjectsPerTeacher = totalTeachers > 0
-        ? teachers.reduce((acc, teacher) => acc + teacher.subjectsCount, 0) / totalTeachers
-        : 0;
+    const avgSubjectsPerTeacher =
+        totalTeachers > 0
+            ? teachers.reduce((acc, teacher) => acc + teacher.subjectsCount, 0) / totalTeachers
+            : 0;
     const maleCount = teachers.filter(t => t.gender === 'Masculino').length;
     const femaleCount = teachers.filter(t => t.gender === 'Femenino').length;
     const femalePercentage = totalTeachers ? (femaleCount / totalTeachers) * 100 : 0;
 
     const metricsConfig: MetricConfig[] = [
         {
-            id: "total-teachers",
-            icon: "person-chalkboard",
-            title: "Total de Profesores",
+            id: 'total-teachers',
+            icon: 'person-chalkboard',
+            title: 'Total de Profesores',
             value: totalTeachers,
-            badgeColor: "info",
-            badgeText: `${activeTeachers} activos`
+            badgeColor: 'info',
+            badgeText: `${activeTeachers} activos`,
         },
         {
-            id: "subjects-per-teacher",
-            icon: "books",
-            title: "Materias por Profesor",
+            id: 'subjects-per-teacher',
+            icon: 'books',
+            title: 'Materias por Profesor',
             value: avgSubjectsPerTeacher.toFixed(1),
-            badgeColor: "success",
-            badgeText: `${multiSubjectTeachers} multi-materia`
+            badgeColor: 'success',
+            badgeText: `${multiSubjectTeachers} multi-materia`,
         },
         {
-            id: "gender-distribution",
-            icon: "venus-mars",
-            title: "Distribución Género",
+            id: 'gender-distribution',
+            icon: 'venus-mars',
+            title: 'Distribución Género',
             value: `${maleCount}M / ${femaleCount}F`,
-            badgeColor: "warning",
-            badgeText: `${femalePercentage.toFixed(0)}% mujeres`
-        }
+            badgeColor: 'warning',
+            badgeText: `${femalePercentage.toFixed(0)}% mujeres`,
+        },
     ];
 
     // Preparar datos para gráficos
@@ -223,7 +234,7 @@ export default function TeachersDashboard() {
         name: teacher.name,
         label: teacher.name,
         value: index,
-        gender_id: teacher.gender_id
+        gender_id: teacher.gender_id,
     }));
 
     const chartConfigs = [
@@ -244,10 +255,10 @@ export default function TeachersDashboard() {
     // Adaptar profesores para DeletedItemsList que requiere objetos BaseItem con id
     const teachersForDeletedList = deletedTeachers.map(teacher => ({
         ...teacher,
-        id: teacher.teacher_id // Mapear teacher_id a id para cumplir con BaseItem
+        id: teacher.teacher_id, // Mapear teacher_id a id para cumplir con BaseItem
     }));
 
-    const teacherListConfig: DeletedItemsListConfig<typeof teachersForDeletedList[0]> = {
+    const teacherListConfig: DeletedItemsListConfig<(typeof teachersForDeletedList)[0]> = {
         title: 'Profesores eliminados',
         description: 'Lista de profesores eliminados',
         noDataMessage: 'No hay profesores eliminados',
@@ -261,41 +272,41 @@ export default function TeachersDashboard() {
                 key: 'first_name',
                 header: 'Nombre',
                 sortable: true,
-                render: (teacher) => (
-                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                render: teacher => (
+                    <span className="block font-outfit text-sm font-medium text-gray-800 dark:text-white/90">
                         {teacher.first_name}
                     </span>
-                )
+                ),
             },
             {
                 key: 'father_last_name',
                 header: 'Apellido Paterno',
                 sortable: true,
-                render: (teacher) => (
-                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                render: teacher => (
+                    <span className="block font-outfit text-sm font-medium text-gray-800 dark:text-white/90">
                         {teacher.father_last_name}
                     </span>
-                )
+                ),
             },
             {
                 key: 'mother_last_name',
                 header: 'Apellido Materno',
                 sortable: true,
-                render: (teacher) => (
-                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                render: teacher => (
+                    <span className="block font-outfit text-sm font-medium text-gray-800 dark:text-white/90">
                         {teacher.mother_last_name}
                     </span>
-                )
+                ),
             },
             {
                 key: 'birth_date',
                 header: 'Fecha de Nacimiento',
                 sortable: true,
-                render: (teacher) => (
-                    <span className="block text-sm font-medium text-gray-800 dark:text-white/90 font-outfit">
+                render: teacher => (
+                    <span className="block font-outfit text-sm font-medium text-gray-800 dark:text-white/90">
                         {new Date(teacher.birth_date).toLocaleDateString()}
                     </span>
-                )
+                ),
             },
         ],
     };
@@ -307,9 +318,18 @@ export default function TeachersDashboard() {
 
             {/* Metrics and Charts Wrapper */}
             <MetricsChartsWrapper title="Estadísticas y Gráficos de Profesores">
-                <MetricsGroup metricsConfig={metricsConfig} isLoading={isLoadingMetrics} isEmpty={teachers.length === 0} emptyMessage="No hay profesores activos" />
+                <MetricsGroup
+                    metricsConfig={metricsConfig}
+                    isLoading={isLoadingMetrics}
+                    isEmpty={teachers.length === 0}
+                    emptyMessage="No hay profesores activos"
+                />
 
-                <BarChartsGroup data={chartData} isLoading={isLoadingTeachers} charts={chartConfigs} />
+                <BarChartsGroup
+                    data={chartData}
+                    isLoading={isLoadingTeachers}
+                    charts={chartConfigs}
+                />
             </MetricsChartsWrapper>
 
             {/* Teacher List */}
@@ -349,10 +369,14 @@ export default function TeachersDashboard() {
                     setTeacherToDelete(null);
                 }}
                 onConfirm={confirmDelete}
-                itemName={teacherToDelete ? `${teacherToDelete.first_name} ${teacherToDelete.father_last_name}` : ''}
+                itemName={
+                    teacherToDelete
+                        ? `${teacherToDelete.first_name} ${teacherToDelete.father_last_name}`
+                        : ''
+                }
                 itemType="profesor"
                 isDeleting={isSaving}
             />
         </div>
     );
-} 
+}

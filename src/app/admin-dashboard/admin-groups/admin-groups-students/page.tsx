@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 // Components
 import Label from '@/components/form/Label';
@@ -36,7 +37,7 @@ export default function GroupStudentsDashboard() {
         handleAddStudents,
         handleEditModalOpen,
         handleEditModalClose,
-        handleUpdateStudentStatus
+        handleUpdateStudentStatus,
     } = useGroupStudentsManagement();
 
     // Configuración de tabla de estudiantes
@@ -45,15 +46,17 @@ export default function GroupStudentsDashboard() {
         activeStudentActionButtons,
         activeStudentListConfig,
         inactiveStudentListConfig,
-        deletedStudentListConfig
+        deletedStudentListConfig,
     } = useTableConfig({
         handleDelete: handleDeleteStudent,
         handleRestore: handleRestoreStudent,
         handleEdit: handleEditModalOpen,
-        selectedGroup: selectedGroup ? {
-            ...selectedGroup,
-            students: [...activeStudents, ...inactiveStudents, ...deletedStudents]
-        } : null
+        selectedGroup: selectedGroup
+            ? {
+                  ...selectedGroup,
+                  students: [...activeStudents, ...inactiveStudents, ...deletedStudents],
+              }
+            : null,
     });
 
     // Opciones de estado para el estudiante en el grupo
@@ -61,7 +64,7 @@ export default function GroupStudentsDashboard() {
         { value: STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE.toString(), label: 'Activo' },
         { value: STUDENT_GROUP_STATUS.STUDENT_GROUP_INACTIVE.toString(), label: 'Inactivo' },
         { value: STUDENT_GROUP_STATUS.STUDENT_GROUP_GRADUATED.toString(), label: 'Graduado' },
-        { value: STUDENT_GROUP_STATUS.STUDENT_GROUP_TRANSFERRED.toString(), label: 'Transferido' }
+        { value: STUDENT_GROUP_STATUS.STUDENT_GROUP_TRANSFERRED.toString(), label: 'Transferido' },
     ];
 
     // Función para crear un objeto StudentGroupStatus a partir de un estudiante
@@ -69,12 +72,12 @@ export default function GroupStudentsDashboard() {
         if (student.student_group_status) {
             return {
                 id: student.student_group_status.status_id.toString(),
-                name: student.student_group_status.name
+                name: student.student_group_status.name,
             };
         }
         return {
             id: student.student_group_status_id?.toString() || '0',
-            name: 'Desconocido'
+            name: 'Desconocido',
         };
     };
 
@@ -83,7 +86,11 @@ export default function GroupStudentsDashboard() {
             <PageBreadcrumb pageTitle="Gestión de estudiantes por grupo" />
 
             {/* Selector de Grupo */}
-            <ComponentCard title="Seleccionar Grupo" desc="Selecciona un grupo para gestionar los estudiantes." className="mb-6">
+            <ComponentCard
+                title="Seleccionar Grupo"
+                desc="Selecciona un grupo para gestionar los estudiantes."
+                className="mb-6"
+            >
                 <div className="mb-6 px-4">
                     <Label htmlFor="group-select" className="font-outfit">
                         Seleccionar Grupo
@@ -129,14 +136,14 @@ export default function GroupStudentsDashboard() {
                             onClose={handleEditModalClose}
                             studentData={{
                                 student: editingStudent,
-                                status: createStatusFromStudent(editingStudent)
+                                status: createStatusFromStudent(editingStudent),
                             }}
                             isSaving={loadingState.saving}
                             onSave={(_studentId, newStatus) => {
                                 if (editingStudent.student_group_id) {
                                     handleUpdateStudentStatus(
                                         editingStudent.student_group_id,
-                                        parseInt(newStatus)
+                                        parseInt(newStatus),
                                     );
                                 }
                             }}
@@ -149,12 +156,12 @@ export default function GroupStudentsDashboard() {
                         className="mt-6"
                         items={inactiveStudents}
                         isLoading={loadingState.groupStudents || loadingState.groups}
-                        onRestore={(id) => {
+                        onRestore={id => {
                             const student = inactiveStudents.find(s => s.id === id);
                             if (student && student.student_group_id) {
                                 handleUpdateStudentStatus(
                                     student.student_group_id,
-                                    STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE
+                                    STUDENT_GROUP_STATUS.STUDENT_GROUP_ACTIVE,
                                 );
                             }
                         }}
@@ -166,7 +173,7 @@ export default function GroupStudentsDashboard() {
                         className="mt-6"
                         items={deletedStudents}
                         isLoading={loadingState.groupStudents || loadingState.groups}
-                        onRestore={(id) => {
+                        onRestore={id => {
                             const student = deletedStudents.find(s => s.id === id);
                             if (student && student.student_group_id) {
                                 handleRestoreStudent(student.student_group_id);

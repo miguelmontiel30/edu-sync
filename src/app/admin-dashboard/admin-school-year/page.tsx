@@ -17,11 +17,7 @@ import ItemsList from '../core/Tables/ItemsList';
 import { CYCLE_STATUS } from './module-utils/types';
 
 // Hooks
-import {
-    useCycleManagement,
-    useMetricsConfig,
-    useTableConfig
-} from './hooks';
+import { useCycleManagement, useMetricsConfig, useTableConfig } from './hooks';
 
 export default function SchoolYearDashboard() {
     // Usar hook principal para gestión de ciclos
@@ -41,7 +37,7 @@ export default function SchoolYearDashboard() {
         closeModal,
         setIsDeleteModalOpen,
         handleSaveCycle,
-        handleRestore
+        handleRestore,
     } = useCycleManagement();
 
     // Configuración de métricas y gráficos
@@ -53,7 +49,7 @@ export default function SchoolYearDashboard() {
         cycleActionButtons,
         cycleListConfig,
         deletedCycleListConfig,
-        deleteConfirmModalConfig
+        deleteConfirmModalConfig,
     } = useTableConfig({ handleEdit, handleDelete });
 
     return (
@@ -63,11 +59,7 @@ export default function SchoolYearDashboard() {
 
             {/* Error Alert */}
             {errorAlert && (
-                <Alert
-                    title={errorAlert.title}
-                    message={errorAlert.message}
-                    variant="error"
-                />
+                <Alert title={errorAlert.title} message={errorAlert.message} variant="error" />
             )}
 
             {/* Metrics and Charts Wrapper */}

@@ -1,4 +1,4 @@
-import {SupabaseGroupTeachersRepository, IGroupTeachersRepository} from './repository';
+import { SupabaseGroupTeachersRepository, IGroupTeachersRepository } from './repository';
 
 // Instancia compartida del repositorio
 const repository: IGroupTeachersRepository = new SupabaseGroupTeachersRepository();

@@ -3,7 +3,7 @@
 // Routes
 import ProtectedRoute from '@/app/(auth)/ProtectedRoute';
 
-export default function AdminUsersLayout({children}: Readonly<{children: React.ReactNode}>) {
+export default function AdminUsersLayout({ children }: Readonly<{ children: React.ReactNode }>) {
     return (
         <ProtectedRoute>
             <div className="min-h-screen">

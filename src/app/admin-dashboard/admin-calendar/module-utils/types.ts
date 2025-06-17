@@ -1,4 +1,4 @@
-import {CalendarEvent} from '@/components/core/calendar/types';
+import { CalendarEvent } from '@/components/core/calendar/types';
 
 export interface DatabaseEvent {
     event_id: number;
@@ -47,6 +47,7 @@ export interface EventType {
 export interface Role {
     id: number;
     name: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
 }
 
@@ -61,6 +62,7 @@ export interface EventData {
     all_day?: boolean;
     status_id: number;
     created_by: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
 }
 
@@ -73,6 +75,8 @@ export interface EventRecipient {
 
 export interface RepositoryResponse {
     success: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data?: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     error?: any;
 }

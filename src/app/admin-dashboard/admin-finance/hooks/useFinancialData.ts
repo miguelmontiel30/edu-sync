@@ -9,14 +9,14 @@ export function useFinancialData() {
     const [filters, setFilters] = useState<FinancialFilters>({
         dateRange: 'month',
         schoolYear: 'all',
-        transactionType: 'all'
+        transactionType: 'all',
     });
 
     // Cargar datos basados en filtros
     useEffect(() => {
         const loadData = () => {
             setIsLoading(true);
-            
+
             // Simular carga de datos
             setTimeout(() => {
                 // Aquí iría la lógica para filtrar datos reales según los filtros
@@ -33,7 +33,7 @@ export function useFinancialData() {
     const handleFilterChange = (name: keyof FinancialFilters, value: string) => {
         setFilters(prev => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
     };
 
@@ -41,6 +41,6 @@ export function useFinancialData() {
         financialData,
         filters,
         isLoading,
-        handleFilterChange
+        handleFilterChange,
     };
-} 
+}

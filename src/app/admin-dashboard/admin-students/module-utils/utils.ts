@@ -1,4 +1,5 @@
-import {Student, StudentGroup, StudentFilterOptions, StudentMetrics} from './types';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Student, StudentGroup, StudentFilterOptions, StudentMetrics } from './types';
 
 /**
  * Calcula la edad a partir de la fecha de nacimiento

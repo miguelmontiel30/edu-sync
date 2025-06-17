@@ -22,7 +22,11 @@ const mockStudents = [
     { value: 'student9', label: 'Alejandro Castro Medina' },
 ];
 
-export default function StudentSelector({ selectedStudent, onStudentChange, isLoading: _isLoading = false }: StudentSelectorProps) {
+export default function StudentSelector({
+    selectedStudent,
+    onStudentChange,
+    isLoading: _isLoading = false,
+}: StudentSelectorProps) {
     return (
         <div className="w-full">
             <Select
@@ -34,4 +38,4 @@ export default function StudentSelector({ selectedStudent, onStudentChange, isLo
             />
         </div>
     );
-} 
+}

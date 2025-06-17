@@ -25,10 +25,16 @@ interface Permission {
     delete_flag: boolean;
 }
 
+// Estructura de los datos de permisos tal como los retorna Supabase
+interface PermissionInfo {
+    name: string;
+    description?: string | null;
+}
+
 interface RolePermission {
     role_id: number;
     permission_id: number;
-    permissions: any;
+    permissions: PermissionInfo[];
 }
 
 export default function RolesPermissions() {
@@ -62,10 +68,7 @@ export default function RolesPermissions() {
 
     // Función para cargar todos los datos iniciales
     async function loadInitialData() {
-        await Promise.all([
-            loadRoles(),
-            loadPermissions()
-        ]);
+        await Promise.all([loadRoles(), loadPermissions()]);
     }
 
     // Cargar roles
@@ -125,18 +128,21 @@ export default function RolesPermissions() {
 
             if (error) throw error;
 
-
             // Creamos una copia segura y tipada de los datos
             const formattedData: RolePermission[] = [];
 
             if (Array.isArray(data)) {
                 data.forEach(item => {
                     // Asegurarnos de que tenemos los datos mínimos necesarios
-                    if (item && typeof item.role_id === 'number' && typeof item.permission_id === 'number') {
+                    if (
+                        item &&
+                        typeof item.role_id === 'number' &&
+                        typeof item.permission_id === 'number'
+                    ) {
                         formattedData.push({
                             role_id: item.role_id,
                             permission_id: item.permission_id,
-                            permissions: item.permissions || {}
+                            permissions: item.permissions,
                         });
                     }
                 });
@@ -147,7 +153,9 @@ export default function RolesPermissions() {
 
             // Preparar selección para el modal de gestión
             if (data) {
-                const permissionIds = data.map(rp => rp.permission_id).filter(id => id !== undefined);
+                const permissionIds = data
+                    .map(rp => rp.permission_id)
+                    .filter(id => id !== undefined);
                 setSelectedPermissions(permissionIds);
             } else {
                 setSelectedPermissions([]);
@@ -188,7 +196,7 @@ export default function RolesPermissions() {
             if (selectedPermissions.length > 0) {
                 const permissionsToInsert = selectedPermissions.map(permissionId => ({
                     role_id: selectedRole.role_id,
-                    permission_id: permissionId
+                    permission_id: permissionId,
                 }));
 
                 const { error: insertError } = await supabaseClient
@@ -223,12 +231,15 @@ export default function RolesPermissions() {
         setIsLoading(true);
 
         try {
-            const { data, error } = await supabaseClient.from('roles').insert([
-                {
-                    name: roleForm.name,
-                    description: roleForm.description,
-                },
-            ]).select();
+            const { data, error } = await supabaseClient
+                .from('roles')
+                .insert([
+                    {
+                        name: roleForm.name,
+                        description: roleForm.description,
+                    },
+                ])
+                .select();
 
             if (error) throw error;
 
@@ -256,12 +267,15 @@ export default function RolesPermissions() {
         setIsLoading(true);
 
         try {
-            const { data, error } = await supabaseClient.from('permissions').insert([
-                {
-                    name: permissionForm.name,
-                    description: permissionForm.description,
-                },
-            ]).select();
+            const { data, error } = await supabaseClient
+                .from('permissions')
+                .insert([
+                    {
+                        name: permissionForm.name,
+                        description: permissionForm.description,
+                    },
+                ])
+                .select();
 
             if (error) throw error;
 
@@ -285,7 +299,11 @@ export default function RolesPermissions() {
 
     // Eliminar rol
     async function deleteRole(roleId: number) {
-        if (!confirm('¿Estás seguro que deseas eliminar este rol? Esta acción no se puede deshacer.')) {
+        if (
+            !confirm(
+                '¿Estás seguro que deseas eliminar este rol? Esta acción no se puede deshacer.',
+            )
+        ) {
             return;
         }
 
@@ -317,7 +335,11 @@ export default function RolesPermissions() {
 
     // Eliminar permiso
     async function deletePermission(permissionId: number) {
-        if (!confirm('¿Estás seguro que deseas eliminar este permiso? Esta acción no se puede deshacer.')) {
+        if (
+            !confirm(
+                '¿Estás seguro que deseas eliminar este permiso? Esta acción no se puede deshacer.',
+            )
+        ) {
             return;
         }
 
@@ -331,7 +353,9 @@ export default function RolesPermissions() {
             if (error) throw error;
 
             // Actualizar la lista de permisos
-            setPermissions(permissions.filter(permission => permission.permission_id !== permissionId));
+            setPermissions(
+                permissions.filter(permission => permission.permission_id !== permissionId),
+            );
             setMessage({
                 type: 'success',
                 text: 'Permiso eliminado correctamente.',
@@ -357,9 +381,11 @@ export default function RolesPermissions() {
     }
 
     // Filtrar permisos por búsqueda
-    const filteredPermissions = permissions.filter(permission =>
-        permission.name.toLowerCase().includes(permissionSearch.toLowerCase()) ||
-        (permission.description && permission.description.toLowerCase().includes(permissionSearch.toLowerCase()))
+    const filteredPermissions = permissions.filter(
+        permission =>
+            permission.name.toLowerCase().includes(permissionSearch.toLowerCase()) ||
+            (permission.description &&
+                permission.description.toLowerCase().includes(permissionSearch.toLowerCase())),
     );
 
     return (
@@ -369,21 +395,25 @@ export default function RolesPermissions() {
                     Configuración de Roles y Permisos
                 </h3>
                 <p className="mb-6 text-gray-600 dark:text-gray-400">
-                    Administra los roles y permisos del sistema para controlar el acceso a las diferentes funcionalidades.
+                    Administra los roles y permisos del sistema para controlar el acceso a las
+                    diferentes funcionalidades.
                 </p>
             </div>
 
             {/* Mensaje de estado */}
             {message.text && (
                 <div
-                    className={`mb-4 rounded-lg p-4 ${message.type === 'success'
-                        ? 'bg-success-50 text-success-700 dark:bg-success-500/20 dark:text-success-400'
-                        : 'bg-error-50 text-error-700 dark:bg-error-500/20 dark:text-error-400'
-                        }`}
+                    className={`mb-4 rounded-lg p-4 ${
+                        message.type === 'success'
+                            ? 'bg-success-50 text-success-700 dark:bg-success-500/20 dark:text-success-400'
+                            : 'bg-error-50 text-error-700 dark:bg-error-500/20 dark:text-error-400'
+                    }`}
                 >
                     <div className="flex items-center">
                         <IconFA
-                            icon={message.type === 'success' ? 'check-circle' : 'exclamation-circle'}
+                            icon={
+                                message.type === 'success' ? 'check-circle' : 'exclamation-circle'
+                            }
                             className="mr-2"
                             size="lg"
                         />
@@ -414,20 +444,27 @@ export default function RolesPermissions() {
                                 <TableRow>
                                     <TableCell isHeader>Nombre</TableCell>
                                     <TableCell isHeader>Descripción</TableCell>
-                                    <TableCell isHeader className="text-right">Acciones</TableCell>
+                                    <TableCell isHeader className="text-right">
+                                        Acciones
+                                    </TableCell>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {roles.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={3} className="text-center py-4 text-gray-500">
+                                        <TableCell
+                                            colSpan={3}
+                                            className="py-4 text-center text-gray-500"
+                                        >
                                             No hay roles definidos
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    roles.map((role) => (
+                                    roles.map(role => (
                                         <TableRow key={role.role_id}>
-                                            <TableCell className="font-medium">{role.name}</TableCell>
+                                            <TableCell className="font-medium">
+                                                {role.name}
+                                            </TableCell>
                                             <TableCell>{role.description || '-'}</TableCell>
                                             <TableCell className="text-right">
                                                 <Button
@@ -475,7 +512,7 @@ export default function RolesPermissions() {
                             placeholder="Buscar permisos..."
                             startIcon={<IconFA icon="search" className="text-gray-400" />}
                             value={permissionSearch}
-                            onChange={(e) => setPermissionSearch(e.target.value)}
+                            onChange={e => setPermissionSearch(e.target.value)}
                         />
                     </div>
 
@@ -485,24 +522,35 @@ export default function RolesPermissions() {
                                 <TableRow>
                                     <TableCell isHeader>Nombre</TableCell>
                                     <TableCell isHeader>Descripción</TableCell>
-                                    <TableCell isHeader className="text-right">Acciones</TableCell>
+                                    <TableCell isHeader className="text-right">
+                                        Acciones
+                                    </TableCell>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {filteredPermissions.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={3} className="text-center py-4 text-gray-500">
-                                            {permissionSearch ? 'No se encontraron resultados' : 'No hay permisos definidos'}
+                                        <TableCell
+                                            colSpan={3}
+                                            className="py-4 text-center text-gray-500"
+                                        >
+                                            {permissionSearch
+                                                ? 'No se encontraron resultados'
+                                                : 'No hay permisos definidos'}
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    filteredPermissions.map((permission) => (
+                                    filteredPermissions.map(permission => (
                                         <TableRow key={permission.permission_id}>
-                                            <TableCell className="font-medium">{permission.name}</TableCell>
+                                            <TableCell className="font-medium">
+                                                {permission.name}
+                                            </TableCell>
                                             <TableCell>{permission.description || '-'}</TableCell>
                                             <TableCell className="text-right">
                                                 <Button
-                                                    onClick={() => deletePermission(permission.permission_id)}
+                                                    onClick={() =>
+                                                        deletePermission(permission.permission_id)
+                                                    }
                                                     variant="outline"
                                                     className="text-error-600 hover:bg-error-50"
                                                     startIcon={<IconFA icon="trash" />}
@@ -520,17 +568,14 @@ export default function RolesPermissions() {
             </div>
 
             {/* Modal de Nuevo Rol */}
-            <Modal
-                isOpen={isRoleModalOpen}
-                onClose={() => setIsRoleModalOpen(false)}
-            >
+            <Modal isOpen={isRoleModalOpen} onClose={() => setIsRoleModalOpen(false)}>
                 <form onSubmit={createRole} className="space-y-6">
                     <div>
                         <Label htmlFor="roleName">Nombre del Rol</Label>
                         <Input
                             id="roleName"
                             value={roleForm.name}
-                            onChange={(e) => setRoleForm({ ...roleForm, name: e.target.value })}
+                            onChange={e => setRoleForm({ ...roleForm, name: e.target.value })}
                             placeholder="Ej: admin, teacher, student"
                         />
                     </div>
@@ -539,7 +584,9 @@ export default function RolesPermissions() {
                         <Input
                             id="roleDescription"
                             value={roleForm.description}
-                            onChange={(e) => setRoleForm({ ...roleForm, description: e.target.value })}
+                            onChange={e =>
+                                setRoleForm({ ...roleForm, description: e.target.value })
+                            }
                             placeholder="Describe el propósito de este rol"
                         />
                     </div>
@@ -554,7 +601,9 @@ export default function RolesPermissions() {
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            startIcon={<IconFA icon={isLoading ? 'spinner' : 'save'} spin={isLoading} />}
+                            startIcon={
+                                <IconFA icon={isLoading ? 'spinner' : 'save'} spin={isLoading} />
+                            }
                         >
                             Guardar
                         </Button>
@@ -563,17 +612,16 @@ export default function RolesPermissions() {
             </Modal>
 
             {/* Modal de Nuevo Permiso */}
-            <Modal
-                isOpen={isPermissionModalOpen}
-                onClose={() => setIsPermissionModalOpen(false)}
-            >
+            <Modal isOpen={isPermissionModalOpen} onClose={() => setIsPermissionModalOpen(false)}>
                 <form onSubmit={createPermission} className="space-y-6">
                     <div>
                         <Label htmlFor="permissionName">Nombre del Permiso</Label>
                         <Input
                             id="permissionName"
                             value={permissionForm.name}
-                            onChange={(e) => setPermissionForm({ ...permissionForm, name: e.target.value })}
+                            onChange={e =>
+                                setPermissionForm({ ...permissionForm, name: e.target.value })
+                            }
                             placeholder="Ej: create_user, edit_group"
                         />
                     </div>
@@ -582,7 +630,12 @@ export default function RolesPermissions() {
                         <Input
                             id="permissionDescription"
                             value={permissionForm.description}
-                            onChange={(e) => setPermissionForm({ ...permissionForm, description: e.target.value })}
+                            onChange={e =>
+                                setPermissionForm({
+                                    ...permissionForm,
+                                    description: e.target.value,
+                                })
+                            }
                             placeholder="Describe el propósito de este permiso"
                         />
                     </div>
@@ -597,7 +650,9 @@ export default function RolesPermissions() {
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            startIcon={<IconFA icon={isLoading ? 'spinner' : 'save'} spin={isLoading} />}
+                            startIcon={
+                                <IconFA icon={isLoading ? 'spinner' : 'save'} spin={isLoading} />
+                            }
                         >
                             Guardar
                         </Button>
@@ -611,7 +666,9 @@ export default function RolesPermissions() {
                 onClose={() => setIsManagePermissionsModalOpen(false)}
             >
                 <div className="space-y-6">
-                    <h3 className="text-lg font-medium">Permisos del Rol: {selectedRole?.name || ''}</h3>
+                    <h3 className="text-lg font-medium">
+                        Permisos del Rol: {selectedRole?.name || ''}
+                    </h3>
                     <p className="text-gray-600 dark:text-gray-400">
                         Selecciona los permisos que deseas asignar a este rol:
                     </p>
@@ -621,7 +678,7 @@ export default function RolesPermissions() {
                             placeholder="Buscar permisos..."
                             startIcon={<IconFA icon="search" className="text-gray-400" />}
                             value={permissionSearch}
-                            onChange={(e) => setPermissionSearch(e.target.value)}
+                            onChange={e => setPermissionSearch(e.target.value)}
                         />
                     </div>
 
@@ -632,13 +689,20 @@ export default function RolesPermissions() {
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {filteredPermissions.map((permission) => (
-                                    <div key={permission.permission_id} className="flex items-center">
+                                {filteredPermissions.map(permission => (
+                                    <div
+                                        key={permission.permission_id}
+                                        className="flex items-center"
+                                    >
                                         <input
                                             type="checkbox"
                                             id={`permission-${permission.permission_id}`}
-                                            checked={selectedPermissions.includes(permission.permission_id)}
-                                            onChange={() => togglePermissionSelection(permission.permission_id)}
+                                            checked={selectedPermissions.includes(
+                                                permission.permission_id,
+                                            )}
+                                            onChange={() =>
+                                                togglePermissionSelection(permission.permission_id)
+                                            }
                                             className="h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900"
                                         />
                                         <label
@@ -655,7 +719,9 @@ export default function RolesPermissions() {
                                                     </span>
                                                 )}
                                             </div>
-                                            {rolePermissions.some(rp => rp.permission_id === permission.permission_id) && (
+                                            {rolePermissions.some(
+                                                rp => rp.permission_id === permission.permission_id,
+                                            ) && (
                                                 <Badge color="primary" variant="light" size="sm">
                                                     Asignado
                                                 </Badge>
@@ -678,7 +744,9 @@ export default function RolesPermissions() {
                         <Button
                             onClick={saveRolePermissions}
                             disabled={isLoading}
-                            startIcon={<IconFA icon={isLoading ? 'spinner' : 'save'} spin={isLoading} />}
+                            startIcon={
+                                <IconFA icon={isLoading ? 'spinner' : 'save'} spin={isLoading} />
+                            }
                         >
                             Guardar Permisos
                         </Button>
@@ -687,4 +755,4 @@ export default function RolesPermissions() {
             </Modal>
         </div>
     );
-} 
+}

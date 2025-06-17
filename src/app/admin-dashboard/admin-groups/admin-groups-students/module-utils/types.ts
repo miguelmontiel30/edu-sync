@@ -8,7 +8,7 @@ export const STUDENT_GROUP_STATUS = {
 // Interfaz para categorías de SelectWithCategories
 export interface Category {
     label: string;
-    options: Array<{value: string; label: string}>;
+    options: Array<{ value: string; label: string }>;
     isActive?: boolean;
 }
 

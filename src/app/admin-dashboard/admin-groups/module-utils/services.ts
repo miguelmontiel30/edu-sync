@@ -1,18 +1,18 @@
 // Types
-import {Group, GroupFormData} from './types';
+import { Group, GroupFormData } from './types';
 
 // Repository
-import {groupRepository} from './repository';
+import { groupRepository } from './repository';
 
 // Exportar funciones públicas que utilizan el repositorio
 export async function loadAllGroupsData(
     schoolId: number,
-): Promise<{active: Group[]; deleted: Group[]}> {
+): Promise<{ active: Group[]; deleted: Group[] }> {
     return await groupRepository.getAllGroupsBySchoolId(schoolId);
 }
 
 export async function loadDeletedGroups(schoolId: number): Promise<Group[]> {
-    const {deleted} = await groupRepository.getAllGroupsBySchoolId(schoolId);
+    const { deleted } = await groupRepository.getAllGroupsBySchoolId(schoolId);
     return deleted;
 }
 

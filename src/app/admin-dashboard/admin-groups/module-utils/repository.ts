@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Supabase Client
-import {supabaseClient} from '@/services/config/supabaseClient';
+import { supabaseClient } from '@/services/config/supabaseClient';
 
 // Types
-import {Group, GROUP_STATUS, GroupFormData} from './types';
+import { Group, GROUP_STATUS, GroupFormData } from './types';
 
 /**
  * Interfaz del repositorio de grupos
@@ -10,7 +11,7 @@ import {Group, GROUP_STATUS, GroupFormData} from './types';
  */
 export interface IGroupRepository {
     /** Obtiene todos los grupos activos y eliminados de una escuela */
-    getAllGroupsBySchoolId(schoolId: number): Promise<{active: Group[]; deleted: Group[]}>;
+    getAllGroupsBySchoolId(schoolId: number): Promise<{ active: Group[]; deleted: Group[] }>;
 
     /** Guarda un grupo nuevo o actualiza uno existente */
     saveGroup(groupData: GroupFormData, schoolId?: number, groupId?: number): Promise<void>;
@@ -27,7 +28,7 @@ export interface IGroupRepository {
  */
 export class SupabaseGroupRepository implements IGroupRepository {
     // Mapas de estados para conversión de IDs a nombres legibles
-    private statusMap: {[key: string]: string} = {
+    private readonly statusMap: { [key: string]: string } = {
         [GROUP_STATUS.ACTIVE]: 'Activo',
         [GROUP_STATUS.INACTIVE]: 'Inactivo',
         [GROUP_STATUS.COMPLETED]: 'Finalizado',
@@ -81,18 +82,17 @@ export class SupabaseGroupRepository implements IGroupRepository {
      * @param schoolId - ID de la escuela
      * @returns Objetos con grupos activos y eliminados
      */
-    async getAllGroupsBySchoolId(schoolId: number): Promise<{active: Group[]; deleted: Group[]}> {
+    async getAllGroupsBySchoolId(schoolId: number): Promise<{ active: Group[]; deleted: Group[] }> {
         try {
             // Realizar una sola consulta para ambos tipos de grupos
-            const {data, error} = await this.baseQuery()
+            const { data, error } = await this.baseQuery()
                 .eq('school_id', schoolId)
-                .order('created_at', {ascending: false});
+                .order('created_at', { ascending: false });
 
             if (error) throw error;
-            if (!data) return {active: [], deleted: []};
+            if (!data) return { active: [], deleted: [] };
 
             // Procesar y filtrar los datos en memoria
-            // @ts-ignore - Ignoramos el error de tipos aquí ya que sabemos que la estructura es correcta
             const formattedGroups = this.mapDatabaseToGroups(data);
 
             return {
@@ -161,7 +161,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
      * @returns Lista de estudiantes
      */
     private extractStudentsFromGroup(group: any): any[] {
-        return group.student_groups?.map((sg: {students: any}) => sg.students).flat() || [];
+        return group.student_groups?.map((sg: { students: any }) => sg.students).flat() || [];
     }
 
     /**
@@ -173,7 +173,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-        return students.filter((student: {created_at: string}) => {
+        return students.filter((student: { created_at: string }) => {
             const studentDate = new Date(student.created_at);
             return studentDate >= thirtyDaysAgo;
         });
@@ -186,7 +186,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
      */
     private formatTeacherInfo(
         group: any,
-    ): Array<{id: number; name: string; role: string; image?: string}> {
+    ): Array<{ id: number; name: string; role: string; image?: string }> {
         if (!group.teacher) return [];
 
         const teacherName = `${group.teacher.first_name} ${group.teacher.father_last_name} ${
@@ -227,7 +227,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
             // Si tenemos groupId, es una actualización
             if (groupId) {
                 // Actualizar grupo existente
-                const {error} = await supabaseClient
+                const { error } = await supabaseClient
                     .from('groups')
                     .update(groupDataToSave)
                     .eq('group_id', groupId)
@@ -244,7 +244,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
                 }
 
                 // Crear nuevo grupo
-                const {error} = await supabaseClient.from('groups').insert([
+                const { error } = await supabaseClient.from('groups').insert([
                     {
                         ...groupDataToSave,
                         school_id: schoolId,
@@ -267,7 +267,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
     async deleteGroup(id: number): Promise<void> {
         try {
             const statusValue = GROUP_STATUS.INACTIVE;
-            const {error} = await supabaseClient
+            const { error } = await supabaseClient
                 .from('groups')
                 .update({
                     delete_flag: true,
@@ -289,7 +289,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
      */
     async restoreGroup(id: number): Promise<void> {
         try {
-            const {error} = await supabaseClient
+            const { error } = await supabaseClient
                 .from('groups')
                 .update({
                     delete_flag: false,

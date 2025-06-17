@@ -1,5 +1,6 @@
-import {supabaseClient} from '@/services/config/supabaseClient';
-import {STUDENT_GROUP_STATUS} from './types';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { supabaseClient } from '@/services/config/supabaseClient';
+import { STUDENT_GROUP_STATUS } from './types';
 
 /**
  * Consulta base para obtener estudiantes con sus relaciones
@@ -73,7 +74,7 @@ export async function getStudentsByIdsAndSchool(studentIds: number[], schoolId: 
         .eq('delete_flag', false)
         .eq('school_id', schoolId)
         .in('student_id', studentIds)
-        .order('first_name', {ascending: true});
+        .order('first_name', { ascending: true });
 }
 
 /**
@@ -98,7 +99,7 @@ export async function getActiveStudentGroupAssignments(statusId: number) {
 export async function getStudentCountInGroupByStatus(groupId: number, statusId: number) {
     return await supabaseClient
         .from('student_groups')
-        .select('*', {count: 'exact', head: true})
+        .select('*', { count: 'exact', head: true })
         .eq('group_id', groupId)
         .eq('delete_flag', false)
         .eq('status_id', statusId);

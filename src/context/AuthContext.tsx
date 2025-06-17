@@ -26,6 +26,12 @@ interface UserProfile {
     permissions: string[];
 }
 
+interface PermissionData {
+    permissions: {
+        name: string;
+    };
+}
+
 interface AuthContextType {
     user: User | null;
     profile: UserProfile | null;
@@ -107,9 +113,11 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
                         roles: customUser.user_metadata.roles.map(role => ({
                             role_id: role.role_id,
                             name: role.name,
-                            description: null
+                            description: null,
                         })),
-                        permissions: Array.isArray(app_metadata.permissions) ? app_metadata.permissions : []
+                        permissions: Array.isArray(app_metadata.permissions)
+                            ? app_metadata.permissions
+                            : [],
                     };
 
                     setProfile(profileFromAuth);
@@ -122,7 +130,8 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
                 try {
                     const { data: userData, error: userError } = await supabaseClient
                         .from('users')
-                        .select(`
+                        .select(
+                            `
                             user_id, 
                             school_id, 
                             email, 
@@ -133,7 +142,8 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
                                 role_id, 
                                 roles:role_id(name, description)
                             )
-                        `)
+                        `,
+                        )
                         .eq('email', authUser.email)
                         .eq('user_roles.delete_flag', false)
                         .single();
@@ -146,11 +156,17 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
                     }
 
                     // Formatear roles
-                    const userRoles = (userData.user_roles || []).map((r: any) => ({
-                        role_id: r.role_id,
-                        name: r.roles?.name || '',
-                        description: r.roles?.description || null
-                    }));
+                    const userRoles = (userData.user_roles || []).map(r => {
+                        const roleData = r as unknown as {
+                            role_id: number;
+                            roles: { name: string; description: string | null };
+                        };
+                        return {
+                            role_id: roleData.role_id,
+                            name: roleData.roles?.name || '',
+                            description: roleData.roles?.description || null,
+                        };
+                    });
 
                     // Cargar permisos en una sola consulta adicional
                     let userPermissions: string[] = [];
@@ -158,14 +174,28 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
                         const roleIds = userRoles.map(r => r.role_id);
                         const { data: permissionsData } = await supabaseClient
                             .from('role_permissions')
-                            .select(`
+                            .select(
+                                `
                                 permissions:permission_id(name)
-                            `)
+                            `,
+                            )
                             .in('role_id', roleIds);
 
                         if (permissionsData) {
+                            // Usamos una forma segura de extraer el nombre del permiso
                             userPermissions = permissionsData
-                                .map((p: any) => p.permissions?.name || '')
+                                .map(p => {
+                                    // Verificamos si permissions existe antes de intentar acceder
+                                    const permission = p?.permissions;
+                                    if (
+                                        permission &&
+                                        typeof permission === 'object' &&
+                                        'name' in permission
+                                    ) {
+                                        return permission.name as string;
+                                    }
+                                    return '';
+                                })
                                 .filter(Boolean);
                         }
                     }
@@ -175,7 +205,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
                         ...userData,
                         user_roles: undefined, // Eliminar propiedad anidada que no necesitamos
                         roles: userRoles,
-                        permissions: userPermissions
+                        permissions: userPermissions,
                     };
 
                     setProfile(profileData);
@@ -196,18 +226,16 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
         loadUserAndProfile();
 
         // Suscribirse a cambios de autenticación solo si es necesario
-        const { data: authListener } = supabaseClient.auth.onAuthStateChange(
-            (event, _session) => {
-                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                    loadUserAndProfile();
-                } else if (event === 'SIGNED_OUT') {
-                    setUser(null);
-                    setProfile(null);
-                    localStorage.removeItem('eduSync_profile');
-                    localStorage.removeItem('eduSync_user');
-                }
+        const { data: authListener } = supabaseClient.auth.onAuthStateChange((event, _session) => {
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                loadUserAndProfile();
+            } else if (event === 'SIGNED_OUT') {
+                setUser(null);
+                setProfile(null);
+                localStorage.removeItem('eduSync_profile');
+                localStorage.removeItem('eduSync_user');
             }
-        );
+        });
 
         return () => {
             authListener?.subscription.unsubscribe();
@@ -286,26 +314,25 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     };
 
     // Envolver el valor del contexto en useMemo para evitar recreaciones en cada renderizado
-    const contextValue = useMemo(() => ({
-        user,
-        profile,
-        isLoading,
-        isAdmin,
-        hasPermission,
-        login: handleLogin,
-        logout: handleLogout
-    }), [user, profile, isLoading, isAdmin]);
-
-    return (
-        <AuthContext.Provider value={contextValue}>
-            {children}
-        </AuthContext.Provider>
+    const contextValue = useMemo(
+        () => ({
+            user,
+            profile,
+            isLoading,
+            isAdmin,
+            hasPermission,
+            login: handleLogin,
+            logout: handleLogout,
+        }),
+        [user, profile, isLoading, isAdmin],
     );
+
+    return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 }
 
 // Hook personalizado para usar el contexto
 export function useAuth() {
-    // Obtener el contexto  
+    // Obtener el contexto
     const context = useContext(AuthContext);
 
     // Si el contexto no está definido, lanzar un error
@@ -315,4 +342,4 @@ export function useAuth() {
 
     // Retornar el contexto
     return context;
-} 
+}

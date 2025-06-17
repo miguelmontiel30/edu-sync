@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Utils
-import {formatTeacherData} from './utils';
+import { formatTeacherData } from './utils';
 // Queries
 import {
     getAvailableSubjects,
@@ -13,7 +14,7 @@ import {
     restoreGroupSubject,
 } from './queries';
 // Types
-import {GroupSubjectAssignment, RepositoryResponse, DeletedGroupSubject} from './types';
+import { GroupSubjectAssignment, RepositoryResponse, DeletedGroupSubject } from './types';
 
 // Interfaz del repositorio
 export interface IGroupTeachersRepository {
@@ -44,7 +45,7 @@ export class SupabaseGroupTeachersRepository implements IGroupTeachersRepository
      */
     async getGroupTeacherAssignments(groupId: number): Promise<GroupSubjectAssignment[]> {
         try {
-            const {data: groupSubjects, error} = await getGroupSubjectsWithRelations(groupId);
+            const { data: groupSubjects, error } = await getGroupSubjectsWithRelations(groupId);
 
             if (error) throw error;
             if (!groupSubjects || groupSubjects.length === 0) return [];
@@ -105,7 +106,7 @@ export class SupabaseGroupTeachersRepository implements IGroupTeachersRepository
      */
     async getAllTeachers(schoolId: number): Promise<any[]> {
         try {
-            const {data, error} = await getAllTeachers(schoolId);
+            const { data, error } = await getAllTeachers(schoolId);
 
             if (error) throw error;
             if (!data || data.length === 0) return [];
@@ -122,7 +123,7 @@ export class SupabaseGroupTeachersRepository implements IGroupTeachersRepository
      */
     async getAvailableSubjectsForGroup(schoolId: number): Promise<any[]> {
         try {
-            const {data, error} = await getAvailableSubjects(schoolId);
+            const { data, error } = await getAvailableSubjects(schoolId);
 
             if (error) throw error;
             if (!data || data.length === 0) return [];
@@ -142,12 +143,12 @@ export class SupabaseGroupTeachersRepository implements IGroupTeachersRepository
         teacherId: number,
     ): Promise<RepositoryResponse> {
         try {
-            const {error} = await assignTeacherToGroupSubject(groupSubjectId, teacherId);
+            const { error } = await assignTeacherToGroupSubject(groupSubjectId, teacherId);
             if (error) throw error;
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al asignar profesor a materia:', error);
-            return {success: false, error};
+            return { success: false, error };
         }
     }
 
@@ -156,12 +157,12 @@ export class SupabaseGroupTeachersRepository implements IGroupTeachersRepository
      */
     async removeTeacherFromSubject(groupSubjectId: number): Promise<RepositoryResponse> {
         try {
-            const {error} = await removeTeacherFromGroupSubject(groupSubjectId);
+            const { error } = await removeTeacherFromGroupSubject(groupSubjectId);
             if (error) throw error;
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al eliminar profesor de materia:', error);
-            return {success: false, error};
+            return { success: false, error };
         }
     }
 
@@ -174,14 +175,14 @@ export class SupabaseGroupTeachersRepository implements IGroupTeachersRepository
         teacherId: number | null,
     ): Promise<RepositoryResponse> {
         try {
-            const {error} = await createGroupSubjectAssignment(groupId, subjectId, teacherId);
+            const { error } = await createGroupSubjectAssignment(groupId, subjectId, teacherId);
 
             if (error) throw error;
 
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al crear asignación de materia:', error);
-            return {success: false, error};
+            return { success: false, error };
         }
     }
 
@@ -193,12 +194,12 @@ export class SupabaseGroupTeachersRepository implements IGroupTeachersRepository
         userId?: number,
     ): Promise<RepositoryResponse> {
         try {
-            const {error} = await deleteGroupSubject(groupSubjectId, userId);
+            const { error } = await deleteGroupSubject(groupSubjectId, userId);
             if (error) throw error;
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al eliminar materia del grupo:', error);
-            return {success: false, error};
+            return { success: false, error };
         }
     }
 
@@ -207,7 +208,7 @@ export class SupabaseGroupTeachersRepository implements IGroupTeachersRepository
      */
     async getDeletedGroupSubjects(groupId: number): Promise<DeletedGroupSubject[]> {
         try {
-            const {data, error} = await getDeletedGroupSubjects(groupId);
+            const { data, error } = await getDeletedGroupSubjects(groupId);
 
             if (error) throw error;
             if (!data || data.length === 0) return [];
@@ -264,12 +265,12 @@ export class SupabaseGroupTeachersRepository implements IGroupTeachersRepository
      */
     async restoreSubjectToGroup(groupSubjectId: number): Promise<RepositoryResponse> {
         try {
-            const {error} = await restoreGroupSubject(groupSubjectId);
+            const { error } = await restoreGroupSubject(groupSubjectId);
             if (error) throw error;
-            return {success: true};
+            return { success: true };
         } catch (error) {
             console.error('Error al restaurar materia al grupo:', error);
-            return {success: false, error};
+            return { success: false, error };
         }
     }
 }

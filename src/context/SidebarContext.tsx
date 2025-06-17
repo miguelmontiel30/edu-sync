@@ -1,5 +1,5 @@
 'use client';
-import React, {createContext, useContext, useState, useEffect} from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type SidebarContextType = {
     isExpanded: boolean;
@@ -24,7 +24,7 @@ export const useSidebar = () => {
     return context;
 };
 
-export const SidebarProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
+export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);

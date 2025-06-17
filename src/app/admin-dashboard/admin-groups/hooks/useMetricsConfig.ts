@@ -1,6 +1,6 @@
-import {useMemo} from 'react';
-import {Group, GROUP_STATUS} from '../module-utils/types';
-import {MetricConfig} from '../../core/Metrics/types';
+import { useMemo } from 'react';
+import { Group, GROUP_STATUS } from '../module-utils/types';
+import { MetricConfig } from '../../core/Metrics/types';
 
 export function useMetricsConfig(groups: Group[]) {
     // Cálculo de métricas
@@ -75,5 +75,5 @@ export function useMetricsConfig(groups: Group[]) {
         [groups],
     );
 
-    return {metricsConfig, chartConfigs};
+    return { metricsConfig, chartConfigs };
 }

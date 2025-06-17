@@ -1,7 +1,8 @@
-import {useMemo} from 'react';
-import {Student, StudentGroup, StudentMetrics} from '../module-utils/types';
-import {studentRepository} from '../module-utils/repository';
-import {MetricConfig} from '../../core/Metrics/types';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useMemo } from 'react';
+import { Student, StudentGroup, StudentMetrics } from '../module-utils/types';
+import { studentRepository } from '../module-utils/repository';
+import { MetricConfig } from '../../core/Metrics/types';
 
 /**
  * Configuración de gráficos para el dashboard
