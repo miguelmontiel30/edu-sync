@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Message, ChatDetails } from '../components/ChatArea';
+import { Message, ChatDetails, FileStats } from '../components/ChatArea';
 
 export type ChatGroup = {
     id: number;
@@ -95,6 +95,55 @@ export const useChat = () => {
         },
     ];
 
+    // Mock file statistics for each chat
+    const fileStatsByChat: Record<number, FileStats> = {
+        // Grupo A
+        1: {
+            documents: { count: 126, size: '193MB' },
+            photos: { count: 53, size: '321MB' },
+            videos: { count: 3, size: '210MB' },
+            other: { count: 49, size: '194MB' },
+            total: { count: 231 },
+            links: { count: 45 },
+        },
+        // Grupo B
+        2: {
+            documents: { count: 87, size: '142MB' },
+            photos: { count: 35, size: '187MB' },
+            videos: { count: 1, size: '95MB' },
+            other: { count: 28, size: '103MB' },
+            total: { count: 151 },
+            links: { count: 32 },
+        },
+        // Grupo C
+        3: {
+            documents: { count: 64, size: '118MB' },
+            photos: { count: 23, size: '154MB' },
+            videos: { count: 2, size: '173MB' },
+            other: { count: 18, size: '82MB' },
+            total: { count: 107 },
+            links: { count: 25 },
+        },
+        // Chat con Laura
+        5: {
+            documents: { count: 14, size: '32MB' },
+            photos: { count: 6, size: '17MB' },
+            videos: { count: 0, size: '0MB' },
+            other: { count: 3, size: '8MB' },
+            total: { count: 23 },
+            links: { count: 12 },
+        },
+        // Anuncios General
+        7: {
+            documents: { count: 35, size: '78MB' },
+            photos: { count: 12, size: '46MB' },
+            videos: { count: 1, size: '32MB' },
+            other: { count: 8, size: '15MB' },
+            total: { count: 56 },
+            links: { count: 28 },
+        },
+    };
+
     // Get chat details when active chat changes
     useEffect(() => {
         const group = groups.find(g => g.id === activeChat);
@@ -104,6 +153,7 @@ export const useChat = () => {
                 id: group.id,
                 name: group.name,
                 type: group.type,
+                fileStats: fileStatsByChat[group.id], // Add file statistics
             };
 
             // Add additional details based on chat type

@@ -41,6 +41,13 @@ const navItems: NavItem[] = [
                 pro: false,
                 icon: 'chalkboard-teacher',
             },
+            {
+                name: 'Registro de Asistencia',
+                path: '/teacher-dashboard/attendance',
+                pro: false,
+                icon: 'user-check',
+                new: true,
+            },
         ],
     },
     {
