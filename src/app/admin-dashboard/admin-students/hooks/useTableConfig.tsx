@@ -7,6 +7,7 @@ import IconFA from '@/components/ui/IconFA';
 import { Column } from '@/components/core/table/module-utils/types';
 
 // Core Components
+import ProfileAvatar from '@/components/core/avatar/ProfileAvatar';
 import { ActionButton, ItemsListConfig } from '../../core/Tables/ItemsList';
 import { DeletedItemsListConfig } from '../../core/Tables/DeletedItemsList';
 
@@ -50,22 +51,15 @@ export function useTableConfig({
                 header: 'Nombre',
                 sortable: true,
                 render: (student: Student) => (
-                    <div className="flex items-center">
-                        {student.image_url ? (
-                            <img
-                                src={student.image_url}
-                                alt={student.full_name}
-                                className="mr-2 h-8 w-8 rounded-full"
-                            />
-                        ) : (
-                            <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
-                                <IconFA
-                                    icon="user"
-                                    className={getGenderIconColor(student.gender?.code)}
-                                />
-                            </div>
-                        )}
-                        <span className="font-medium">{student.full_name}</span>
+                    <div className="flex items-center justify-center">
+                        <ProfileAvatar
+                            size="sm"
+                            name={`${student.first_name} ${student.father_last_name}`}
+                        />
+
+                        <span className="ml-2 font-outfit text-sm">
+                            {`${student.first_name} ${student.father_last_name} ${student.mother_last_name || ''}`}
+                        </span>
                     </div>
                 ),
             },

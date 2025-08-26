@@ -2,6 +2,8 @@
 
 // React
 import { useMemo } from 'react';
+// Next
+import { useRouter } from 'next/navigation';
 
 // Components
 import StudentFormModal from './components/StudentFormModal';
@@ -20,6 +22,8 @@ import ItemsList from '../core/Tables/ItemsList';
 import { useStudentManagement, useMetricsConfig, useTableConfig } from './hooks';
 
 export default function StudentsDashboard() {
+    const router = useRouter();
+    
     // Usar hook principal para gestión de estudiantes
     const {
         students,
@@ -80,6 +84,11 @@ export default function StudentsDashboard() {
         students,
     });
 
+    // Navegar al perfil del estudiante
+    const handleRowClick = (student: any) => {
+        router.push(`/admin-dashboard/admin-students/${student.id}`);
+    };
+
     return (
         <div className="mx-auto max-w-screen-2xl md:p-6">
             {/* Breadcrumb */}
@@ -113,6 +122,7 @@ export default function StudentsDashboard() {
                 columns={studentColumns}
                 isLoading={loadingState.students}
                 onAddNew={openModal}
+                onRowClick={handleRowClick}
                 config={studentListConfig}
                 actionButtons={studentActionButtons}
             />
