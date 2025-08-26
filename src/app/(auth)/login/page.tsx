@@ -17,7 +17,6 @@ import { ThemeToggleButton } from '@/components/common/ThemeToggleButton';
 
 // Constantes de UI
 const LOGIN_LABELS = {
-    PAGE_TITLE: 'Iniciar Sesión',
     WELCOME_TITLE: '¡Bienvenido de vuelta!',
     LOGIN_SUBTITLE: 'Ingresa tus credenciales para acceder al sistema',
     EMAIL_LABEL: 'Correo electrónico',
@@ -165,12 +164,17 @@ const LoginPage: React.FC = () => {
 
             <div className="flex flex-grow items-center justify-center px-4 py-8">
                 <div className="w-full max-w-md">
-                    <ComponentCard
-                        title={LOGIN_LABELS.PAGE_TITLE}
-                        className="w-full px-6 py-6 shadow-lg"
-                    >
+                    <ComponentCard className="w-full px-6 py-6 shadow-lg">
                         <div className="p-4">
                             <div className="space-y-6">
+                                <div className="flex justify-center">
+                                    <IconFA
+                                        icon="graduation-cap"
+                                        size="2xl"
+                                        className="mr-2 text-indigo-600 dark:text-indigo-400"
+                                    />
+                                </div>
+
                                 <div className="pb-2 text-center">
                                     <div className="flex items-center justify-center">
                                         <h3 className="text-xl font-medium text-gray-800 dark:text-white">
