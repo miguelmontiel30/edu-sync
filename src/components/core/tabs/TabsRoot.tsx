@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import { createContext, useState, useContext, ReactNode } from 'react';
 
 interface TabsContextProps {
   activeTab: string;
@@ -21,13 +21,22 @@ interface TabsRootProps {
   children: ReactNode;
   defaultValue: string;
   className?: string;
+  onValueChange?: (value: string) => void;
 }
 
-export function TabsRoot({ children, defaultValue, className }: TabsRootProps) {
+export function TabsRoot({ children, defaultValue, className, onValueChange }: TabsRootProps) {
   const [activeTab, setActiveTab] = useState<string>(defaultValue);
 
+  // Wrapper para setActiveTab que también llama a onValueChange si existe
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (onValueChange) {
+      onValueChange(value);
+    }
+  };
+
   return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+    <TabsContext.Provider value={{ activeTab, setActiveTab: handleTabChange }}>
       <div className={className}>
         {children}
       </div>
