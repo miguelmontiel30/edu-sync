@@ -22,6 +22,11 @@ const navItems: NavItem[] = [
         path: '/admin-dashboard',
     },
     {
+        icon: <IconFA icon="comments" style="duotone" size="xl" />,
+        name: 'Chat',
+        path: '/chat',
+    },
+    {
         icon: <IconFA icon="calendar-clock" style="duotone" size="xl" />,
         name: 'Ciclos escolares',
         path: '/admin-dashboard/admin-school-year',
@@ -35,6 +40,13 @@ const navItems: NavItem[] = [
                 path: '/admin-dashboard/admin-teachers/',
                 pro: false,
                 icon: 'chalkboard-teacher',
+            },
+            {
+                name: 'Registro de Asistencia',
+                path: '/teacher-dashboard/attendance',
+                pro: false,
+                icon: 'user-check',
+                new: true,
             },
         ],
     },

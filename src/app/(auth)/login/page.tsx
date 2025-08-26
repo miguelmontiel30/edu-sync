@@ -1,17 +1,17 @@
 'use client';
 
 // React
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 
 // Next
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 
 import Link from 'next/link';
 
 // Servicios de autenticación
-import { login } from '@/services/auth/authService';
-import { useSessionContext } from '@/context/SessionContext';
-import { checkSupabaseConnection } from '@/services/config/supabaseClient';
+import {login} from '@/services/auth/authService';
+import {useSessionContext} from '@/context/SessionContext';
+import {checkSupabaseConnection} from '@/services/config/supabaseClient';
 
 // Componentes Core
 import Input from '@/components/form/input/InputField';
@@ -19,7 +19,7 @@ import Label from '@/components/form/Label';
 import Button from '@/components/core/button/Button';
 import IconFA from '@/components/ui/IconFA';
 import ComponentCard from '@/components/common/ComponentCard';
-import { ThemeToggleButton } from '@/components/common/ThemeToggleButton';
+import {ThemeToggleButton} from '@/components/common/ThemeToggleButton';
 
 type UserType = 'student' | 'teacher' | 'admin' | null;
 
@@ -34,7 +34,7 @@ const LoginPage: React.FC = () => {
     const totalSlides = 3;
 
     // Contexts
-    const { refreshSession, isAuthenticated } = useSessionContext();
+    const {refreshSession, isAuthenticated} = useSessionContext();
 
     // Router
     const router = useRouter();
@@ -57,7 +57,7 @@ const LoginPage: React.FC = () => {
                     if (updatedSession.role === 'admin') {
                         targetPath = '/admin-dashboard';
                     } else if (updatedSession.role === 'teacher') {
-                        targetPath = '/teacher-dashboard/dashboard';
+                        targetPath = '/teacher-dashboard';
                     } else if (updatedSession.role === 'student') {
                         targetPath = '/student-dashboard/dashboard';
                     }
@@ -121,7 +121,7 @@ const LoginPage: React.FC = () => {
             if (session.role === 'admin') {
                 router.push('/admin-dashboard');
             } else if (session.role === 'teacher') {
-                router.push('/teacher-dashboard/dashboard');
+                router.push('/teacher-dashboard');
             } else if (session.role === 'student') {
                 router.push('/student-dashboard/dashboard');
             } else {
@@ -129,7 +129,7 @@ const LoginPage: React.FC = () => {
                 if (selectedUserType === 'admin') {
                     router.push('/admin-dashboard');
                 } else if (selectedUserType === 'teacher') {
-                    router.push('/teacher-dashboard/dashboard');
+                    router.push('/teacher-dashboard');
                 } else {
                     router.push('/student-dashboard/dashboard');
                 }
@@ -141,7 +141,7 @@ const LoginPage: React.FC = () => {
             let errorMessage = 'Error de autenticación. Verifica tus credenciales.';
 
             if (typeof error === 'object' && error !== null && 'message' in error) {
-                const errorMsg = (error as { message: string }).message;
+                const errorMsg = (error as {message: string}).message;
 
                 if (errorMsg.includes('Contraseña incorrecta')) {
                     errorMessage = 'La contraseña ingresada es incorrecta';
@@ -713,7 +713,7 @@ const DashboardCard = ({
                         <div className="absolute inset-0 rounded-full border-4 border-gray-600"></div>
                         <div
                             className="absolute inset-0 rounded-full border-4 border-transparent border-b-blue-400 border-r-blue-400 border-t-blue-400"
-                            style={{ transform: 'rotate(45deg)' }}
+                            style={{transform: 'rotate(45deg)'}}
                         ></div>
                     </div>
                 )}
@@ -727,7 +727,7 @@ interface StatCardProps {
     label: string;
 }
 
-const StatCard = ({ value, label }: StatCardProps) => {
+const StatCard = ({value, label}: StatCardProps) => {
     return (
         <div className="rounded-lg bg-gray-700/40 p-3 text-center backdrop-blur-sm">
             <div className="text-xl font-bold text-white">{value}</div>

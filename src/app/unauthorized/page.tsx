@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useSessionContext } from '@/context/SessionContext';
+import {useRouter} from 'next/navigation';
+import {useSessionContext} from '@/context/SessionContext';
 import ComponentCard from '@/components/common/ComponentCard';
 import IconFA from '@/components/ui/IconFA';
-import { ThemeToggleButton } from '@/components/common/ThemeToggleButton';
+import {ThemeToggleButton} from '@/components/common/ThemeToggleButton';
 import Button from '@/components/core/button/Button';
 
 const UnauthorizedPage = () => {
-    const { session, isAuthenticated, refreshSession } = useSessionContext();
+    const {session, isAuthenticated, refreshSession} = useSessionContext();
     const router = useRouter();
     const [sessionInfo, setSessionInfo] = useState<any>(null);
 
@@ -37,7 +37,7 @@ const UnauthorizedPage = () => {
                 }
             } catch (error) {
                 console.error('Error al obtener información de sesión:', error);
-                setSessionInfo({ error: 'Error al obtener información de sesión' });
+                setSessionInfo({error: 'Error al obtener información de sesión'});
             }
         };
 
@@ -52,7 +52,7 @@ const UnauthorizedPage = () => {
             case 'admin':
                 return '/admin-dashboard';
             case 'teacher':
-                return '/teacher-dashboard/dashboard';
+                return '/teacher-dashboard';
             case 'student':
                 return '/student-dashboard/dashboard';
             default:
