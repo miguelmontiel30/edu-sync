@@ -46,7 +46,6 @@ export default function StudentProfilePage() {
         payments,
         grades,
         attendance,
-        groups,
         loadingState,
         loadStudentData,
     } = useStudentProfile(studentId);
@@ -103,33 +102,33 @@ export default function StudentProfilePage() {
     const mockData = generateMockData();
 
     // Handlers para acciones
-    const handleUploadDocument = (type: DocumentType, file: File) => {
-        console.log('Subiendo documento:', type, file.name);
+    const handleUploadDocument = (_type: DocumentType, _file: File) => {
+        // TODO: Implement document upload logic
         return Promise.resolve();
     };
 
     const handleUpdateMedicalInfo = (_info: unknown) => {
-        // Log removed for linting compliance
+        // TODO: Implement medical info update logic
         return Promise.resolve();
     };
 
     const handleSendMessage = (_message: { title: string; content: string; type: MessageType }) => {
-        // Log removed for linting compliance
+        // TODO: Implement message sending logic
         return Promise.resolve();
     };
 
     const handleGenerateDocument = (_templateId: string, _params: Record<string, string>) => {
-        // Log removed for linting compliance
+        // TODO: Implement document generation logic
         return Promise.resolve('/docs/generated-document.pdf');
     };
 
     const handleMarkTaskComplete = (_taskId: string) => {
-        // Log removed for linting compliance
+        // TODO: Implement task completion logic
         return Promise.resolve();
     };
 
     const handleUploadTaskFile = (_taskId: string, _file: File) => {
-        // Log removed for linting compliance
+        // TODO: Implement file upload logic
         return Promise.resolve();
     };
 
@@ -225,7 +224,7 @@ export default function StudentProfilePage() {
                     <DocumentsTab
                         documents={mockData.documents}
                         onUpload={handleUploadDocument}
-                        onReview={(id: string, status: string, comments?: string) =>
+                        onReview={(_id: string, _status: string, _comments?: string) =>
                             Promise.resolve()
                         }
                     />
@@ -236,10 +235,10 @@ export default function StudentProfilePage() {
                     <HealthTab
                         medicalInfo={mockData.medicalInfo}
                         emergencyContacts={mockData.emergencyContacts}
-                        onAddContact={() => console.log('Añadir contacto')}
+                        onAddContact={() => Promise.resolve()}
                         onUpdateMedicalInfo={handleUpdateMedicalInfo}
-                        onCallContact={(phone: string) => console.log('Llamando a:', phone)}
-                        onSendSMS={(phone: string) => console.log('Enviando SMS a:', phone)}
+                        onCallContact={(_phone: string) => Promise.resolve()}
+                        onSendSMS={(_phone: string) => Promise.resolve()}
                     />
                 </TabsContent>
 
@@ -248,7 +247,7 @@ export default function StudentProfilePage() {
                     <CommunicationsTab
                         messages={mockData.messages}
                         onSendMessage={handleSendMessage}
-                        onMarkAsRead={(id: string) => Promise.resolve()}
+                        onMarkAsRead={(_id: string) => Promise.resolve()}
                     />
                 </TabsContent>
 

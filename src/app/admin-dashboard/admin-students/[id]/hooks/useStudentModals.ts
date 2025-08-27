@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { StudentFormData } from '../../module-utils/types';
+import { StudentFormData, Student as FormStudent } from '../../module-utils/types';
 import { Student as ProfileStudent } from '../module-utils/types';
-import { Student as FormStudent } from '../../module-utils/types';
 
 /**
  * Hook para gestionar los modales del perfil de estudiante

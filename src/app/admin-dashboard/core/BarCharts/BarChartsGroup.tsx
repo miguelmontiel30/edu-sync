@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 // Libraries
 import { ApexOptions } from 'apexcharts';
 import IconFA from '@/components/ui/IconFA';
-import ApexCharts from 'apexcharts';
 import React, { useEffect, useState } from 'react';
 import { ChartConfig } from './types';
 
