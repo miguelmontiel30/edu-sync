@@ -1,13 +1,18 @@
 'use client';
 
+// React & Next
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+// Services
 import { login } from '@/services/auth/authService';
-import { useSessionContext } from '@/context/SessionContext';
 import { checkSupabaseConnection } from '@/services/config/supabaseClient';
 
+// Contexts
+import { useSessionContext } from '@/context/SessionContext';
+
+// Components
 import Input from '@/components/form/input/InputField';
 import Label from '@/components/form/Label';
 import Button from '@/components/core/button/Button';
@@ -15,35 +20,20 @@ import IconFA from '@/components/ui/IconFA';
 import ComponentCard from '@/components/common/ComponentCard';
 import { ThemeToggleButton } from '@/components/common/ThemeToggleButton';
 
-// Constantes de UI
-const LOGIN_LABELS = {
-    WELCOME_TITLE: '¡Bienvenido de vuelta!',
-    LOGIN_SUBTITLE: 'Ingresa tus credenciales para acceder al sistema',
-    EMAIL_LABEL: 'Correo electrónico',
-    EMAIL_PLACEHOLDER: 'correo@ejemplo.com',
-    PASSWORD_LABEL: 'Contraseña',
-    PASSWORD_PLACEHOLDER: 'Tu contraseña',
-    LOGIN_BUTTON: 'Iniciar sesión',
-    LOGIN_LOADING: 'Iniciando sesión...',
-    FORGOT_PASSWORD: '¿Olvidaste tu contraseña?',
-    ERROR_EMAIL_REQUIRED: 'Por favor ingresa tu correo electrónico',
-    ERROR_PASSWORD_REQUIRED: 'Por favor ingresa tu contraseña',
-    ERROR_AUTH_GENERIC: 'Error de autenticación. Verifica tus credenciales.',
-    ERROR_WRONG_PASSWORD: 'La contraseña ingresada es incorrecta',
-    ERROR_EMAIL_NOT_REGISTERED: 'El correo electrónico no está registrado en el sistema',
-    ERROR_USER_DATA:
-        'Tu usuario existe pero no se pudieron obtener tus datos. Contacta al administrador.',
-    ERROR_CONNECTION: 'Error de conexión al servidor. Por favor intenta más tarde.',
-    APP_NAME: 'EduSync',
-};
+// Utils
+import { LOGIN_LABELS } from '@/locales/es/login';
 
 const LoginPage: React.FC = () => {
+    // States
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // Contexts
     const { refreshSession, isAuthenticated } = useSessionContext();
+
+    // Router
     const router = useRouter();
 
     // Verificar sesión activa y redirigir
@@ -137,8 +127,15 @@ const LoginPage: React.FC = () => {
         }
     };
 
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        if (name === 'username') setUsername(value);
+        if (name === 'password') setPassword(value);
+    };
+
     return (
         <div className="flex min-h-screen flex-col bg-gray-100 dark:bg-gray-900">
+            {/* Navbar */}
             <header className="flex w-full border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
                 <div className="flex w-full flex-grow items-center justify-between px-6 py-3">
                     <div className="flex items-center">
@@ -162,6 +159,7 @@ const LoginPage: React.FC = () => {
                 </div>
             </header>
 
+            {/* Login Form */}
             <div className="flex flex-grow items-center justify-center px-4 py-8">
                 <div className="w-full max-w-md">
                     <ComponentCard className="w-full px-6 py-6 shadow-lg">
@@ -180,8 +178,10 @@ const LoginPage: React.FC = () => {
                                         <h3 className="text-xl font-medium text-gray-800 dark:text-white">
                                             {LOGIN_LABELS.WELCOME_TITLE}
                                         </h3>
+
                                         <span className="ml-2 text-2xl">👋</span>
                                     </div>
+
                                     <p className="mt-2 text-sm font-normal text-gray-600 dark:text-gray-400">
                                         {LOGIN_LABELS.LOGIN_SUBTITLE}
                                     </p>
@@ -191,6 +191,7 @@ const LoginPage: React.FC = () => {
                                     <div className="rounded-md bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/50 dark:text-red-200">
                                         <div className="flex items-center">
                                             <IconFA icon="circle-exclamation" className="mr-2" />
+
                                             <span>{error}</span>
                                         </div>
                                     </div>
@@ -201,11 +202,13 @@ const LoginPage: React.FC = () => {
                                         <Label htmlFor="username" className="mb-1">
                                             {LOGIN_LABELS.EMAIL_LABEL}
                                         </Label>
+
                                         <Input
                                             id="username"
+                                            name="username"
                                             type="email"
                                             value={username}
-                                            onChange={e => setUsername(e.target.value)}
+                                            onChange={handleInputChange}
                                             startIcon={
                                                 <IconFA icon="envelope" className="text-gray-400" />
                                             }
@@ -213,15 +216,18 @@ const LoginPage: React.FC = () => {
                                             className={`w-full ${isLoading ? 'opacity-70' : ''}`}
                                         />
                                     </div>
+
                                     <div>
                                         <Label htmlFor="password" className="mb-1">
                                             {LOGIN_LABELS.PASSWORD_LABEL}
                                         </Label>
+
                                         <Input
                                             id="password"
+                                            name="password"
                                             type="password"
                                             value={password}
-                                            onChange={e => setPassword(e.target.value)}
+                                            onChange={handleInputChange}
                                             startIcon={
                                                 <IconFA icon="lock" className="text-gray-400" />
                                             }
