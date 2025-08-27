@@ -1,7 +1,7 @@
-import {useState} from 'react';
-import {StudentFormData} from '../../module-utils/types';
-import {Student as ProfileStudent} from '../module-utils/types';
-import {Student as FormStudent} from '../../module-utils/types';
+import { useState } from 'react';
+import { StudentFormData } from '../../module-utils/types';
+import { Student as ProfileStudent } from '../module-utils/types';
+import { Student as FormStudent } from '../../module-utils/types';
 
 /**
  * Hook para gestionar los modales del perfil de estudiante
@@ -11,7 +11,9 @@ import {Student as FormStudent} from '../../module-utils/types';
  */
 export default function useStudentModals(
     student: ProfileStudent | null,
-    handleEditPersonalInfo: (data: StudentFormData) => Promise<{ success: boolean; error?: string }>,
+    handleEditPersonalInfo: (
+        data: Partial<ProfileStudent>,
+    ) => Promise<{ success: boolean; error?: string }>,
     isSaving: boolean,
 ) {
     // Estado para los modales
@@ -52,7 +54,23 @@ export default function useStudentModals(
     // Función para guardar los cambios del formulario de estudiante
     const handleSaveStudentInfo = async (formData: StudentFormData) => {
         try {
-            await handleEditPersonalInfo(formData);
+            // Convertir StudentFormData a Partial<ProfileStudent>
+            const profileData: Partial<ProfileStudent> = {
+                id: formData.id?.toString(),
+                full_name:
+                    `${formData.first_name} ${formData.father_last_name} ${formData.mother_last_name}`.trim(),
+                curp: formData.curp,
+                birth_date: formData.birth_date,
+                gender: {
+                    id: formData.gender_id.toString(),
+                    name: '', // This would need to be fetched or passed
+                },
+                email: formData.email,
+                phone: formData.phone,
+                avatar_url: formData.image_url,
+            };
+
+            await handleEditPersonalInfo(profileData);
             closeEditModal();
         } catch (error) {
             // Log removed for linting compliance

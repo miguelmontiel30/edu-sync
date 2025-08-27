@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Services
-import {
-    updateStudentBasicInfo,
-} from '../module-utils/services';
+import { updateStudentBasicInfo } from '../module-utils/services';
 
 // Types
 import { Student, Address, Tutor } from '../module-utils/types';
@@ -12,7 +10,14 @@ import { Student, Address, Tutor } from '../module-utils/types';
 /**
  * Hook para manejar las acciones del perfil de estudiante
  */
-const useStudentActions = (studentId: string, refreshData: { loadStudentData: () => void; loadAddresses: () => void; loadTutors: () => void }) => {
+const useStudentActions = (
+    studentId: string,
+    refreshData: {
+        loadStudentData: () => void;
+        loadAddresses?: () => void;
+        loadTutors?: () => void;
+    },
+) => {
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -33,7 +38,7 @@ const useStudentActions = (studentId: string, refreshData: { loadStudentData: ()
             const numericStudentId = parseInt(studentId);
             const { error } = await updateStudentBasicInfo(numericStudentId, {
                 ...data,
-                updated_at: new Date().toISOString()
+                updated_at: new Date().toISOString(),
             });
 
             if (error) throw error;
@@ -45,14 +50,17 @@ const useStudentActions = (studentId: string, refreshData: { loadStudentData: ()
         } catch (err: unknown) {
             // Log removed for linting compliance
             setError('No se pudo actualizar la información. Intenta nuevamente.');
-            return { success: false, error: err instanceof Error ? err.message : 'Error desconocido' };
+            return {
+                success: false,
+                error: err instanceof Error ? err.message : 'Error desconocido',
+            };
         } finally {
             setIsSaving(false);
         }
     };
 
     // Editar direcciones del estudiante
-    const handleEditAddresses = (_addressData: Address) => {
+    const handleEditAddresses = (_addressData?: Address) => {
         if (!studentId) return { success: false, error: 'ID de estudiante no válido' };
 
         setIsSaving(true);
@@ -62,7 +70,7 @@ const useStudentActions = (studentId: string, refreshData: { loadStudentData: ()
             // const numericStudentId = parseInt(studentId);
 
             // Si es dirección actual, actualizar las demás a no actuales
-            if (_addressData.is_current) {
+            if (_addressData?.is_current) {
                 // Esta lógica debería manejarse en el backend idealmente
             }
 
@@ -74,21 +82,24 @@ const useStudentActions = (studentId: string, refreshData: { loadStudentData: ()
 
             // if (error) throw error;
 
-            // // Recargar direcciones
-            // refreshData.loadAddresses();
+            //             // Recargar direcciones
+            // refreshData.loadAddresses?.();
 
             return { success: true };
         } catch (err: unknown) {
             // Log removed for linting compliance
             setError('No se pudo actualizar la dirección. Intenta nuevamente.');
-            return { success: false, error: err instanceof Error ? err.message : 'Error desconocido' };
+            return {
+                success: false,
+                error: err instanceof Error ? err.message : 'Error desconocido',
+            };
         } finally {
             setIsSaving(false);
         }
     };
 
     // Agregar tutor al estudiante
-    const handleAddTutor = (_tutorData: Tutor) => {
+    const handleAddTutor = (_tutorData?: Tutor) => {
         if (!studentId) return { success: false, error: 'ID de estudiante no válido' };
 
         setIsSaving(true);
@@ -107,13 +118,16 @@ const useStudentActions = (studentId: string, refreshData: { loadStudentData: ()
             // if (error) throw error;
 
             // // Recargar tutores
-            // refreshData.loadTutors();
+            // refreshData.loadTutors?.();
 
             return { success: true };
         } catch (err: unknown) {
             // Log removed for linting compliance
             setError('No se pudo agregar el tutor. Intenta nuevamente.');
-            return { success: false, error: err instanceof Error ? err.message : 'Error desconocido' };
+            return {
+                success: false,
+                error: err instanceof Error ? err.message : 'Error desconocido',
+            };
         } finally {
             setIsSaving(false);
         }
@@ -132,8 +146,8 @@ const useStudentActions = (studentId: string, refreshData: { loadStudentData: ()
         handleEditPersonalInfo,
         handleEditAddresses,
         handleAddTutor,
-        handleViewTutorDetails
+        handleViewTutorDetails,
     };
 };
 
-export default useStudentActions; 
+export default useStudentActions;

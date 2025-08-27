@@ -210,8 +210,8 @@ export interface EmergencyContact {
 }
 
 export interface InsuranceInfo {
-    provider: string;
-    policyNumber: string;
+    provider?: string;
+    policyNumber?: string;
 }
 
 export interface MedicalInfo {

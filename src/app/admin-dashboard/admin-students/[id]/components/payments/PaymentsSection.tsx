@@ -16,29 +16,63 @@ const PaymentsSection: React.FC<PaymentsSectionProps> = ({ payments }) => {
                         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead className="bg-gray-50 dark:bg-gray-800">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Concepto</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fecha</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Monto</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                                    >
+                                        Concepto
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                                    >
+                                        Fecha
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                                    >
+                                        Monto
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                                    >
+                                        Estado
+                                    </th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
-                                {payments.map((payment) => (
+                            <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-gray-900">
+                                {payments.map(payment => (
                                     <tr key={payment.id}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">{payment.month || payment.concept}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                            {payment.payment_date ? new Date(payment.payment_date).toLocaleDateString('es-MX') :
-                                                new Date(payment.date || new Date()).toLocaleDateString('es-MX')}
+                                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                                            {payment.month}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${payment.amount.toFixed(2)}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${payment.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                                                    payment.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                                                        'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}`}>
-                                                {payment.status === 'paid' ? 'Pagado' :
-                                                    payment.status === 'pending' ? 'Pendiente' :
-                                                        'Vencido'}
+                                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                            {payment.payment_date
+                                                ? new Date(payment.payment_date).toLocaleDateString(
+                                                      'es-MX',
+                                                  )
+                                                : new Date().toLocaleDateString('es-MX')}
+                                        </td>
+                                        <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                            ${payment.amount.toFixed(2)}
+                                        </td>
+                                        <td className="whitespace-nowrap px-6 py-4 text-sm">
+                                            <span
+                                                className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                                                    payment.status === 'paid'
+                                                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                                        : payment.status === 'pending'
+                                                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                                                }`}
+                                            >
+                                                {payment.status === 'paid'
+                                                    ? 'Pagado'
+                                                    : payment.status === 'pending'
+                                                      ? 'Pendiente'
+                                                      : 'Vencido'}
                                             </span>
                                         </td>
                                     </tr>
@@ -47,8 +81,11 @@ const PaymentsSection: React.FC<PaymentsSectionProps> = ({ payments }) => {
                         </table>
                     </div>
                 ) : (
-                    <div className="text-center py-8">
-                        <IconFA icon="receipt" className="text-gray-300 dark:text-gray-600 text-3xl mb-2" />
+                    <div className="py-8 text-center">
+                        <IconFA
+                            icon="receipt"
+                            className="mb-2 text-3xl text-gray-300 dark:text-gray-600"
+                        />
                         <p className="text-gray-500 dark:text-gray-400">No hay pagos registrados</p>
                     </div>
                 )}
@@ -57,4 +94,4 @@ const PaymentsSection: React.FC<PaymentsSectionProps> = ({ payments }) => {
     );
 };
 
-export default PaymentsSection; 
+export default PaymentsSection;

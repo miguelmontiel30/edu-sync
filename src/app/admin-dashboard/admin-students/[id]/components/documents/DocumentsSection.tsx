@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
-import { Document, DocumentStatus, DocumentType } from '../module-utils/types';
+import { Document, DocumentStatus, DocumentType } from '../../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 import { IconFA } from '@/components/ui';
 
