@@ -11,8 +11,8 @@ interface ProfileTabProps {
     addresses: Address[];
     tutors: Tutor[];
     onEdit: () => void;
-    onEditAddresses: (data: any) => void;
-    onAddTutor: (data: any) => void;
+    onEditAddresses: (data: Address) => void;
+    onAddTutor: (data: Tutor) => void;
     onViewTutorDetails: (id: number) => void;
 }
 

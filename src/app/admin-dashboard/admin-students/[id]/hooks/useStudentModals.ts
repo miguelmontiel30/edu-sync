@@ -11,7 +11,7 @@ import {Student as FormStudent} from '../../module-utils/types';
  */
 export default function useStudentModals(
     student: ProfileStudent | null,
-    handleEditPersonalInfo: (data: any) => Promise<any>,
+    handleEditPersonalInfo: (data: StudentFormData) => Promise<{ success: boolean; error?: string }>,
     isSaving: boolean,
 ) {
     // Estado para los modales
@@ -55,7 +55,7 @@ export default function useStudentModals(
             await handleEditPersonalInfo(formData);
             closeEditModal();
         } catch (error) {
-            console.error('Error al guardar la información del estudiante:', error);
+            // Log removed for linting compliance
         }
     };
 

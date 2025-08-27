@@ -18,7 +18,7 @@ export async function getStudentProfile(studentId: string): Promise<StudentProfi
  */
 export async function updateStudentBasicInfo(
     studentId: number,
-    data: any,
-): Promise<{success: boolean; error?: any}> {
+    data: Record<string, unknown>,
+): Promise<{success: boolean; error?: string}> {
     return await studentRepository.updateStudentInfo(studentId, data);
 }

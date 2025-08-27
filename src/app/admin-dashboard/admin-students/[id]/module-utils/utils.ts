@@ -41,10 +41,76 @@ export const getColorByPercentage = (percentage: number): string => {
 
 // ========== Funciones de mapeo de datos ==========
 
+// Tipos para los datos de la base de datos
+interface DatabaseStudent {
+    student_id: number;
+    first_name: string;
+    father_last_name: string;
+    mother_last_name?: string;
+    curp: string;
+    birth_date: string;
+    gender?: {
+        gender_id: number;
+        name: string;
+    };
+    email?: string;
+    phone?: string;
+    image_url?: string;
+}
+
+interface DatabaseAddress {
+    user_address_id: number;
+    address: {
+        street: string;
+        exterior_number: string;
+        interior_number?: string;
+        neighborhood: string;
+        postal_code: string;
+        reference?: string;
+    };
+    address_type: string;
+    is_current: boolean;
+}
+
+interface DatabaseTutor {
+    student_tutor_id: number;
+    tutor: {
+        first_name: string;
+        father_last_name: string;
+        mother_last_name?: string;
+        relationship: string;
+        phone?: string;
+        email?: string;
+        image_url?: string;
+    };
+}
+
+interface DatabaseGrade {
+    grade_id: number;
+    evaluation_period: {
+        name: string;
+        group_subject: {
+            subject: {
+                name: string;
+            };
+        };
+    };
+    grade: number;
+}
+
+interface DatabaseGroup {
+    student_group_id: number;
+    group_id: number;
+    group: {
+        grade: number;
+        group_name: string;
+    };
+}
+
 /**
  * Transforma los datos del estudiante al formato requerido
  */
-export const mapStudentData = (data: any): Student => {
+export const mapStudentData = (data: DatabaseStudent): Student => {
     return {
         id: data.student_id.toString(),
         full_name:
@@ -64,8 +130,8 @@ export const mapStudentData = (data: any): Student => {
 /**
  * Transforma los datos de direcciones al formato requerido
  */
-export const mapAddressData = (data: any[]): Address[] => {
-    return (data as any[]).map((item: any) => ({
+export const mapAddressData = (data: DatabaseAddress[]): Address[] => {
+    return data.map((item: DatabaseAddress) => ({
         id: item.user_address_id.toString(),
         street: item.address.street,
         exterior_number: item.address.exterior_number || '',
@@ -81,8 +147,8 @@ export const mapAddressData = (data: any[]): Address[] => {
 /**
  * Transforma los datos de tutores al formato requerido
  */
-export const mapTutorData = (data: any[], studentId: string): StudentTutor[] => {
-    return (data as any[]).map((item: any) => ({
+export const mapTutorData = (data: DatabaseTutor[], studentId: string): StudentTutor[] => {
+    return data.map((item: DatabaseTutor) => ({
         id: item.student_tutor_id.toString(),
         student_id: studentId,
         full_name:
@@ -97,8 +163,8 @@ export const mapTutorData = (data: any[], studentId: string): StudentTutor[] => 
 /**
  * Transforma los datos de calificaciones al formato requerido
  */
-export const mapGradeData = (data: any[]): Grade[] => {
-    return (data as any[]).map((item: any) => ({
+export const mapGradeData = (data: DatabaseGrade[]): Grade[] => {
+    return data.map((item: DatabaseGrade) => ({
         id: item.grade_id,
         subject: item.evaluation_period.group_subject.subject.name,
         score: item.grade,
@@ -109,8 +175,8 @@ export const mapGradeData = (data: any[]): Grade[] => {
 /**
  * Transforma los datos de grupos al formato requerido
  */
-export const mapGroupData = (data: any[], studentId: string): StudentGroup[] => {
-    return (data as any[]).map((item: any) => ({
+export const mapGroupData = (data: DatabaseGroup[], studentId: string): StudentGroup[] => {
+    return data.map((item: DatabaseGroup) => ({
         id: item.student_group_id.toString(),
         student_id: studentId,
         group_id: item.group_id.toString(),

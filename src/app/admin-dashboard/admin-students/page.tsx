@@ -85,7 +85,7 @@ export default function StudentsDashboard() {
     });
 
     // Navegar al perfil del estudiante
-    const handleRowClick = (student: any) => {
+    const handleRowClick = (student: { id: string | number }) => {
         router.push(`/admin-dashboard/admin-students/${student.id}`);
     };
 

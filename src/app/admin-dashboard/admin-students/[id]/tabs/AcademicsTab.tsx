@@ -120,7 +120,9 @@ const AcademicsTab: React.FC<AcademicsTabProps> = ({
                                     ]
                                 }
                             ]}
-                            onChange={(value: string) => console.log('Ciclo seleccionado:', value)}
+                            onChange={(_value: string) => {
+                                // Log removed for linting compliance
+                            }}
                         />
                     </div>
                 </div>
