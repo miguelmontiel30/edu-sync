@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import IconFA from '@/components/ui/IconFA';
 import Button from '@/components/core/button/Button';
 import { Calendar } from '@/components/core/calendar';
@@ -49,16 +50,6 @@ interface Task {
 interface NotificationsAndTasksProps {
     notifications: Notification[];
     tasks: Task[];
-}
-
-interface PerformanceData {
-    period: string;
-    average: number;
-    group: string;
-}
-
-interface PerformanceChartProps {
-    data: PerformanceData[];
 }
 
 interface Student {
@@ -326,17 +317,17 @@ function MetricCard({
 
 // Componente para el calendario integrado
 function TeacherCalendar({ events }: TeacherCalendarProps) {
-    const [selectedEvent, setSelectedEvent] = useState<any>(null);
+    const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-    const handleEventClick = (info: any) => {
+    const handleEventClick = (info: { event: CalendarEvent }) => {
         setSelectedEvent(info.event);
         setIsModalOpen(true);
     };
 
-    const handleDateSelect = (selectInfo: any) => {
+    const handleDateSelect = (_selectInfo: unknown) => {
         // Implementar lógica para crear nuevo evento
-        console.log('Date selected', selectInfo);
+        // Log removed for linting compliance
     };
 
     const handleAddEventClick = () => {
@@ -381,12 +372,19 @@ function TeacherCalendar({ events }: TeacherCalendarProps) {
                         <div className="mb-4">
                             <p className="mb-2 text-sm text-gray-600 dark:text-gray-300">
                                 <IconFA icon="calendar" className="mr-2" />
-                                {new Date(selectedEvent.start).toLocaleDateString()}
+                                {selectedEvent.startStr
+                                    ? new Date(selectedEvent.startStr).toLocaleDateString()
+                                    : 'Fecha no disponible'}
                             </p>
                             <p className="mb-2 text-sm text-gray-600 dark:text-gray-300">
                                 <IconFA icon="clock" className="mr-2" />
-                                {new Date(selectedEvent.start).toLocaleTimeString()} -{' '}
-                                {new Date(selectedEvent.end).toLocaleTimeString()}
+                                {selectedEvent.startStr
+                                    ? new Date(selectedEvent.startStr).toLocaleTimeString()
+                                    : 'Hora no disponible'}{' '}
+                                -{' '}
+                                {selectedEvent.endStr
+                                    ? new Date(selectedEvent.endStr).toLocaleTimeString()
+                                    : 'Hora no disponible'}
                             </p>
                         </div>
 
@@ -419,14 +417,14 @@ function TeacherCalendar({ events }: TeacherCalendarProps) {
 function NotificationsAndTasks({ notifications, tasks }: NotificationsAndTasksProps) {
     const [activeTab, setActiveTab] = useState('notifications');
 
-    const toggleTask = (taskId: number) => {
+    const toggleTask = (_taskId: number) => {
         // Implementar lógica para marcar/desmarcar tarea
-        console.log('Toggle task', taskId);
+        // Log removed for linting compliance
     };
 
-    const handleAction = (item: Notification | Task, action: string) => {
+    const handleAction = (_item: Notification | Task, _action: string) => {
         // Implementar lógica para acciones rápidas
-        console.log('Action', action, 'for item', item);
+        // Log removed for linting compliance
     };
 
     return (
@@ -581,9 +579,11 @@ function StudentsTable({ students }: StudentsTableProps) {
                         className="flex items-center justify-between rounded-lg p-2 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                     >
                         <div className="flex items-center">
-                            <img
+                            <Image
                                 src={student.avatar}
                                 alt={student.name}
+                                width={40}
+                                height={40}
                                 className="h-10 w-10 rounded-full object-cover"
                             />
                             <div className="ml-3">
@@ -654,7 +654,7 @@ function Messages({ messages }: MessagesProps) {
     const handleSendMessage = (text: string) => {
         if (activeConversation) {
             // En una implementación real, aquí enviarías el mensaje a un API
-            console.log(`Enviando mensaje a ${activeConversation.contact.name}: ${text}`);
+            // Log removed for linting compliance
 
             // Simulamos añadir el mensaje a la conversación
             const newMessage = {
@@ -692,9 +692,11 @@ function Messages({ messages }: MessagesProps) {
                             className="flex cursor-pointer items-start rounded-lg p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
                             onClick={() => handleMessageClick(message)}
                         >
-                            <img
+                            <Image
                                 src={message.avatar}
                                 alt={message.sender}
+                                width={36}
+                                height={36}
                                 className="h-9 w-9 rounded-full object-cover"
                             />
                             <div className="ml-3 flex-1">
@@ -751,7 +753,9 @@ function QuickActions() {
                     <button
                         key={action.action}
                         className="flex flex-col items-center justify-center rounded-lg border border-gray-200 p-3 text-center transition hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-                        onClick={() => console.log('Quick action:', action.action)}
+                        onClick={() => {
+                            // Quick action handler - implement actual logic here
+                        }}
                     >
                         <IconFA
                             icon={action.icon}
@@ -779,7 +783,9 @@ export default function TeacherDashboardPage() {
             badgeText: '2 hoy',
             badgeColor: 'primary',
             tooltip: 'Número total de grupos asignados',
-            onClick: () => console.log('Navigate to classes'),
+            onClick: () => {
+                // Navigate to classes - implement actual navigation here
+            },
         },
         {
             id: 'upcoming-evaluations',
@@ -789,7 +795,9 @@ export default function TeacherDashboardPage() {
             badgeText: `${teacherData.upcomingEvaluations[0]?.subject} - ${teacherData.upcomingEvaluations[0]?.date}`,
             badgeColor: 'warning',
             tooltip: 'Evaluaciones programadas próximamente',
-            onClick: () => console.log('Navigate to evaluations'),
+            onClick: () => {
+                // Navigate to evaluations - implement actual navigation here
+            },
         },
         {
             id: 'total-students',
@@ -799,7 +807,9 @@ export default function TeacherDashboardPage() {
             badgeText: `${teacherData.activeClasses} grupos`,
             badgeColor: 'success',
             tooltip: 'Total de alumnos únicos en todos tus grupos',
-            onClick: () => console.log('Navigate to students'),
+            onClick: () => {
+                // Navigate to students - implement actual navigation here
+            },
         },
         {
             id: 'average-grade',
@@ -809,7 +819,9 @@ export default function TeacherDashboardPage() {
             badgeText: '+0.3 vs anterior',
             badgeColor: 'info',
             tooltip: 'Nota media ponderada de todas tus calificaciones',
-            onClick: () => console.log('Navigate to grades'),
+            onClick: () => {
+                // Navigate to grades - implement actual navigation here
+            },
         },
     ];
 

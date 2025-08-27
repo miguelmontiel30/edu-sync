@@ -31,7 +31,7 @@ const formatDate = (dateString: string): string => {
     return date.toLocaleDateString('es-ES', {
         day: 'numeric',
         month: 'short',
-        year: 'numeric'
+        year: 'numeric',
     });
 };
 
@@ -39,14 +39,19 @@ const PendingTasksList: React.FC<PendingTasksListProps> = ({
     tasks,
     onMarkComplete,
     onUploadTask,
-    isLoading = false
+    isLoading = false,
 }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [subjectFilter, setSubjectFilter] = useState('all');
 
     // Filtrar tareas pendientes y ordenarlas por fecha de entrega
     const pendingTasks = tasks
-        .filter(task => task.status === 'pendiente' || task.status === 'en-progreso' || task.status === 'vencida')
+        .filter(
+            task =>
+                task.status === 'pendiente' ||
+                task.status === 'en-progreso' ||
+                task.status === 'vencida',
+        )
         .filter(task => {
             const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesSubject = subjectFilter === 'all' || task.subject === subjectFilter;
@@ -60,12 +65,14 @@ const PendingTasksList: React.FC<PendingTasksListProps> = ({
     // Manejar estado de carga
     if (isLoading) {
         return (
-            <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
                 <div className="flex items-center space-x-2">
                     <IconFA icon="tasks" className="text-primary-500" />
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Tareas Pendientes</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+                        Tareas Pendientes
+                    </h3>
                 </div>
-                <div className="flex items-center justify-center h-40">
+                <div className="flex h-40 items-center justify-center">
                     <IconFA icon="spinner" spin size="xl" className="text-primary-500" />
                 </div>
             </div>
@@ -73,11 +80,13 @@ const PendingTasksList: React.FC<PendingTasksListProps> = ({
     }
 
     return (
-        <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
-            <div className="flex items-center justify-between mb-4">
+        <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
+            <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                     <IconFA icon="tasks" className="text-primary-500" />
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">Tareas Pendientes</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+                        Tareas Pendientes
+                    </h3>
                 </div>
                 {pendingTasks.length > 0 && (
                     <NotificationBadge
@@ -88,28 +97,33 @@ const PendingTasksList: React.FC<PendingTasksListProps> = ({
             </div>
 
             {/* Filtros */}
-            <div className="flex flex-wrap gap-4 mb-4">
-                <div className="flex-1 min-w-0">
+            <div className="mb-4 flex flex-wrap gap-4">
+                <div className="min-w-0 flex-1">
                     <div className="relative">
-                        <IconFA icon="search" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                        <IconFA
+                            icon="search"
+                            className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400 dark:text-gray-500"
+                        />
                         <input
                             type="text"
                             placeholder="Buscar tareas..."
-                            className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="focus:ring-primary-500 w-full rounded-lg border border-gray-200 bg-white py-2 pl-10 pr-4 text-gray-800 focus:border-transparent focus:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={e => setSearchTerm(e.target.value)}
                         />
                     </div>
                 </div>
 
                 <select
-                    className="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-2 focus:ring-primary-500"
+                    className="focus:ring-primary-500 rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-800 focus:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                     value={subjectFilter}
-                    onChange={(e) => setSubjectFilter(e.target.value)}
+                    onChange={e => setSubjectFilter(e.target.value)}
                 >
                     <option value="all">Todas las materias</option>
                     {subjects.map(subject => (
-                        <option key={subject} value={subject}>{subject}</option>
+                        <option key={subject} value={subject}>
+                            {subject}
+                        </option>
                     ))}
                 </select>
             </div>
@@ -117,9 +131,13 @@ const PendingTasksList: React.FC<PendingTasksListProps> = ({
             {/* Estado vacío */}
             {pendingTasks.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
-                    <IconFA icon="check-circle" size="2xl" className="text-success-500 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-800 dark:text-white/90 mb-2">No hay tareas pendientes</h3>
-                    <p className="text-gray-500 dark:text-gray-400">¡Excelente trabajo! El estudiante está al día con sus actividades.</p>
+                    <IconFA icon="check-circle" size="2xl" className="mb-4 text-success-500" />
+                    <h3 className="mb-2 text-lg font-medium text-gray-800 dark:text-white/90">
+                        No hay tareas pendientes
+                    </h3>
+                    <p className="text-gray-500 dark:text-gray-400">
+                        ¡Excelente trabajo! El estudiante está al día con sus actividades.
+                    </p>
                 </div>
             )}
 
@@ -127,11 +145,14 @@ const PendingTasksList: React.FC<PendingTasksListProps> = ({
             {pendingTasks.length > 0 && (
                 <div className="space-y-3">
                     {pendingTasks.map(task => (
-                        <div key={task.id} className="border-l-4 border-primary-200 dark:border-primary-800 pl-4 py-3">
+                        <div
+                            key={task.id}
+                            className="border-primary-200 dark:border-primary-800 border-l-4 py-3 pl-4"
+                        >
                             <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
+                                    <div className="mb-1 flex items-center gap-2">
+                                        <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-200">
                                             {task.subject}
                                         </span>
                                         {getStatusBadge(task.status)}
@@ -141,13 +162,16 @@ const PendingTasksList: React.FC<PendingTasksListProps> = ({
                                         {task.title}
                                     </h4>
 
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                                    <p className="mt-1 line-clamp-2 text-xs text-gray-500 dark:text-gray-400">
                                         {task.description}
                                     </p>
 
-                                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                    <div className="mt-2 flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                                         <div className="flex items-center gap-1">
-                                            <IconFA icon="calendar-alt" className="text-primary-500" />
+                                            <IconFA
+                                                icon="calendar-alt"
+                                                className="text-primary-500"
+                                            />
                                             <span>Entrega: {formatDate(task.dueDate)}</span>
                                         </div>
 
@@ -175,7 +199,7 @@ const PendingTasksList: React.FC<PendingTasksListProps> = ({
                                         onClick={() => {
                                             const input = document.createElement('input');
                                             input.type = 'file';
-                                            input.onchange = (e) => {
+                                            input.onchange = e => {
                                                 const target = e.target as HTMLInputElement;
                                                 if (target.files && target.files[0]) {
                                                     onUploadTask(task.id, target.files[0]);
@@ -197,8 +221,10 @@ const PendingTasksList: React.FC<PendingTasksListProps> = ({
             {pendingTasks.length > 5 && (
                 <Button
                     variant="outline"
-                    className="w-full mt-4"
-                    onClick={() => console.log('Ver todas las tareas')}
+                    className="mt-4 w-full"
+                    onClick={() => {
+                        // View all tasks - implement actual logic here
+                    }}
                 >
                     Ver todas las tareas
                 </Button>

@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { DocumentTemplate, DocumentTemplateType } from '../module-utils/types';
+import {
+    DocumentTemplate,
+    DocumentTemplateType,
+} from '@/app/admin-dashboard/admin-students/[id]/module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 import { IconFA } from '@/components/ui';
 
@@ -14,7 +17,7 @@ const getTemplateTypeLabel = (type: DocumentTemplateType): string => {
         boleta: 'Boleta de calificaciones',
         constancia: 'Constancia de estudios',
         certificado: 'Certificado escolar',
-        recibo: 'Recibo de pago'
+        recibo: 'Recibo de pago',
     };
     return labels[type];
 };
@@ -25,14 +28,14 @@ const getTemplateIcon = (type: DocumentTemplateType): string => {
         boleta: 'file-lines',
         constancia: 'file-certificate',
         certificado: 'certificate',
-        recibo: 'receipt'
+        recibo: 'receipt',
     };
     return icons[type];
 };
 
 const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
     templates,
-    onGenerateDocument
+    onGenerateDocument,
 }) => {
     // Estado para controlar el modal de parámetros
     const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null);
@@ -41,13 +44,16 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
     const [isGenerating, setIsGenerating] = useState(false);
 
     // Agrupar plantillas por tipo
-    const templatesByType = templates.reduce((acc, template) => {
-        if (!acc[template.type]) {
-            acc[template.type] = [];
-        }
-        acc[template.type].push(template);
-        return acc;
-    }, {} as Record<DocumentTemplateType, DocumentTemplate[]>);
+    const templatesByType = templates.reduce(
+        (acc, template) => {
+            if (!acc[template.type]) {
+                acc[template.type] = [];
+            }
+            acc[template.type].push(template);
+            return acc;
+        },
+        {} as Record<DocumentTemplateType, DocumentTemplate[]>,
+    );
 
     // Abrir modal con la plantilla seleccionada
     const handleSelectTemplate = (template: DocumentTemplate) => {
@@ -90,35 +96,46 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
 
     return (
         <>
-            <ComponentCard title="Documentos Disponibles" desc="Genera y descarga documentos oficiales">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <ComponentCard
+                title="Documentos Disponibles"
+                desc="Genera y descarga documentos oficiales"
+            >
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {Object.entries(templatesByType).map(([type, typeTemplates]) => (
-                        <div key={type} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                            <div className="flex items-center mb-3">
+                        <div
+                            key={type}
+                            className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+                        >
+                            <div className="mb-3 flex items-center">
                                 <IconFA
                                     icon={getTemplateIcon(type as DocumentTemplateType)}
                                     className="text-primary-500 mr-3"
                                     size="lg"
                                 />
-                                <h3 className="font-medium">{getTemplateTypeLabel(type as DocumentTemplateType)}</h3>
+                                <h3 className="font-medium">
+                                    {getTemplateTypeLabel(type as DocumentTemplateType)}
+                                </h3>
                             </div>
 
-                            <div className="space-y-3 mt-4">
+                            <div className="mt-4 space-y-3">
                                 {typeTemplates.map(template => (
                                     <div
                                         key={template.id}
-                                        className="flex justify-between items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-md transition-colors cursor-pointer"
+                                        className="flex cursor-pointer items-center justify-between rounded-md p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
                                         onClick={() => handleSelectTemplate(template)}
                                     >
                                         <div>
                                             <p className="font-medium">{template.name}</p>
                                             {template.description && (
-                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                                     {template.description}
                                                 </p>
                                             )}
                                         </div>
-                                        <button type="button" className="bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 p-2 rounded-full hover:bg-primary-100 dark:hover:bg-primary-800/30 transition-colors">
+                                        <button
+                                            type="button"
+                                            className="bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-800/30 rounded-full p-2 transition-colors"
+                                        >
                                             <IconFA icon="download" />
                                         </button>
                                     </div>
@@ -129,15 +146,18 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
                 </div>
 
                 {/* Instrucciones */}
-                <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm text-blue-700 dark:text-blue-300">
+                <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300">
                     <div className="flex">
-                        <IconFA icon="circle-info" className="text-blue-500 mr-3 mt-0.5" />
+                        <IconFA icon="circle-info" className="mr-3 mt-0.5 text-blue-500" />
                         <div>
-                            <p className="font-medium mb-1">¿Cómo descargar un documento?</p>
-                            <ol className="list-decimal pl-5 space-y-1">
+                            <p className="mb-1 font-medium">¿Cómo descargar un documento?</p>
+                            <ol className="list-decimal space-y-1 pl-5">
                                 <li>Selecciona el tipo de documento que necesitas</li>
                                 <li>Completa los parámetros requeridos (fecha, período, etc.)</li>
-                                <li>Haz clic en "Generar" y el documento se abrirá en una nueva pestaña</li>
+                                <li>
+                                    Haz clic en &quot;Generar&quot; y el documento se abrirá en una
+                                    nueva pestaña
+                                </li>
                                 <li>Descarga o imprime el documento desde tu navegador</li>
                             </ol>
                         </div>
@@ -147,10 +167,12 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
 
             {/* Modal para parámetros */}
             {isModalOpen && selectedTemplate && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md p-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="font-medium text-lg">Generar: {selectedTemplate.name}</h3>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+                    <div className="w-full max-w-md rounded-lg bg-white p-6 dark:bg-gray-800">
+                        <div className="mb-4 flex items-center justify-between">
+                            <h3 className="text-lg font-medium">
+                                Generar: {selectedTemplate.name}
+                            </h3>
                             <button
                                 type="button"
                                 onClick={() => setIsModalOpen(false)}
@@ -163,14 +185,15 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
                         <div className="space-y-4">
                             {selectedTemplate.availableParams.map(param => (
                                 <div key={param}>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                        {param.charAt(0).toUpperCase() + param.slice(1).replace(/([A-Z])/g, ' $1')}
+                                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        {param.charAt(0).toUpperCase() +
+                                            param.slice(1).replace(/([A-Z])/g, ' $1')}
                                     </label>
                                     <input
                                         type="text"
-                                        className="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-700 text-sm py-2"
+                                        className="w-full rounded-md border-gray-300 py-2 text-sm dark:border-gray-700 dark:bg-gray-700"
                                         value={params[param] || ''}
-                                        onChange={(e) => handleParamChange(param, e.target.value)}
+                                        onChange={e => handleParamChange(param, e.target.value)}
                                     />
                                 </div>
                             ))}
@@ -180,14 +203,14 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
                             <button
                                 type="button"
                                 onClick={() => setIsModalOpen(false)}
-                                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                className="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                             >
                                 Cancelar
                             </button>
                             <button
                                 type="button"
                                 onClick={handleGenerateDocument}
-                                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md flex items-center"
+                                className="bg-primary-500 hover:bg-primary-600 flex items-center rounded-md px-4 py-2 text-white"
                                 disabled={isGenerating}
                             >
                                 {isGenerating ? (
@@ -210,4 +233,4 @@ const DocumentTemplatesList: React.FC<DocumentTemplatesListProps> = ({
     );
 };
 
-export default DocumentTemplatesList; 
+export default DocumentTemplatesList;

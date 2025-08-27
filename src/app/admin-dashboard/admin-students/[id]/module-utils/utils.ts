@@ -41,10 +41,77 @@ export const getColorByPercentage = (percentage: number): string => {
 
 // ========== Funciones de mapeo de datos ==========
 
+// Tipos para los datos de la base de datos
+interface DatabaseStudentResponse {
+    student_id: number;
+    first_name: string;
+    father_last_name: string;
+    mother_last_name?: string;
+    curp: string;
+    birth_date: string;
+    gender?: Array<{
+        gender_id: number;
+        name: string;
+    }>;
+    email?: string;
+    phone?: string;
+    image_url?: string;
+}
+
+interface DatabaseAddressResponse {
+    user_address_id: number;
+    address: Array<{
+        street: string;
+        exterior_number: string;
+        interior_number?: string;
+        neighborhood: string;
+        postal_code: string;
+        reference?: string;
+    }>;
+    address_type: string;
+    is_current: boolean;
+}
+
+interface DatabaseTutorResponse {
+    student_tutor_id: number;
+    tutor: Array<{
+        first_name: string;
+        father_last_name: string;
+        mother_last_name?: string;
+        relationship: string;
+        phone?: string;
+        email?: string;
+        image_url?: string;
+    }>;
+}
+
+interface DatabaseGradeResponse {
+    grade_id: number;
+    evaluation_period: Array<{
+        name: string;
+        end_date?: string;
+        group_subject: Array<{
+            subject: Array<{
+                name: string;
+            }>;
+        }>;
+    }>;
+    grade: number;
+}
+
+interface DatabaseGroupResponse {
+    student_group_id: number;
+    group_id: number;
+    group: Array<{
+        grade: number;
+        group_name: string;
+    }>;
+}
+
 /**
  * Transforma los datos del estudiante al formato requerido
  */
-export const mapStudentData = (data: any): Student => {
+export const mapStudentData = (data: DatabaseStudentResponse): Student => {
     return {
         id: data.student_id.toString(),
         full_name:
@@ -52,8 +119,8 @@ export const mapStudentData = (data: any): Student => {
         curp: data.curp,
         birth_date: data.birth_date,
         gender: {
-            id: (data.gender?.gender_id || '0').toString(),
-            name: data.gender?.name || 'No especificado',
+            id: (data.gender?.[0]?.gender_id || '0').toString(),
+            name: data.gender?.[0]?.name || 'No especificado',
         },
         email: data.email || undefined,
         phone: data.phone || undefined,
@@ -64,60 +131,61 @@ export const mapStudentData = (data: any): Student => {
 /**
  * Transforma los datos de direcciones al formato requerido
  */
-export const mapAddressData = (data: any[]): Address[] => {
-    return (data as any[]).map((item: any) => ({
+export const mapAddressData = (data: DatabaseAddressResponse[]): Address[] => {
+    return data.map((item: DatabaseAddressResponse) => ({
         id: item.user_address_id.toString(),
-        street: item.address.street,
-        exterior_number: item.address.exterior_number || '',
-        interior_number: item.address.interior_number || undefined,
-        neighborhood: item.address.neighborhood,
-        postal_code: item.address.postal_code,
+        street: item.address[0]?.street || '',
+        exterior_number: item.address[0]?.exterior_number || '',
+        interior_number: item.address[0]?.interior_number || undefined,
+        neighborhood: item.address[0]?.neighborhood || '',
+        postal_code: item.address[0]?.postal_code || '',
         address_type: item.address_type === 'home' ? 'home' : 'other',
         is_current: item.is_current,
-        reference: item.address.reference || undefined,
+        reference: item.address[0]?.reference || undefined,
     }));
 };
 
 /**
  * Transforma los datos de tutores al formato requerido
  */
-export const mapTutorData = (data: any[], studentId: string): StudentTutor[] => {
-    return (data as any[]).map((item: any) => ({
+export const mapTutorData = (data: DatabaseTutorResponse[], studentId: string): StudentTutor[] => {
+    return data.map((item: DatabaseTutorResponse) => ({
         id: item.student_tutor_id.toString(),
         student_id: studentId,
         full_name:
-            `${item.tutor.first_name} ${item.tutor.father_last_name} ${item.tutor.mother_last_name || ''}`.trim(),
-        relationship: item.tutor.relationship,
-        phone: item.tutor.phone || undefined,
-        email: item.tutor.email || undefined,
-        avatar_url: item.tutor.image_url || undefined,
+            `${item.tutor[0]?.first_name || ''} ${item.tutor[0]?.father_last_name || ''} ${item.tutor[0]?.mother_last_name || ''}`.trim(),
+        relationship: item.tutor[0]?.relationship || '',
+        phone: item.tutor[0]?.phone || undefined,
+        email: item.tutor[0]?.email || undefined,
+        avatar_url: item.tutor[0]?.image_url || undefined,
     }));
 };
 
 /**
  * Transforma los datos de calificaciones al formato requerido
  */
-export const mapGradeData = (data: any[]): Grade[] => {
-    return (data as any[]).map((item: any) => ({
-        id: item.grade_id,
-        subject: item.evaluation_period.group_subject.subject.name,
+export const mapGradeData = (data: DatabaseGradeResponse[]): Grade[] => {
+    return data.map((item: DatabaseGradeResponse) => ({
+        id: item.grade_id.toString(),
+        subject: item.evaluation_period[0]?.group_subject[0]?.subject[0]?.name || '',
         score: item.grade,
-        period: item.evaluation_period.name,
+        period: item.evaluation_period[0]?.name || '',
+        date: item.evaluation_period[0]?.end_date || new Date().toISOString().split('T')[0],
     }));
 };
 
 /**
  * Transforma los datos de grupos al formato requerido
  */
-export const mapGroupData = (data: any[], studentId: string): StudentGroup[] => {
-    return (data as any[]).map((item: any) => ({
+export const mapGroupData = (data: DatabaseGroupResponse[], studentId: string): StudentGroup[] => {
+    return data.map((item: DatabaseGroupResponse) => ({
         id: item.student_group_id.toString(),
         student_id: studentId,
         group_id: item.group_id.toString(),
         group: {
             id: item.group_id.toString(),
-            name: `${item.group.grade}°${item.group.group_name}`,
-            grade: item.group.grade.toString(),
+            name: `${item.group[0]?.grade || ''}°${item.group[0]?.group_name || ''}`,
+            grade: (item.group[0]?.grade || '').toString(),
             level: 'Primaria', // Este dato no está en la DB, lo generamos
         },
     }));
@@ -172,10 +240,11 @@ export const generateMockGrades = (): Grade[] => {
     ];
 
     return subjects.map((subject, index) => ({
-        id: index + 1,
+        id: (index + 1).toString(),
         subject,
         score: Math.floor(Math.random() * 3) + 7 + Math.random(), // Genera calificaciones entre 7.0 y 10.0
         period: '2024-1',
+        date: new Date().toISOString().split('T')[0],
     }));
 };
 

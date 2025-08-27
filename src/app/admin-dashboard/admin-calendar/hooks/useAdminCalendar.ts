@@ -76,7 +76,7 @@ export function useAdminCalendar() {
             } else {
                 setIsLoading(false);
             }
-        } catch (error) {
+        } catch (_error) {
             setIsLoading(false);
         }
     };

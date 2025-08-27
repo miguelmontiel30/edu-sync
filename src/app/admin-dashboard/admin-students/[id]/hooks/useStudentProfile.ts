@@ -46,7 +46,7 @@ export default function useStudentProfile(studentId: string) {
             // Obtener el perfil completo usando el servicio
             const profileData = await getStudentProfile(studentId);
 
-            console.log('profileData: ', profileData);
+            // Log removed for linting compliance
 
             // Actualizar los estados con los datos obtenidos
             setStudent(profileData.student);
@@ -70,7 +70,7 @@ export default function useStudentProfile(studentId: string) {
                 groups: false,
             });
         } catch (error) {
-            console.error('Error loading student data:', error);
+            // Log removed for linting compliance
 
             // Manejar el error
             setErrorState(prev => ({

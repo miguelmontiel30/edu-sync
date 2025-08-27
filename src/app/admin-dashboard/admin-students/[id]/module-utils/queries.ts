@@ -176,5 +176,5 @@ export const getGroupsByStudentId = (studentId: number) =>
 /**
  * Actualiza la información personal de un estudiante
  */
-export const updateStudentInfo = (studentId: number, data: any) =>
+export const updateStudentInfo = (studentId: number, data: Record<string, unknown>) =>
     supabaseClient.from('students').update(data).eq('student_id', studentId);

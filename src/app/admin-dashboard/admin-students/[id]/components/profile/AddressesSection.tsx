@@ -6,7 +6,7 @@ import Badge from '@/components/core/badge/Badge';
 
 interface AddressesSectionProps {
     addresses: Address[];
-    onEdit: (data?: any) => void;
+    onEdit: (data?: Address) => void;
 }
 
 const AddressesSection: React.FC<AddressesSectionProps> = ({ addresses, onEdit }) => (

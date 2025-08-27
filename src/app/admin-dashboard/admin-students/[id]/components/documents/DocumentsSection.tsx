@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Document, DocumentStatus, DocumentType } from '../module-utils/types';
+import Image from 'next/image';
+import { Document, DocumentStatus, DocumentType } from '../../module-utils/types';
 import ComponentCard from '@/components/common/ComponentCard';
 import { IconFA } from '@/components/ui';
 
@@ -100,9 +101,11 @@ const DocumentUploadCard: React.FC<{
                                 <span className="text-sm">{document.name}</span>
                             </div>
                         ) : (
-                            <img
+                            <Image
                                 src={document.fileUrl}
                                 alt={getDocumentLabel(type)}
+                                width={200}
+                                height={128}
                                 className="h-full w-full object-cover"
                             />
                         )}

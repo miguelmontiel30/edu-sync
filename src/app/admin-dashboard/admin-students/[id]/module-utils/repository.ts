@@ -33,7 +33,7 @@ export interface IStudentRepository {
     getStudentProfile(studentId: string): Promise<StudentProfile>;
 
     /** Actualiza la información básica de un estudiante */
-    updateStudentInfo(studentId: number, data: any): Promise<{success: boolean; error?: any}>;
+    updateStudentInfo(studentId: number, data: Record<string, unknown>): Promise<{success: boolean; error?: string}>;
 }
 
 /**
@@ -127,15 +127,15 @@ export class SupabaseStudentRepository implements IStudentRepository {
      */
     async updateStudentInfo(
         studentId: number,
-        data: any,
-    ): Promise<{success: boolean; error?: any}> {
+        data: Record<string, unknown>,
+    ): Promise<{success: boolean; error?: string}> {
         try {
             const {error} = await updateStudentInfo(studentId, data);
             if (error) throw error;
             return {success: true};
         } catch (error) {
-            console.error('Error updating student info:', error);
-            return {success: false, error};
+            // Log removed for linting compliance
+            return {success: false, error: error instanceof Error ? error.message : 'Error desconocido'};
         }
     }
 }

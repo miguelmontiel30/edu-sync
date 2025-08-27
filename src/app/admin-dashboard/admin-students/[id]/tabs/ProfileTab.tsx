@@ -11,8 +11,8 @@ interface ProfileTabProps {
     addresses: Address[];
     tutors: Tutor[];
     onEdit: () => void;
-    onEditAddresses: (data: any) => void;
-    onAddTutor: (data: any) => void;
+    onEditAddresses: (data?: Address) => void;
+    onAddTutor: (data?: Tutor) => void;
     onViewTutorDetails: (id: number) => void;
 }
 
@@ -23,14 +23,14 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
     onEdit,
     onEditAddresses,
     onAddTutor,
-    onViewTutorDetails
+    onViewTutorDetails,
 }) => {
     if (!student) return null;
 
     return (
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-4">
             {/* Columna izquierda */}
-            <div className="xl:col-span-1 space-y-6">
+            <div className="space-y-6 xl:col-span-1">
                 {/* Perfil del estudiante */}
                 <ProfileHeader student={student} />
 
@@ -39,28 +39,22 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             </div>
 
             {/* Columna derecha */}
-            <div className="xl:col-span-3 space-y-6">
+            <div className="space-y-6 xl:col-span-3">
                 {/* Información personal */}
-                <PersonalInfoSection
-                    student={student}
-                    onEdit={onEdit}
-                />
+                <PersonalInfoSection student={student} onEdit={onEdit} />
 
                 {/* Direcciones */}
-                <AddressesSection
-                    addresses={addresses}
-                    onEdit={onEditAddresses}
-                />
+                <AddressesSection addresses={addresses} onEdit={onEditAddresses} />
 
                 {/* Tutores */}
                 <TutorsSection
                     tutors={tutors}
                     onAddTutor={onAddTutor}
-                    onViewTutorDetails={(id) => onViewTutorDetails(Number(id))}
+                    onViewTutorDetails={id => onViewTutorDetails(Number(id))}
                 />
             </div>
         </div>
     );
 };
 
-export default ProfileTab; 
+export default ProfileTab;

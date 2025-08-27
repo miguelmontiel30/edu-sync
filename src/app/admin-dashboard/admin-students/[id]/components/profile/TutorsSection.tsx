@@ -6,7 +6,7 @@ import { Tutor } from '../../module-utils/types';
 
 interface TutorsSectionProps {
     tutors: Tutor[];
-    onAddTutor: (data?: any) => void;
+    onAddTutor: (data?: Tutor) => void;
     onViewTutorDetails: (tutorId: string) => void;
 }
 

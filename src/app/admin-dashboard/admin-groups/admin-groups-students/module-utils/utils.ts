@@ -20,7 +20,7 @@ export const calculateAge = (birthDate: string): number => {
 
     // Verificar si la fecha de nacimiento es válida
     if (isNaN(birth.getTime())) {
-        console.warn('Fecha de nacimiento inválida:', birthDate);
+        // Log removed for linting compliance
         return 0;
     }
 

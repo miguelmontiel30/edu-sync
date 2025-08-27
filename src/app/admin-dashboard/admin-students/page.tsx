@@ -23,7 +23,7 @@ import { useStudentManagement, useMetricsConfig, useTableConfig } from './hooks'
 
 export default function StudentsDashboard() {
     const router = useRouter();
-    
+
     // Usar hook principal para gestión de estudiantes
     const {
         students,
@@ -52,22 +52,49 @@ export default function StudentsDashboard() {
     const chartData = useMemo(() => {
         // Verificar si hay estudiantes
         if (!students || students.length === 0) {
-            // Devolvemos datos mínimos necesarios
+            // Devolvemos datos mínimos necesarios con la estructura completa
             return [
                 {
                     id: 0,
                     name: 'Sin datos',
                     full_name: 'Sin datos',
-                    status_id: 0,
+                    school_id: 0,
+                    first_name: 'Sin',
+                    father_last_name: 'datos',
+                    mother_last_name: '',
+                    birth_date: '',
                     gender_id: 0,
+                    gender: undefined,
+                    curp: '',
+                    phone: '',
+                    email: '',
+                    status_id: 0,
+                    status: undefined,
+                    image_url: null,
+                    age: undefined,
                 },
             ];
         }
 
         // Tenemos estudiantes, los mapeamos con solo las propiedades necesarias
         return students.map(student => ({
-            ...student,
+            id: student.id,
             name: student.full_name || 'Sin nombre',
+            // Incluir todas las propiedades necesarias para los gráficos
+            school_id: student.school_id,
+            first_name: student.first_name,
+            father_last_name: student.father_last_name,
+            mother_last_name: student.mother_last_name,
+            birth_date: student.birth_date,
+            gender_id: student.gender_id,
+            gender: student.gender,
+            curp: student.curp,
+            phone: student.phone,
+            email: student.email,
+            status_id: student.status_id,
+            status: student.status,
+            image_url: student.image_url,
+            age: student.age,
         }));
     }, [students]);
 
@@ -85,7 +112,7 @@ export default function StudentsDashboard() {
     });
 
     // Navegar al perfil del estudiante
-    const handleRowClick = (student: any) => {
+    const handleRowClick = (student: { id: string | number }) => {
         router.push(`/admin-dashboard/admin-students/${student.id}`);
     };
 
